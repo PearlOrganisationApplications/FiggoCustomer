@@ -5,77 +5,88 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    android:background="@color/colorlightblue"
-    >
+    android:background="@drawable/mpin_gradinet"
+ >
 
     <include layout="@layout/headerbackwithnotification" />
 
+
+    <LinearLayout
+        android:id="@+id/ll_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <include layout="@layout/searchdriver_gifscreen"/>
+
+        <ProgressBar
+            android:id="@+id/progressbar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:max="100"
+            android:progress="0"
+            android:layout_marginHorizontal="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/bottom_header_relativelayout"
+            />
+        <TextView
+            android:id="@+id/txt_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:textColor="@color/black"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/txt_per"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/black"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="visible"
 
-        android:id="@+id/ll_main"
+        android:visibility="gone"
+        android:id="@+id/ll_details"
         android:orientation="vertical">
 
-
-
-
-
         <TextView
-            android:layout_marginTop="@dimen/_20sdp"
-            android:id="@+id/textView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
+            android:text="We are happy to inform you that your booking is confirmed ! Get ready to create some unforgettable memories"
+            android:textSize="16sp"
+            android:id="@+id/text"
             android:gravity="center"
-            android:text="Seaching for Nearby Drivers Please Wait ..."
-            android:textColor="@color/white"
-            android:textSize="15sp" />
+            android:layout_marginStart="@dimen/_6sdp"
+            android:layout_marginEnd="@dimen/_6sdp"
+            android:background="@drawable/mpin_gradinet"
+            android:textColor="@color/white"/>
+
+
+
+        <include
+            layout="@layout/layout_driver_details"
+            android:id="@+id/layoutdriverdetails" />
+
+
+
 
     </LinearLayout>
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:visibility="gone"
-    android:id="@+id/ll_details"
-    android:orientation="vertical">
-
-
-    <include
-        layout="@layout/layout_driver_details"
-        android:id="@+id/layoutdriverdetails" />
-
-
-    <TextView
-        android:id="@+id/txt_timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:textColor="@color/white"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-<!--    <TextView-->
-<!--        android:id="@+id/tv_click"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="@color/colorRed"-->
-<!--        android:gravity="center"-->
-<!--        android:padding="5dp"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:text="Click Here"-->
-<!--        android:textColor="@color/white"-->
-<!--        android:textSize="15sp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent" />-->
-
-</LinearLayout>
 </LinearLayout>

@@ -54,6 +54,7 @@ class LoginActivity : AppCompatActivity(){
     lateinit var otp_Verify_button: Button
     lateinit var progress: ProgressBar
     lateinit var cTimer : CountDownTimer
+     var count : Int = 0
     lateinit var txt_mpin : TextView
     lateinit var txt_otp : TextView
     lateinit var login_mpin : CardView
@@ -238,7 +239,8 @@ class LoginActivity : AppCompatActivity(){
             }
 
             override fun onFinish() {
-                resend.setText("resend OTP!")
+                resend.setText("RESEND OTP!")
+                resend.setTextColor(Color.BLUE)
 
             }
         }
@@ -273,12 +275,12 @@ class LoginActivity : AppCompatActivity(){
             // prefManager.setToken("")
             Toast.makeText(this@LoginActivity, "Signed In :" + account.account.toString(), Toast.LENGTH_LONG).show()
 
-            if (pref.getMpin().equals("") || pref.getMpin().equals("null")) {
+           /* if (pref.getMpin().equals("") || pref.getMpin().equals("null")) {
                 startActivity(Intent(this,MPinGenerate::class.java))
             } else {
-                startActivity(Intent(this,DashBoard::class.java))
-            }
 
+            }*/
+            startActivity(Intent(this,DashBoard::class.java))
             // Signed in successfully, show authenticated UI.
             // updateUI(account)
         } catch (e: ApiException) {
@@ -415,7 +417,7 @@ class LoginActivity : AppCompatActivity(){
                                 ).show()
                                 //  Log.d("SendData", "token===" + token)
                                 //  startActivity(Intent(this@LoginActivity,MPinGenerate::class.java))
-                                if (pref.getMpin().equals("")) {
+                               /* if (pref.getMpin().equals("")) {
                                     startActivity(
                                         Intent(
                                             this@LoginActivity,
@@ -429,8 +431,13 @@ class LoginActivity : AppCompatActivity(){
                                             DashBoard::class.java
                                         )
                                     )
-                                }
-
+                                }*/
+                                startActivity(
+                                    Intent(
+                                        this@LoginActivity,
+                                        DashBoard::class.java
+                                    )
+                                )
 
                             } else {
                                 val token = response.getString("token")
@@ -476,7 +483,13 @@ class LoginActivity : AppCompatActivity(){
 
 
     override fun onBackPressed() {
-        finishAffinity();
+        if (count == 0) {
+            cc_number.isVisible = true
+            otp_screen.isVisible = false
+        }else{
+            finishAffinity()
+        }
+        count++
     }
 
 }

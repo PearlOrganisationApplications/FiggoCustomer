@@ -89,6 +89,7 @@ class CurrentVehicleAdapter(var context: Activity, var cablist: ArrayList<Curren
                                 Toast.makeText(context, "Something Went Wrong!", Toast.LENGTH_LONG)
                                     .show()
                             } else {
+                                pref.setNotify("false")
                                 context.startActivity(Intent(context, SearchDriver::class.java))
                             }
                         }catch (e:Exception){

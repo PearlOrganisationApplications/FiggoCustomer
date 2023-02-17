@@ -399,4 +399,42 @@ import android.content.SharedPreferences
          return pref?.getString("time","null").toString()
      }
 
+
+     fun setNotify(type:String){
+         editor?.putString("notify",type)
+         editor?.commit()
+     }
+
+     fun getNotify():String{
+         return pref?.getString("notify","null").toString()
+     }
+
+     fun setlatitude(toFloat: Float) {
+         editor?.putFloat("f_lat",toFloat)
+         editor?.commit()
+     }
+     fun getlatitude():Float{
+         return pref!!.getFloat("f_lat",0.0f)
+     }
+     fun setlongitude(toFloat: Float) {
+         editor?.putFloat("f_lng",toFloat)
+         editor?.commit()
+     }
+     fun getlongitude():Float{
+         return pref!!.getFloat("f_lng",0.0f)
+     }
+
+     fun setDriverlocation(toFloat: Float, toFloat1: Float) {
+         editor?.putFloat("d_lat",toFloat)
+         editor?.commit()
+         editor?.putFloat("d_lng",toFloat1)
+         editor?.commit()
+     }
+     fun getDriverlat():Float{
+         return pref!!.getFloat("d_lat",0.0f)
+     }
+     fun getDriverlng():Float{
+         return pref!!.getFloat("d_lng",0.0f)
+     }
+
  }

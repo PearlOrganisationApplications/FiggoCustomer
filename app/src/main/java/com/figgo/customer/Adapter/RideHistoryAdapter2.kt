@@ -15,9 +15,9 @@ class RideHistoryAdapter2(var data: ArrayList<List<String>>,var content: Context
     }
 
     override fun onBindViewHolder(holder: RideHistoryRowHolder1, position: Int) {
-        holder.recyclerView.adapter=BottomHistoryRideAdapter(data[position],position,content)
-        holder.recyclerView.layoutManager=
-            LinearLayoutManager(content, LinearLayoutManager.VERTICAL,false)
+      //  holder.recyclerView.adapter=BottomHistoryRideAdapter(data[position],position,content)
+      //  holder.recyclerView.layoutManager=
+       //     LinearLayoutManager(content, LinearLayoutManager.VERTICAL,false)
     }
 
     override fun getItemCount(): Int {
@@ -25,7 +25,7 @@ class RideHistoryAdapter2(var data: ArrayList<List<String>>,var content: Context
     }
 
     class RideHistoryRowHolder1(itemView: View):ViewHolder(itemView) {
-        var recyclerView = itemView.findViewById<RecyclerView>(R.id.ridehistoryRowRecycler)
+      //  var recyclerView = itemView.findViewById<RecyclerView>(R.id.ridehistoryRowRecycler)
     }
 
 

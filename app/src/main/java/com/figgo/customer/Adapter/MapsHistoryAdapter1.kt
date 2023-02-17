@@ -21,7 +21,7 @@ class MapsHistoryAdapter1(var data: List<String>,var x:Int,var context: Context)
 
     override fun onBindViewHolder(holder: RideHistory_one, position: Int) {
         var str = data[position]
-        holder.boxTV.text = str
+      /*  holder.boxTV.text = str
         if (x == 0) {
             //holder.boxTV.setTextColor(Color.WHITE)
             holder.block.setBackgroundColor(context.getColor(R.color.colornavyblue))
@@ -40,7 +40,7 @@ class MapsHistoryAdapter1(var data: List<String>,var x:Int,var context: Context)
                 context.startActivity(Intent(context, HistoryMapsActivity::class.java))
             }
 
-        }
+        }*/
     }
 
 
@@ -49,7 +49,6 @@ class MapsHistoryAdapter1(var data: List<String>,var x:Int,var context: Context)
     }
 
     class RideHistory_one(itemView: View) : ViewHolder(itemView) {
-        var boxTV = itemView.findViewById<TextView>(R.id.tablecontentTV)
-        var block = itemView.findViewById<LinearLayout>(R.id.blocklinear)
+//        var block = itemView.findViewById<LinearLayout>(R.id.blocklinear)
     }
 }

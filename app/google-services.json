@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "99208861462",
+    "project_id": "figgo-dfe1b",
+    "storage_bucket": "figgo-dfe1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:99208861462:android:86963b3caeff063cf22237",
+        "android_client_info": {
+          "package_name": "com.figgo.cabs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "99208861462-nigjtmms0r36p20nbf6pp4or2h05fibd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl-VB4gWgpXaabhxL9uzD2pCX33tx-IKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "99208861462-nigjtmms0r36p20nbf6pp4or2h05fibd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:99208861462:android:c6e243a759733a4ef22237",
+        "android_client_info": {
+          "package_name": "com.figgo.customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "99208861462-nigjtmms0r36p20nbf6pp4or2h05fibd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl-VB4gWgpXaabhxL9uzD2pCX33tx-IKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "99208861462-nigjtmms0r36p20nbf6pp4or2h05fibd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

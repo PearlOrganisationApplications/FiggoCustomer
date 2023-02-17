@@ -1,4 +1,5 @@
 package com.figgo.customer.UI
+
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -9,37 +10,38 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.location.*
 import android.net.Uri
-import android.os.AsyncTask
-import android.os.Build
-import android.os.Bundle
+import android.os.*
 import android.util.Log
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.figgo.cabs.figgodriver.MapData
+import com.figgo.cabs.figgodriver.Service.FireBaseService
+import com.figgo.customer.R
+import com.figgo.customer.pearlLib.BaseClass
+import com.figgo.customer.pearlLib.PrefManager
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.libraries.places.api.Places
-
-import com.figgo.customer.R
-import com.figgo.customer.pearlLib.BaseClass
-import com.figgo.customer.pearlLib.PrefManager
-
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
+import com.google.firebase.database.FirebaseDatabase
+import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 
-class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationListener {
+class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
 
     lateinit var pref: PrefManager
     private var mMap: GoogleMap? = null
@@ -48,21 +50,23 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
     private var originLongitude: Double = 77.4054901
     private var destinationLatitude: Double = 28.5151087
     private var destinationLongitude: Double = 77.3932163
+    private var waypointsLatitude : Double = 28.5151087
+    private var waypointsLongitude : Double = 77.3932163
     lateinit var geocoder:Geocoder
-    var to_lat :Double ?= 0.0
-    var from_lat :Double ?= 0.0
-    var to_lng :Double ?= 0.0
-    var from_lng :Double ?= 0.0
-    var Access_Location_Request_Code:Int=1001
+    private lateinit var driverlocation:LatLng
+    private var customerLAT:Double=0.0
+    var rideId:String=""
+    private var customerLON:Double=0.0
+    private var count:Int=0
+    var rideID:Int = 0
+    private var timer: CountDownTimer?=null
     lateinit var fusedLocationProviderClient:FusedLocationProviderClient
     lateinit var context:Context
-    val MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:Int=1001
-    var pickupLocation: LatLng? = null
     var dropLocation: LatLng? = null
-    var pontos: List<LatLng> = java.util.ArrayList()
-    var polyline: Polyline? = null
     var line: Polyline? = null
     private var provider: String? = null
+    var waypoints = ""
+    var customerLoc:LatLng? = null
     private var locationManager: LocationManager? = null
     override fun setLayoutXml() {
         TODO("Not yet implemented")
@@ -84,7 +88,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
         TODO("Not yet implemented")
     }
 
-
+    @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +100,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
         var tv_vehiclenumber = findViewById<TextView>(R.id.tv_vehiclenumber)
         var iv_drivername = findViewById<TextView>(R.id.iv_drivername)
 
-
+       rideId=pref.getride_id()
         var tv_activanumber = findViewById<TextView>(R.id.tv_activanumber)
         var tv_drivername = findViewById<TextView>(R.id.tv_drivername)
         var tv_dl_number = findViewById<TextView>(R.id.tv_dl_number)
@@ -112,6 +116,8 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
         tv_activanumber.setText(veh_number)
         tv_drivername.setText(profileName)
         tv_dl_number.setText(dl_number)
+
+        startService(Intent(this, FireBaseService::class.java))
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
         val criteria = Criteria()
@@ -146,7 +152,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
         // Fetching API_KEY which we wrapped
         val ai: ApplicationInfo = applicationContext.packageManager
             .getApplicationInfo(applicationContext.packageName, PackageManager.GET_META_DATA)
-        val value = ai.metaData["api_key"]
+       //            val value = ai.metaData["api_key"]
         val apiKey = getString(R.string.api_key)
 
         // Initializing the Places API with the help of our API_KEY
@@ -154,14 +160,19 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
             Places.initialize(applicationContext, apiKey)
         }
 
+        val database = FirebaseDatabase.getInstance()
+        val customerRef = database.getReference("$rideID customer")
+        val driverRef = database.getReference("$rideID driver")
 
 
         // Map Fragment
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val gd = findViewById<Button>(R.id.directions)
-        gd.setOnClickListener{
+        setCurrentLatLon()
+        destinationLatitude = pref.getToLatMC().toDouble()
+        destinationLongitude = pref.getToLngMC().toDouble()
+
             mapFragment.getMapAsync {
                 mMap = it
                 val originLocation = LatLng(originLatitude, originLongitude)
@@ -170,13 +181,32 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
                 mMap!!.addMarker(MarkerOptions().position(destinationLocation))
                 val urll = getDirectionURL(originLocation, destinationLocation, apiKey)
                // GetDirection(urll).execute()
+
+                timer = object: CountDownTimer(1000000, 500) {
+                    override fun onTick(millisUntilFinished: Long) {
+                       // val custData = customerRef.child("loc")
+
+                        setCurrentLatLon()
+
+
+
+
+                        liveRouting()
+                    }
+                    override fun onFinish() {
+
+                    }
+                }
+                (timer as CountDownTimer).start()
+
                 mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(originLocation, 14F))
 
 
             }
 
-        }
+
     }
+/*
     override fun onLocationChanged(location: Location) {
         val curLat: Double = location.getLatitude() //current latitude
         val curLong: Double = location.getLongitude() //current longitude
@@ -208,6 +238,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
         GetDirection().execute(source, destination)
 
     }
+*/
 
 
 
@@ -223,188 +254,186 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback, LocationLis
 
 
 
-    private fun getDirectionURL(origin:LatLng, dest:LatLng, secret: String) : String{
+/*    private fun getDirectionURL(origin:LatLng, dest:LatLng, secret: String) : String{
         return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" +
                 "&destination=${dest.latitude},${dest.longitude}" +
                 "&sensor=false" +
                 "&mode=driving" +
                 "&key=$secret"
+    }*/
+
+
+
+
+    override fun onMapReady(p0: GoogleMap) {
+        mMap =p0
     }
 
-
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        to_lat = pref.getToLatLC().toDouble()
-        to_lng = pref.getToLngLC().toDouble()
-        from_lat =  pref.getToLatMC().toDouble()
-        from_lng =  pref.getToLngMC().toDouble()
-        pickupLocation = LatLng(to_lat!!, to_lng!!)
-        dropLocation = LatLng(from_lat!!, from_lng!!)
-        val height = 100
-        val width = 100
-        val bitmapdraw = resources.getDrawable(R.drawable.pic_location) as BitmapDrawable
-        val b = bitmapdraw.bitmap
-        val smallMarker = Bitmap.createScaledBitmap(b, width, height, false)
-        mMap?.addMarker(
-            MarkerOptions().position(pickupLocation!!)
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-                .title("pickup"))
-
-        val bitmapdraw2 = resources.getDrawable(R.drawable.drop_location) as BitmapDrawable
-        val b2 = bitmapdraw2.bitmap
-        val smallMarker2 = Bitmap.createScaledBitmap(b2, width, height, false)
-        mMap?.addMarker(MarkerOptions().position(dropLocation!!).icon(BitmapDescriptorFactory.fromBitmap(smallMarker2)).title("dropoff"))
-
-        val source = "" + to_lat + "," + to_lng
-        val destination = "" + from_lat + "," + from_lng
-      //  Log.e("Origin ", "$source\n Destination $destination")
-        GetDirection().execute(source, destination)
-
-
+    private fun getDirectionURL(origin:LatLng, dest:LatLng, secret: String) : String{
+        waypoints = "waypoints="
+        waypoints += waypointsLatitude.toString() + "," + waypointsLongitude.toString() + "|";
+        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" +
+                "&destination=${dest.latitude},${dest.longitude}" +
+                "&sensor=false" +
+                "&mode=driving" +
+                "&key=$secret" +
+                "&"+waypoints
     }
 
-    inner class GetDirection :
-        AsyncTask<String?, String?, String?>() {
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetDirection(val url : String) : AsyncTask<Void, Void, List<List<LatLng>>>(){
+        override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
+            val client = OkHttpClient()
+            val request = Request.Builder().url(url).build()
+            val response = client.newCall(request).execute()
+            val data = response.body?.string()
+            Log.d("SEND DATA"," data ===="+ data )
 
-
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
-
-        protected override fun doInBackground(vararg params: String?): String? {
-            var stringUrl = ""
-
-
-            stringUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + params[0] + "&destination=" + params[1] + "&key=" + "AIzaSyCbd3JqvfSx0p74kYfhRTXE7LZghirSDoU" + "&sensor=false"
-           // Log.e("URL : ", "" + stringUrl)
-            val response = StringBuilder()
-            try {
-                val url = URL(stringUrl)
-                val httpconn = url.openConnection() as HttpURLConnection
-                if (httpconn.responseCode == HttpURLConnection.HTTP_OK) {
-                    val input = BufferedReader(InputStreamReader(httpconn.inputStream), 8192)
-                    var strLine: String? = null
-                    while (input.readLine().also { strLine = it } != null) {
-                        response.append(strLine)
-                    }
-                    input.close()
+            val result =  ArrayList<List<LatLng>>()
+            try{
+                val respObj = Gson().fromJson(data, MapData::class.java)
+                val path =  ArrayList<LatLng>()
+                for (i in 0 until respObj.routes[0].legs[0].steps.size){
+                    path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
                 }
-                val jsonOutput = response.toString()
-                val jsonObject = JSONObject(jsonOutput)
-
-                // routesArray contains ALL routes
-                val routesArray = jsonObject.getJSONArray("routes")
-                // Grab the first route
-                val route = routesArray.getJSONObject(0)
-                val poly = route.getJSONObject("overview_polyline")
-                val polyline = poly.getString("points")
-                pontos = decodePoly(polyline)!!
-                val legs = route.getJSONArray("legs")
-                var steps: JSONObject
-                var distance: JSONObject? = null
-                var totalDistance = 0f
-                for (i in 0 until legs.length()) {
-                    steps = legs.getJSONObject(i)
-                    distance = steps.getJSONObject("distance")
-                    val total = distance.getString("text").split(" ".toRegex()).toTypedArray()
-                    totalDistance += total[0].replace(",", "").toFloat()
-                }
-                //distanceString = "$totalDistance Km"
-               // Log.e("Total Distance : ", "" + distanceString)
-            } catch (e: Exception) {
+                result.add(path)
+            }catch (e:Exception){
                 e.printStackTrace()
             }
-            return null
+            return result
         }
 
-        private fun decodePoly(encoded: String): List<LatLng>? {
-            val poly: MutableList<LatLng> = ArrayList()
-            var index = 0
-            val len = encoded.length
-            var lat = 0
-            var lng = 0
-            while (index < len) {
-                var b: Int
-                var shift = 0
-                var result = 0
-                do {
-                    b = encoded[index++].code - 63
-                    result = result or (b and 0x1f shl shift)
-                    shift += 5
-                } while (b >= 0x20)
-                val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-                lat += dlat
-                shift = 0
-                result = 0
-                do {
-                    b = encoded[index++].code - 63
-                    result = result or (b and 0x1f shl shift)
-                    shift += 5
-                } while (b >= 0x20)
-                val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-                lng += dlng
-                val p = LatLng(lat.toDouble() / 1E5, lng.toDouble() / 1E5)
-                poly.add(p)
-            }
-            return poly
-        }
+        override fun onPostExecute(result: List<List<LatLng>>) {
+            val lineoption = PolylineOptions()
+            for (i in result.indices){
+                lineoption.addAll(result[i])
+                lineoption.width(10f)
+                lineoption.color(Color.GREEN)
+                lineoption.geodesic(true)
+                /* lineoption.startCap()
+                 if (result.lastIndex.equals(LatLng(destinationLatitude, destinationLongitude))){
 
-
-        override fun onPostExecute(file_url: String?) {
-            var src1: LatLng? = null
-            var dest: LatLng? = null
-            for (i in 0 until pontos.size - 1) {
-               // Log.e("call poly ", "loop = $i")
-                val src: LatLng = pontos.get(i)
-                if (i == 0) {
-                    src1 = src
-                }
-                dest = pontos.get(i + 1)
-
-                try {
-                    polyline = mMap?.addPolyline(
-                        PolylineOptions().add(
-                            LatLng(src.latitude, src.longitude),
-                            LatLng(dest.latitude, dest.longitude)
-                        ).width(7f).color(
-                            Color.GREEN
-                        ).geodesic(true))
-                } catch (e: NullPointerException) {
-                    Log.e("Error", "NullPointerException onPostExecute: $e")
-                } catch (e2: Exception) {
-                    Log.e("Error", "Exception onPostExecute: $e2")
-                }
+                 }*/
             }
-            try {
-                val builder = LatLngBounds.Builder()
-                builder.include(src1!!)
-                builder.include(dest!!)
-                val bounds = builder.build()
-                //  mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                val padding = 250 // offset from edges of the map in pixels
-                val cu = CameraUpdateFactory.newLatLngBounds(bounds, 100)
-                mMap?.moveCamera(cu)
-                this@EmergencyRoutedraweActivity.runOnUiThread {
-                    // kmsTxt?.setText("" + distanceString)
-                }
-            } catch (e: Exception) {
-            }
+            mMap?.addPolyline(lineoption)
         }
     }
-
+    fun decodePolyline(encoded: String): List<LatLng> {
+        val poly = ArrayList<LatLng>()
+        var index = 0
+        val len = encoded.length
+        var lat = 0
+        var lng = 0
+        while (index < len) {
+            var b: Int
+            var shift = 0
+            var result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lat += dlat
+            shift = 0
+            result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lng += dlng
+            val latLng = LatLng((lat.toDouble() / 1E5),(lng.toDouble() / 1E5))
+            poly.add(latLng)
+        }
+        return poly
+    }
 
     @SuppressLint("MissingPermission")
     override fun onResume() {
         super.onResume()
 
 
-        locationManager?.requestLocationUpdates(provider!!, 400L, 1F, this@EmergencyRoutedraweActivity)
+
 
 
     }
+    @SuppressLint("MissingPermission")
+    fun setCurrentLatLon(){
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
+            override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
+
+            override fun isCancellationRequested() = false
+        })
+            .addOnSuccessListener { location: android.location.Location? ->
+                if (location == null)
+                    Toast.makeText(this, "Cannot get location.", Toast.LENGTH_SHORT).show()
+                else {
+                    waypointsLatitude = location.latitude
+                    //pref.setlatitude(originLatitude.toFloat())
+                    waypointsLongitude = location.longitude
+
+                    originLatitude = pref.getDriverlat().toDouble()
+                    originLatitude = pref.getDriverlng().toDouble()
+                    //pref.setlongitude(originLongitude.toFloat())
+                    //Toast.makeText(this,"Lat :"+lat+"\nLong: "+long, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+
+    }
+
+    fun liveRouting(){
+
+        mMap?.clear()
+
+        driverlocation   = LatLng(originLatitude, originLongitude)
+        dropLocation  = LatLng(destinationLatitude, destinationLongitude)
+        customerLoc = LatLng(waypointsLatitude,waypointsLongitude)
+        //customerLocation = LatLng(cust_lat)
+        val height = 80
+        val width = 80
+        val bitmapdraw = resources.getDrawable(R.drawable.ic_pinpoint) as BitmapDrawable
+        val b = bitmapdraw.bitmap
+        val smallMarker = Bitmap.createScaledBitmap(b, width, height, false)
+        mMap?.addMarker(
+            MarkerOptions().position(driverlocation!!)
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+                .title("Current Location")
+        )
+        val bitmapdraw2 = resources.getDrawable(R.drawable.ic_arrival) as BitmapDrawable
+        val b2 = bitmapdraw2.bitmap
+        val smallMarker2 = Bitmap.createScaledBitmap(b2, width, height, false)
+        mMap?.addMarker(
+            MarkerOptions().position(dropLocation!!)
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker2))
+                .title("drop-off")
+        )
+
+        val bitmapdraw3 = resources.getDrawable(R.drawable.driver) as BitmapDrawable
+        val b3 = bitmapdraw3.bitmap
+        val smallMarker3 = Bitmap.createScaledBitmap(b3, width, height, false)
+
+        mMap?.addMarker(
+            MarkerOptions().position(customerLoc!!)
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker3))
+                .title("drop-off")
+        )
+
+
+        val source = "$originLatitude,$originLongitude"
+        val destination = "$destinationLatitude,$destinationLongitude"
+        Log.e("Origin ", "$source\n Destination $destination")
+        //GetDirection().execute(source, destination)
+        var url:String=getDirectionURL(driverlocation!!, dropLocation!!,"AIzaSyCbd3JqvfSx0p74kYfhRTXE7LZghirSDoU")
+        GetDirection(url).execute()
+        Handler().postDelayed({
+            //do something
+        }, 5000)
+    }
+
 
 }
 

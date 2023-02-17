@@ -120,8 +120,8 @@ class PayFragment : Fragment()  {
 
             }else {
 
-                getPayUNow()
-               // getPayNow();
+               // getPayUNow()
+                getPayNow();
             }
 
         }

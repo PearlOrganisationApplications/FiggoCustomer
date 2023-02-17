@@ -68,6 +68,11 @@ class HistoryFragment : Fragment() {
     }
 
     private fun getHistory() {
+
+
+
+
+
         val progressDialog = ProgressDialog(requireActivity())
         progressDialog.show()
         val URL =Helper.RIDE_HISTORY
@@ -97,7 +102,7 @@ class HistoryFragment : Fragment() {
                             var actual_distance: String
                             var price: String
                             for (p in 0..allrideArray.length() - 1) {
-
+                                progressDialog.hide()
                                 val booking_id =
                                     response.getJSONObject("data").getJSONArray("all_rides")
                                         .getJSONObject(p).getString("booking_id")
@@ -112,6 +117,28 @@ class HistoryFragment : Fragment() {
                                 val actual_distance =
                                     response.getJSONObject("data").getJSONArray("all_rides")
                                         .getJSONObject(p).getString("actual_distance")
+
+                                val date =
+                                    response.getJSONObject("data").getJSONArray("all_rides")
+                                        .getJSONObject(p).getString("date_only")
+
+                                val time =
+                                    response.getJSONObject("data").getJSONArray("all_rides")
+                                        .getJSONObject(p).getString("time_only")
+                                val paramMap = HashMap<String, String>()
+                                paramMap.put( "booking_id", booking_id);
+                                paramMap.put( "to_loc" , name);
+                                paramMap.put( "from_loc", name1);
+                                paramMap.put( "status", status);
+                                paramMap.put( "distance" , actual_distance);
+                                paramMap.put( "date" , date);
+                                paramMap.put( "time" , time);
+
+
+                                MapUtility.paramMap.put(p,paramMap)
+
+
+
                                 contentdata.add(
                                     listOf(
                                         booking_id,
@@ -125,7 +152,7 @@ class HistoryFragment : Fragment() {
                             }
                             header?.adapter = RideHistoryRowAdapter(contentdata, requireContext())
                             header?.layoutManager = LinearLayoutManager(requireContext())
-                            progressDialog.hide()
+
                         }catch (e:Exception){
                             MapUtility.showDialog(e.toString(),requireActivity())
 

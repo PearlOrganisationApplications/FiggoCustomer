@@ -26,6 +26,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.figgo.customer.R
 import java.lang.Exception
+import java.util.HashMap
 
 object MapUtility {
     const val MAP_URL = "https://maps.googleapis.com"
@@ -35,6 +36,7 @@ object MapUtility {
     var ADDRESS = "address"
     var LATITUDE = "lat"
     var LONGITUDE = "long"
+    val paramMap = HashMap<Int, HashMap<String,String>>()
     fun isNetworkAvailable(context: Context): Boolean {
         var activeNetworkInfo: NetworkInfo? = null
         try {
@@ -88,7 +90,7 @@ object MapUtility {
         dialog.setContentView(R.layout.custom_layout)
         val body = dialog.findViewById(R.id.error) as TextView
        // body.text = "Error! We are unable to commmunicate with servers, please try again in few mintues. if still problem persists, kindly contact with Figgo Support. with all the details"
-       body.text = title
+      body.text = title
         val yesBtn = dialog.findViewById(R.id.ok) as Button
         yesBtn.setOnClickListener {
             dialog.dismiss()

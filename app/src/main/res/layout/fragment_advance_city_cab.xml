@@ -66,7 +66,6 @@
                                 android:id="@+id/datetext"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="25-06-2022"
                                 android:background="@drawable/background_card"
                                 android:padding="8dp"
                                 android:layout_marginRight="50dp"
@@ -95,7 +94,6 @@
                                 android:layout_weight="1"
                                 android:background="@drawable/background_card"
                                 android:layout_height="wrap_content"
-                                android:text="02:23"
                                 android:padding="8dp"
                                 android:textAlignment="center"
                                 android:layout_gravity="center"/>

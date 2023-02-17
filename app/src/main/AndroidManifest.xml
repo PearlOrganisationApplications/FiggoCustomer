@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -65,10 +65,14 @@
       <activity android:name="com.figgo.customer.UI.Current_Driver_Details_List"
           android:exported="false"/>
         <activity android:name="com.figgo.customer.UI.EmergencyRoutedraweActivity"
-            android:exported="false"/>
+            android:exported="true">
 
+        </activity>
         <activity android:name="com.figgo.customer.UI.SearchDriver"
-            android:exported="false"/>
+            android:exported="false">
+
+        </activity>
+
         <activity
             android:name="com.figgo.customer.UI.GoogleWebview"
             android:exported="false" />
@@ -135,7 +139,8 @@
 
         <activity
             android:name="com.figgo.customer.UI.MPinGenerate"
-            android:exported="false">
+            android:exported="false"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -172,7 +177,8 @@
         </activity>
         <activity
             android:name="com.figgo.customer.UI.LoginActivity"
-            android:exported="false">
+            android:exported="false"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -225,7 +231,12 @@
                     android:scheme="io.rzp" />
             </intent-filter>
         </activity>
-
+        <service
+            android:name="com.figgo.cabs.figgodriver.Service.FireBaseService"
+            android:enabled="true"
+            android:foregroundServiceType="location"
+            android:exported="true">
+        </service>
         <meta-data
             android:name="com.razorpay.plugin.googlepay_all"
             android:value="com.razorpay.RzpGpayMerge" />

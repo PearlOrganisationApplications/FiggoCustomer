@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.figgo.cabs.figgodriver.Fragment.RideHistory
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -155,7 +156,7 @@ class DashBoard : BaseClass(){
 
 
 
-        var rides =/* RidesBottom()*/ /*CurrentRidesFragment()*/ HistoryFragment()
+        var rides =/* RidesBottom()*/ /*CurrentRidesFragment()*/ RideHistory()
         var more = /*RoundAndTourFragment()*/ CurrentMoreFragment()
         var support = SupportBottomNav()
         var navView = findViewById<NavigationView>(R.id.navView)
@@ -179,10 +180,7 @@ class DashBoard : BaseClass(){
         var img_webview = findViewById<ImageView>(R.id.iv_webview)
          liveLoc = findViewById<TextView>(R.id.live_loc)
         var ll_logout = findViewById<LinearLayout>(R.id.ll_logout)
-        locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-/*
-        liveLoc = findViewById<TextView>(R.id.live_loc)
-*/
+
 
 
 
@@ -408,8 +406,8 @@ class DashBoard : BaseClass(){
                     )
                     == PackageManager.PERMISSION_GRANTED
                 ) {
-                    setfragment(homeFrag)
-                    getLocation()
+                    checkLocationService()
+
                 } else {
                     ActivityCompat.requestPermissions(
                         this@DashBoard,
@@ -444,6 +442,15 @@ class DashBoard : BaseClass(){
         task.addOnSuccessListener(this@DashBoard){it->
             it.locationSettingsStates;
            setfragment(homeFrag)
+            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+            hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+//------------------------------------------------------//
+            hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+            liveLoc = findViewById<TextView>(R.id.live_loc)
+
+            getLocation()
         }
 
         task.addOnFailureListener(this@DashBoard) { e ->
@@ -451,6 +458,7 @@ class DashBoard : BaseClass(){
                 // Location settings are not satisfied, but this can be fixed
                 // by showing the user a dialog.
                 try {
+                    grantLocPer()
                     // Show the dialog by calling startResolutionForResult(),
                     // and check the result in onActivityResult().
                     e.startResolutionForResult (this@DashBoard, REQUEST_CHECK_SETTINGS)
@@ -489,6 +497,14 @@ class DashBoard : BaseClass(){
         }
         if (resultCode == -1) {
            setfragment(homeFrag)
+            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+            hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+//------------------------------------------------------//
+            hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+            liveLoc = findViewById<TextView>(R.id.live_loc)
+
             getLocation()
 
         } else {
@@ -523,10 +539,22 @@ class DashBoard : BaseClass(){
                             PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
                     }
                 } else {
+                    if ((ContextCompat.checkSelfPermission(this@DashBoard,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION) ===
+                                PackageManager.PERMISSION_GRANTED)) {
+
+                        main.isVisible = false
+                        perm.isVisible = true
 
 
-                    main.isVisible = false
-                    perm.isVisible = true
+                    }else{
+                        ActivityCompat.requestPermissions(
+                            this@DashBoard,
+                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
+                    }
+
+
                 }
                 return
             }

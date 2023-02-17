@@ -1,8 +1,10 @@
 package com.figgo.customer.Fragments
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,6 +15,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.Navigation
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -24,6 +28,9 @@ import com.figgo.customer.R
 import com.figgo.customer.Fragments.Shared_Cab_Fragment.ThankyouScreenFragment
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.Helper
+import com.paytm.pgsdk.PaytmOrder
+import com.paytm.pgsdk.PaytmPGService
+import com.paytm.pgsdk.PaytmPaymentTransactionCallback
 import com.razorpay.Checkout
 import org.json.JSONException
 import org.json.JSONObject
@@ -121,6 +128,70 @@ class CabBookFragment : Fragment() {
                 Toast.makeText(requireActivity(), "Error in payment: " + e.message, Toast.LENGTH_SHORT).show();
                 e.printStackTrace()
             }
+
+           /* if (ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_SMS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(
+                        Manifest.permission.READ_SMS,
+                        Manifest.permission.RECEIVE_SMS
+                    ),
+                    101
+                )
+            }
+            val Service = PaytmPGService.getProductionService()
+            val paramMap = HashMap<String, String>()
+            //these are mandatory parameters
+            //these are mandatory parameters
+            paramMap.put( "MID" , "rxazcv89315285244163");
+// Key in your staging and production MID available in your dashboard
+            paramMap.put( "ORDER_ID" , "order1");
+            paramMap.put( "CUST_ID" , "cust123");
+            paramMap.put( "MOBILE_NO" , "7777777777");
+            paramMap.put( "EMAIL" , "username@emailprovider.com");
+            paramMap.put( "CHANNEL_ID" , "WAP");
+            paramMap.put( "TXN_AMOUNT" , "100.12");
+            paramMap.put( "WEBSITE" , "WEBSTAGING");
+// This is the staging value. Production value is available in your dashboard
+            paramMap.put( "INDUSTRY_TYPE_ID" , "Retail");
+// This is the staging value. Production value is available in your dashboard
+            paramMap.put( "CALLBACK_URL", "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=order1");
+            paramMap.put( "CHECKSUMHASH" , "w2QDRMgp1234567JEAPCIOmNgQvsi+BhpqijfM9KvFfRiPmGSt3Ddzw+oTaGCLneJwxFFq5mqTMwJXdQE2EzK4px2xruDqKZjHupz9yXev4=")
+            val Order = PaytmOrder(paramMap);
+            // val Certificate = PaytmClientCertificate( inPassword:String, inFileName:String);
+            Service.initialize(Order, null);
+            Service.startPaymentTransaction(
+                requireActivity(),
+                true,
+                true,
+                object : PaytmPaymentTransactionCallback {
+                    /*Call Backs*/
+                    override fun someUIErrorOccurred(inErrorMessage: String) {}
+                    override fun onTransactionResponse(inResponse: Bundle?) {}
+                    override fun networkNotAvailable() {}
+                    override fun onErrorProceed(p0: String?) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun clientAuthenticationFailed(inErrorMessage: String) {}
+                    override fun onErrorLoadingWebPage(
+                        iniErrorCode: Int,
+                        inErrorMessage: String,
+                        inFailingUrl: String
+                    ) {
+                    }
+
+                    override fun onBackPressedCancelTransaction() {}
+                    override fun onTransactionCancel(
+                        inErrorMessage: String,
+                        inResponse: Bundle
+                    ) {
+                    }
+                })*/
 
         }
 

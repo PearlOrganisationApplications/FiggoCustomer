@@ -10,5 +10,10 @@
         <item name="android:paddingLeft">@dimen/_10sdp</item>
         <item name="android:layout_height">@dimen/_30sdp</item>
     </style>
+    .pac-container:after {
+    /* Disclaimer: not needed to show 'powered by Google' if also a Google Map is shown */
 
+    background-image: none !important;
+    height: 0px;
+    }
 </resources>

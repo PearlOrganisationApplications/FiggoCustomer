@@ -1,35 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-    <LinearLayout
-    android:layout_height="wrap_content"
-    android:id="@+id/blocklinear"
-    android:background="@color/white"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
+    android:background="@color/white"
+    android:id="@+id/blocklinear"
     android:orientation="horizontal"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-
+    android:layout_height="wrap_content">
     <LinearLayout
+        android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_width="130dp"
+        android:minWidth="80dp"
         android:layout_margin="@dimen/_1sdp"
-        android:minWidth="80dp">
-
-    <TextView
-        android:layout_height="match_parent"
-        android:id="@+id/tablecontentTV"
-        android:layout_width="match_parent"
-        android:layout_margin="@dimen/_5sdp"
-        android:textSize="@dimen/_12sdp"
-        android:textColor="@color/black"
-        android:gravity="center"
-        android:text="BLOCK"/>
-
-</LinearLayout>
-
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="BLOCK"
+            android:gravity="center"
+            android:textSize="@dimen/_10sdp"
+            android:visibility="visible"
+            android:id="@+id/tablecontentTV"
+            android:layout_margin="@dimen/_5sdp"
+            />
+    </LinearLayout>
     <LinearLayout
         android:layout_width="@dimen/_1sdp"
         android:layout_height="match_parent"
         android:background="@color/white"
+        android:id="@+id/history_side_band"
+        android:orientation="vertical"
         />
-
 </LinearLayout>

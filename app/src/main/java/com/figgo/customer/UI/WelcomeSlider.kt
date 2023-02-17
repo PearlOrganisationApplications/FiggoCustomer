@@ -29,6 +29,7 @@ class WelcomeSlider : AppCompatActivity() {
     private var btnSkip: Button? = null
     private var btnNext: Button? = null
     private var prefManager: PrefManager? = null
+    var count :Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -66,8 +67,14 @@ class WelcomeSlider : AppCompatActivity() {
         btnNext!!.setOnClickListener {
             // checking for last page if true launch MainActivity
 
-            if(prefManager!!.getToken().equals("")|| prefManager!!.getToken().equals("null"))
+
+            if (count %2== 1){
                 startActivity(Intent(this@WelcomeSlider, LoginActivity::class.java))
+        }/*else if (prefManager!!.getMpin().equals("") || prefManager!!.getMpin().equals("null")){
+                startActivity(Intent(this@WelcomeSlider, MPinGenerate::class.java))
+            }
+            */
+
             else{
             val current = getItem(+1)
             if (current < layouts.size) {
@@ -78,6 +85,7 @@ class WelcomeSlider : AppCompatActivity() {
             }
 
             }
+            count++
 
         }
     }
@@ -108,6 +116,15 @@ class WelcomeSlider : AppCompatActivity() {
             startActivity(Intent(this@WelcomeSlider, LoginActivity::class.java))
             finish()
         }else{
+
+           /* if (prefManager!!.getMpin().equals("")){
+                startActivity(Intent(this@WelcomeSlider, MPinGenerate::class.java))
+                finish()
+            }else {
+                startActivity(Intent(this@WelcomeSlider, DashBoard::class.java))
+                finish()
+            }*/
+
             startActivity(Intent(this@WelcomeSlider, DashBoard::class.java))
             finish()
         }
@@ -170,4 +187,8 @@ class WelcomeSlider : AppCompatActivity() {
             container.removeView(view)
         }
     }
+    override fun onBackPressed() {
+      finishAffinity()
+    }
+
 }

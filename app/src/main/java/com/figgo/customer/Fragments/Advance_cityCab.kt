@@ -12,6 +12,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +32,17 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.figgo.customer.Adapter.AdvanceCityDataAdapter
+import com.figgo.customer.Model.AdvanceCityCabModel
+import com.figgo.customer.R
+import com.figgo.customer.UI.CabDetailsActivity
+import com.figgo.customer.UI.IOnBackPressed
+import com.figgo.customer.UI.LocationPickerActivity
+import com.figgo.customer.Util.MapUtility
+import com.figgo.customer.databinding.ActivityMainBinding
+import com.figgo.customer.databinding.FragmentAdvanceCityCabBinding
+import com.figgo.customer.pearlLib.Helper
+import com.figgo.customer.pearlLib.PrefManager
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResolvableApiException
@@ -49,22 +61,12 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-import com.figgo.customer.Adapter.AdvanceCityDataAdapter
-import com.figgo.customer.Model.AdvanceCityCabModel
-import com.figgo.customer.R
-import com.figgo.customer.UI.CabDetailsActivity
-import com.figgo.customer.UI.IOnBackPressed
-import com.figgo.customer.UI.LocationPickerActivity
-import com.figgo.customer.Util.MapUtility
-import com.figgo.customer.databinding.ActivityMainBinding
-import com.figgo.customer.databinding.FragmentAdvanceCityCabBinding
-import com.figgo.customer.pearlLib.Helper
-import com.figgo.customer.pearlLib.PrefManager
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.min
 
 
 class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -113,6 +115,8 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
     var timetext: TextView? = null
     var mapFragment: Fragment? = null
     private var onResu: String? = ""
+    lateinit var cTimer : CountDownTimer
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -152,7 +156,11 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
         pref.setRideId("")
         pref.setVehicleId("")
         pref.setTypeC("")
-
+        pref.setToLatLC("")
+        pref.setToLngLC("")
+        pref.setToLatMC("")
+        pref.setToLngMC("")
+        startTimer()
         val apiKey = getString(R.string.api_key)
 
         if (!Places.isInitialized()) {
@@ -202,18 +210,33 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
             if (datePickerDialog != null) {
                 datePickerDialog.show()
             }
-            watchimg?.setOnClickListener {
-                val cal = Calendar.getInstance()
-                val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
-                    cal.set(Calendar.HOUR_OF_DAY, hour)
-                    cal.set(Calendar.MINUTE, minute)
-                    if (timetext != null) {
-                        timetext?.text = SimpleDateFormat("HH:mm:s").format(cal.time)
+
+        }
+        watchimg?.setOnClickListener {
+            val cal = Calendar.getInstance()
+            val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
+                val am_pm = if (hour < 12) "AM" else "PM"
+               var selectedHour : Int
+                if (hour > 12){
+                    selectedHour = hour - 12
+                }else{
+                    if(hour == 0){
+                        selectedHour = 12
+
+                    }else {
+                        selectedHour = hour
                     }
                 }
-                TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+                cal.set(Calendar.HOUR_OF_DAY, selectedHour)
+                cal.set(Calendar.MINUTE, minute)
+                if (timetext != null) {
+                    if (::cTimer.isInitialized) {
+                        cTimer.cancel()
+                    }
+                    timetext?.text = SimpleDateFormat("HH:mm:ss").format(cal.time)+""+am_pm+""
+                }
             }
-
+            TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show()
         }
 
         manualLoc?.setOnClickListener {
@@ -285,7 +308,69 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
        // Initialize Places.
 
     }
+
+    fun startTimer() {
+
+        cTimer = object : CountDownTimer(3000000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {//300000
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val currentDate = LocalDateTime.now().format(formatter)
+
+                    val calendar = Calendar.getInstance()
+                    val hour = calendar[Calendar.HOUR_OF_DAY]
+                    val minutes = calendar[Calendar.MINUTE]
+                    val seconds = calendar[Calendar.SECOND]
+                    val am_pm = if (hour < 12) "AM" else "PM"
+                    var selectedHour : String
+                    var selectedMin : String
+                    var selectedSec : String
+
+                    if (hour > 12){
+                        selectedHour = (hour - 12).toString()
+                    }else{
+                        if(hour == 0){
+                            selectedHour = 12.toString()
+
+                        }else {
+                            if (hour < 10){
+                                selectedHour = "0"+hour.toString()
+                            }else {
+                                selectedHour = hour.toString()
+                            }
+                        }
+                    }
+                    if (minutes < 10){
+                        selectedMin = "0"+minutes.toString()
+                    }else{
+                        selectedMin = minutes.toString()
+                    }
+                    if (seconds < 10){
+                        selectedSec = "0"+seconds.toString()
+                    }else{
+                        selectedSec = seconds.toString()
+
+                    }
+                    val time = selectedHour+":"+selectedMin+":"+selectedSec+""+am_pm+""
+                    datetext?.setText(currentDate)
+                    timetext?.setText(time)
+                } else {
+                    TODO("VERSION.SDK_INT < O")
+                }
+
+            }
+
+            override fun onFinish() {
+
+
+            }
+        }
+        cTimer.start()
+    }
+
+
     private fun submitform() {
+
         val progressDialog = ProgressDialog(requireActivity())
         progressDialog.show()
         val URL = Helper.create_ride
@@ -928,17 +1013,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
     override fun onResume() {
         super.onResume()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val currentDate = LocalDateTime.now().format(formatter)
-            val formated = DateTimeFormatter.ofPattern("HH:mm:s")
-            val currentTime = LocalDateTime.now().format(formated)
 
-            datetext?.setText(currentDate)
-            timetext?.setText(currentTime)
-        } else {
-            TODO("VERSION.SDK_INT < O")
-        }
 
         if (onResu.equals("false")){
             onResu = ""

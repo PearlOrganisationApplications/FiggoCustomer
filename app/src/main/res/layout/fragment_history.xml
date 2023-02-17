@@ -1,30 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/c_login"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#B9E5FA"
-    tools:context=".Fragments.HistoryFragment">
+    android:layout_height="wrap_content"
+    android:background="@color/gray_8ba6c1"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+  >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="History"
-        android:textColor="@color/black"
-        android:textSize="@dimen/_16sdp"
-        android:layout_marginStart="@dimen/_6sdp"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true">
 
-    <include layout="@layout/historybottomscreen"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/content_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/progress_bar"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/activity_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:gravity="center_horizontal"
+                        android:textAllCaps="true"
+                        android:textColor="@color/black"
+                        android:text="History"
+
+                        android:textStyle="bold"
+                        />
+                    <View
+                        android:id="@+id/heading"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:background="@drawable/appicon"
+                        />
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/informationContainer"
+                        android:layout_width="match_parent"
+                        android:background="@color/quantum_amber50"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/iNoActiveGrant"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:textAlignment="textStart"
+                            android:gravity="start"
+                            android:includeFontPadding="true"
+                            android:justificationMode="inter_word"
+                            android:lineSpacingExtra="12sp"
+                            android:text=""
+                            android:textAllCaps="false"
+                            android:background="@color/appcolorlight"
+
+                            />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:background="@color/colorlightpurple"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:id="@+id/attendanceContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <ProgressBar
+                            android:id="@+id/progress_bar_r"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+                            android:visibility="gone" />
+                        <LinearLayout
+                            android:id="@+id/content_container_r"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/progress_bar_r"
+                            android:orientation="vertical">
+                            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                android:id="@+id/attendanceTable"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:stretchColumns="*">
+
+                                <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    android:id="@+id/attendanceTableScroll"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="4dp">
+
+                                    <androidx.recyclerview.widget.RecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
+                                        xmlns:tools="http://schemas.android.com/tools"
+                                        android:id="@+id/ridehistoryheader"
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="fill_parent"
+                                        android:isScrollContainer="true"
+
+                                        android:scrollbars="horizontal"
+                                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                        tools:context=".grant.xCubeStudent.attendance.SMonthlyAttDA"
+                                       />
+                                </HorizontalScrollView>
+                            </TableLayout>
+                        </LinearLayout>
+                    </LinearLayout>
 
 
+                </LinearLayout>
 
 
+            </RelativeLayout>
+
+        </LinearLayout>
 
 
-
-
-
-
-
-</LinearLayout>
+    </ScrollView>
+</RelativeLayout>

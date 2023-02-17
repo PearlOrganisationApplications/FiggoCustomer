@@ -1,109 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/colorlightblue"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:gravity="center">
+    android:layout_height="match_parent">
+
 
     <androidx.cardview.widget.CardView
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/_1sdp"
+        android:background="@drawable/mpin_gradinet"
         app:cardCornerRadius="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="4dp">
 
-        android:background="@drawable/mpin_gradinet">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:gravity="left"
-            android:padding="10dp"
+            android:layout_alignTop="@+id/iv_close"
+            android:gravity="center"
             android:orientation="vertical">
-            <!-- <TextView
-                 android:id="@+id/txt_filter"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="Pending"
-                 android:layout_gravity="center"
-                 android:background="@drawable/shadow_transparent_radius"
-                 android:textSize="16sp"
-                 android:textStyle="bold"
-                 android:gravity="center"
-                 android:paddingTop="5dp"
-                 android:paddingBottom="5dp"
-                 android:paddingRight="20dp"
-                 android:layout_marginRight="10dp"
-                 android:paddingLeft="20dp"
-                 android:layout_weight="1"
-                 android:textColor="@color/box_green"/>-->
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/iv_close"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:background="@drawable/appicon"
-                android:layout_gravity="right"
-                />
 
+            <ImageView
+                android:id="@+id/iv_check"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:src="@drawable/appicon" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/txt_msg"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/iv_close"
-                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
                 android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/iv_check"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/appicon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:id="@+id/txt_msg"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center"
-                    android:id="@+id/book_now"
-                    android:text="Book Now"
-                    android:textColor="#E14B5A"
-                    android:textStyle="bold" />
+            <Button
+                android:id="@+id/book_now"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:elevation="@dimen/_10sdp"
+                android:gravity="center"
+                android:text="Book Now"
+                android:textColor="#E14B5A"
+                android:textStyle="bold" />
 
-            </LinearLayout>
-
-
-
-            <!--   <TextView
-                   android:id="@+id/done"
-                   android:background="@drawable/round_btn_bg"
-                   android:textColor="@color/white"
-                   android:textStyle="bold"
-                   android:gravity="center"
-                   android:layout_gravity="center"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:textSize="@dimen/dp_18"
-                   android:paddingRight="30dp"
-                   android:paddingLeft="30dp"
-                   android:paddingTop="5dp"
-                   android:paddingBottom="5dp"
-                   android:layout_marginTop="15dp"
-                   android:layout_marginBottom="15dp"
-                   android:text="Done" />-->
-
-        </RelativeLayout>
-
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
-</LinearLayout>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

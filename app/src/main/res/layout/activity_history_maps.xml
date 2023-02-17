@@ -40,6 +40,7 @@
                     android:textSize="@dimen/_14sdp"
                     android:textColor="@color/black"
                     android:text="# 12345"
+                    android:id="@+id/booking_id"
                     android:layout_marginStart="@dimen/_6sdp"/>
 
                 <TextView
@@ -48,17 +49,20 @@
                     android:textSize="@dimen/_14sdp"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:id="@+id/status"
                     android:textColor="@color/green"
                     android:text="Completed"/>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/_16sdp"
                     android:gravity="center"
-                    android:textSize="@dimen/_14sdp"
-                    android:textColor="@color/black"
                     android:text="2/5/2023"
-                    android:layout_marginStart="@dimen/_16sdp"/>
+                    android:id="@+id/date"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_14sdp" />
 
 
                 <TextView
@@ -69,6 +73,7 @@
                     android:textSize="@dimen/_14sdp"
                     android:textColor="@color/black"
                     android:text="12:25"
+                    android:id="@+id/time"
                     android:layout_marginStart="@dimen/_6sdp"/>
 
 
@@ -95,6 +100,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/_14sdp"
+                        android:id="@+id/to_loc"
                         android:textColor="@color/black"
                         android:text="Dehradun"
                        />
@@ -102,6 +108,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/_14sdp"
+                        android:id="@+id/from_loc"
                         android:textColor="@color/black"
                         android:text="Delhi" />
                     <LinearLayout

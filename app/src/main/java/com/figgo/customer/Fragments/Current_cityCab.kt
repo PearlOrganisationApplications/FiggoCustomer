@@ -15,6 +15,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -119,6 +120,8 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
     private var onResu: String? = ""
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    lateinit var cTimer : CountDownTimer
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding=DataBindingUtil.inflate(inflater,R.layout.fragment_current_city_cab, container, false)
         return binding.root
@@ -153,6 +156,11 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         pref.setRideId("")
         pref.setVehicleId("")
         pref.setType("")
+        pref.setType("")
+        pref.setToLatL("")
+        pref.setToLngL("")
+        pref.setToLatM("")
+        pref.setToLngM("")
         val apiKey = getString(R.string.api_key)
         if (!Places.isInitialized()) {
             Places.initialize(requireActivity(), apiKey)
@@ -165,7 +173,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-
+       startTimer()
 
 
         calenderimg.setOnClickListener {
@@ -194,18 +202,33 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
             if (datePickerDialog != null) {
                 datePickerDialog.show()
             }
-            watchimg?.setOnClickListener {
-                val cal = Calendar.getInstance()
-                val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
-                    cal.set(Calendar.HOUR_OF_DAY, hour)
-                    cal.set(Calendar.MINUTE, minute)
-                    if (timetext != null) {
-                        timetext?.text = SimpleDateFormat("HH:mm:s").format(cal.time)
+
+        }
+        watchimg?.setOnClickListener {
+            val cal = Calendar.getInstance()
+            val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
+                val am_pm = if (hour < 12) "AM" else "PM"
+                var selectedHour : Int
+                if (hour > 12){
+                    selectedHour = hour - 12
+                }else{
+                    if(hour == 0){
+                        selectedHour = 12
+
+                    }else {
+                        selectedHour = hour
                     }
                 }
-                TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+                cal.set(Calendar.HOUR_OF_DAY, selectedHour)
+                cal.set(Calendar.MINUTE, minute)
+                if (timetext != null) {
+                    if (::cTimer.isInitialized) {
+                        cTimer.cancel()
+                    }
+                    timetext?.text = SimpleDateFormat("HH:mm:ss").format(cal.time)+""+am_pm+""
+                }
             }
-
+            TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show()
         }
 
         manualLoc?.setOnClickListener {
@@ -319,6 +342,67 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         //   binding.currentCabList.adapter=advanceCityAdapter
 
     }
+
+    fun startTimer() {
+
+        cTimer = object : CountDownTimer(3000000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {//300000
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val currentDate = LocalDateTime.now().format(formatter)
+
+                    val calendar = Calendar.getInstance()
+                    val hour = calendar[Calendar.HOUR_OF_DAY]
+                    val minutes = calendar[Calendar.MINUTE]
+                    val seconds = calendar[Calendar.SECOND]
+                    val am_pm = if (hour < 12) "AM" else "PM"
+                    var selectedHour : String
+                    var selectedMin : String
+                    var selectedSec : String
+
+                    if (hour > 12){
+                        selectedHour = (hour - 12).toString()
+                    }else{
+                        if(hour == 0){
+                            selectedHour = 12.toString()
+
+                        }else {
+                            if (hour < 10){
+                                selectedHour = "0"+hour.toString()
+                            }else {
+                                selectedHour = hour.toString()
+                            }
+                        }
+                    }
+                    if (minutes < 10){
+                        selectedMin = "0"+minutes.toString()
+                    }else{
+                        selectedMin = minutes.toString()
+                    }
+                    if (seconds < 10){
+                        selectedSec = "0"+seconds.toString()
+                    }else{
+                        selectedSec = seconds.toString()
+
+                    }
+                    val time = selectedHour+":"+selectedMin+":"+selectedSec+""+am_pm+""
+                    datetext?.setText(currentDate)
+                    timetext?.setText(time)
+                } else {
+                    TODO("VERSION.SDK_INT < O")
+                }
+
+            }
+
+            override fun onFinish() {
+
+
+            }
+        }
+        cTimer.start()
+    }
+
+
 
     private fun submitform() {
 
@@ -1025,16 +1109,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
     override fun onResume() {
         super.onResume()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val currentDate = LocalDateTime.now().format(formatter)
-            val formated = DateTimeFormatter.ofPattern("HH:mm:s")
-            val currentTime = LocalDateTime.now().format(formated)
-            datetext?.setText(currentDate)
-            timetext?.setText(currentTime)
-        } else {
 
-        }
         pref.setSearchBack("")
         if (onResu.equals("false")){
             onResu = ""
