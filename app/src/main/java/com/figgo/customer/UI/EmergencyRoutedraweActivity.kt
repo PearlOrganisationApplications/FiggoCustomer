@@ -160,10 +160,6 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
             Places.initialize(applicationContext, apiKey)
         }
 
-        val database = FirebaseDatabase.getInstance()
-        val customerRef = database.getReference("$rideID customer")
-        val driverRef = database.getReference("$rideID driver")
-
 
         // Map Fragment
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -189,9 +185,10 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                         setCurrentLatLon()
 
 
+                        Log.d("rideId",rideId)
 
 
-                        liveRouting()
+
                     }
                     override fun onFinish() {
 
@@ -276,8 +273,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                 "&destination=${dest.latitude},${dest.longitude}" +
                 "&sensor=false" +
                 "&mode=driving" +
-                "&key=$secret" +
-                "&"+waypoints
+                "&key=$secret"
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -376,7 +372,8 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                     waypointsLongitude = location.longitude
 
                     originLatitude = pref.getDriverlat().toDouble()
-                    originLatitude = pref.getDriverlng().toDouble()
+                    originLongitude = pref.getDriverlng().toDouble()
+                    liveRouting()
                     //pref.setlongitude(originLongitude.toFloat())
                     //Toast.makeText(this,"Lat :"+lat+"\nLong: "+long, Toast.LENGTH_SHORT).show()
                 }
@@ -389,37 +386,40 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
 
         mMap?.clear()
 
-        driverlocation   = LatLng(originLatitude, originLongitude)
+
         dropLocation  = LatLng(destinationLatitude, destinationLongitude)
         customerLoc = LatLng(waypointsLatitude,waypointsLongitude)
         //customerLocation = LatLng(cust_lat)
         val height = 80
         val width = 80
-        val bitmapdraw = resources.getDrawable(R.drawable.ic_pinpoint) as BitmapDrawable
-        val b = bitmapdraw.bitmap
-        val smallMarker = Bitmap.createScaledBitmap(b, width, height, false)
-        mMap?.addMarker(
-            MarkerOptions().position(driverlocation!!)
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-                .title("Current Location")
-        )
+if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
+    driverlocation = LatLng(originLatitude, originLongitude)
+    val bitmapdraw = resources.getDrawable(R.drawable.driver) as BitmapDrawable
+    val b = bitmapdraw.bitmap
+    val smallMarker = Bitmap.createScaledBitmap(b, width, height, false)
+    mMap?.addMarker(
+        MarkerOptions().position(driverlocation!!)
+            .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+            .title("Driver Location")
+    )
+}
         val bitmapdraw2 = resources.getDrawable(R.drawable.ic_arrival) as BitmapDrawable
         val b2 = bitmapdraw2.bitmap
         val smallMarker2 = Bitmap.createScaledBitmap(b2, width, height, false)
         mMap?.addMarker(
             MarkerOptions().position(dropLocation!!)
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker2))
-                .title("drop-off")
+                .title("Destination")
         )
 
-        val bitmapdraw3 = resources.getDrawable(R.drawable.driver) as BitmapDrawable
+        val bitmapdraw3 = resources.getDrawable(R.drawable.ic_custmarker) as BitmapDrawable
         val b3 = bitmapdraw3.bitmap
         val smallMarker3 = Bitmap.createScaledBitmap(b3, width, height, false)
 
         mMap?.addMarker(
             MarkerOptions().position(customerLoc!!)
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker3))
-                .title("drop-off")
+                .title("My Location")
         )
 
 

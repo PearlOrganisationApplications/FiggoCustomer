@@ -25,7 +25,7 @@ class AdvanceCityDataAdapter(var context:Activity, var cablist:List<AdvanceCityC
     {
         var cab=itemview.findViewById<ImageView>(R.id.cab)
         var ratings=itemview.findViewById<TextView>(R.id.rating)
-        var min=itemview.findViewById<TextView>(R.id.min)
+            // var min=itemview.findViewById<TextView>(R.id.min)
         var max=itemview.findViewById<TextView>(R.id.max)
         var linear=itemview.findViewById<LinearLayout>(R.id.linear)
     }
@@ -41,8 +41,8 @@ class AdvanceCityDataAdapter(var context:Activity, var cablist:List<AdvanceCityC
      var data=cablist[position]
       //  holder.cab.setImageResource(data.cab)
         holder.ratings.text=data.name
-        holder.min.text=data.min
-        holder.max.text=data.max
+       // holder.min.text=data.min
+        holder.max.text="Rs ." +data.max
         Picasso.get().load(data.image).into(holder.cab)
 
         holder.itemView.setOnClickListener {

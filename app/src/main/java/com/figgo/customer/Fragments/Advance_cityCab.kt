@@ -374,6 +374,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
         val progressDialog = ProgressDialog(requireActivity())
         progressDialog.show()
         val URL = Helper.create_ride
+        Log.d("url",URL)
         val queue = Volley.newRequestQueue(requireContext())
         val json = JSONObject()
         json.put("date", datetext?.text.toString())
@@ -385,6 +386,10 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
         json.put("type", "advance_booking")
         json.put("to_location_name", liveLoc?.text.toString())
         json.put("from_location_name", manualLoc?.text.toString())
+
+        Log.d("requestdata",""+json)
+
+
         val jsonOblect: JsonObjectRequest = object : JsonObjectRequest(Method.POST, URL, json, object :
                 Response.Listener<JSONObject?>               {
                 @SuppressLint("SuspiciousIndentation")
@@ -393,6 +398,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
                     if (response != null) {
                         progressDialog.hide()
                         try {
+
 
                             ll_location?.isVisible = false
                             ll_choose_vehicle?.isVisible = true

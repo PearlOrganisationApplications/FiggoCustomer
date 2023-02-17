@@ -562,7 +562,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
                                 ll_search?.isVisible = false
                                 ll_details?.isVisible = true
-                                RunAnimation()
+                               // RunAnimation()
                                 prices = response.getJSONObject("data").getString("price")
                                 name = response.getJSONObject("data").getJSONObject("ride_driver")
                                     .getString("name")
@@ -631,7 +631,9 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
         try {
             transaction_id = s
-            getOtp()
+         //  getOtp()
+           getAcceptRide()
+
         } catch (e: Exception) {
             Log.e(ContentValues.TAG, "Exception in onPaymentSuccess", e)
         }
@@ -774,7 +776,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
                             val status = response.getString("status")
                             if (status.equals("true")) {
-                                getAcceptRide()
+
                             } else {
 
                             }
@@ -912,8 +914,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
                             pref.setOtp(otp.toString())
                             pref.setBookingNo(booking_no)
-
-                            getUpdatePayment()
+                            getAcceptRide()
                         }catch (e:Exception){
                             MapUtility.showDialog(e.toString(),this@SearchDriver)
 
