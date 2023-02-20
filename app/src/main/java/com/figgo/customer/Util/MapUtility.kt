@@ -89,8 +89,10 @@ object MapUtility {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.custom_layout)
         val body = dialog.findViewById(R.id.error) as TextView
+        body.text = "Something Went Wrong"
+
        // body.text = "Error! We are unable to commmunicate with servers, please try again in few mintues. if still problem persists, kindly contact with Figgo Support. with all the details"
-      body.text = title
+     // body.text = title
         val yesBtn = dialog.findViewById(R.id.ok) as Button
         yesBtn.setOnClickListener {
             dialog.dismiss()

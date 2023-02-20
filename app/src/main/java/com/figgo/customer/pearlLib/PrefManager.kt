@@ -424,6 +424,7 @@ import android.content.SharedPreferences
          return pref!!.getFloat("f_lng",0.0f)
      }
 
+
      fun setDriverlocation(toFloat: Float, toFloat1: Float) {
          editor?.putFloat("d_lat",toFloat)
          editor?.commit()

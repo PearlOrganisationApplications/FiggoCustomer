@@ -30,6 +30,7 @@ import java.util.regex.Pattern
 abstract class BaseClass  : AppCompatActivity(){
    // open lateinit var pref: PrefManager
 
+
     protected var versionNew: String? = null
     protected var versionName: String? = null
     // var mIsUpdateAppTask: IsAppUpdated? = null

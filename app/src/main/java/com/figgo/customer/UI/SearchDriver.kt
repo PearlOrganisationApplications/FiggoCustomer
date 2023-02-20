@@ -116,6 +116,9 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         ll_details = findViewById<LinearLayout>(R.id.ll_details)
         var ll_back = findViewById<LinearLayout>(R.id.ll_back)
         var tv_reject_btn = findViewById<TextView>(R.id.tv_reject_btn)
+        shareimg()
+        onBackPress()
+
         driver_id = intent.getStringExtra("driver_id")
         ride_id = intent.getStringExtra("ride_id")
         pref = PrefManager(this)
@@ -126,11 +129,14 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         /* getcurrentdriverdetails()*/
 
         tv_accept.setOnClickListener {
+           /* startActivity(Intent(this,EmergencyRoutedraweActivity::class.java))*/
+
             showPendingPopup()
         }
         iv_bellicon.setOnClickListener {
             startActivity(Intent(this, NotificationBellIconActivity::class.java))
         }
+
         tv_reject_btn.setOnClickListener {
             val URL = Helper.ride_delete
             val progressDialog = ProgressDialog(this)
@@ -210,6 +216,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
             queue.add(jsonOblect)
 
         }
+
         ll_back.setOnClickListener {
             val URL = Helper.ride_delete
             val progressDialog = ProgressDialog(this)
@@ -320,8 +327,6 @@ class SearchDriver : BaseClass() , PaymentResultListener {
     @SuppressLint("MissingInflatedId")
     private fun showPendingPopup() {
         //Create a View object yourself through inflater
-
-
         val dialog = Dialog(this)
         dialog.setCancelable(true)
         dialog.setContentView(R.layout.row_pending_layout)
@@ -333,7 +338,6 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         book_now.setOnClickListener {
 
             pref.setSearchBack("")
-
             val amt = pref.getPrice()
             val amount = Math.round(amt.toFloat() * 100).toInt()
             val checkout = Checkout()
@@ -358,81 +362,16 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                 e.printStackTrace()
             }
 
-           /* if (ContextCompat.checkSelfPermission(
-                    this@SearchDriver,
-                    Manifest.permission.READ_SMS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this@SearchDriver,
-                    arrayOf(
-                        Manifest.permission.READ_SMS,
-                        Manifest.permission.RECEIVE_SMS
-                    ),
-                    101
-                )
-            }
-            val Service = PaytmPGService.getProductionService()
-            val paramMap = java.util.HashMap<String, String>()
-            //these are mandatory parameters
-            //these are mandatory parameters
-            paramMap.put( "MID" , "rxazcv89315285244163");
-// Key in your staging and production MID available in your dashboard
-            paramMap.put( "ORDER_ID" , "order1");
-            paramMap.put( "CUST_ID" , "cust123");
-            paramMap.put( "MOBILE_NO" , "7777777777");
-            paramMap.put( "EMAIL" , "username@emailprovider.com");
-            paramMap.put( "CHANNEL_ID" , "WAP");
-            paramMap.put( "TXN_AMOUNT" , "100.12");
-            paramMap.put( "WEBSITE" , "WEBSTAGING");
-// This is the staging value. Production value is available in your dashboard
-            paramMap.put( "INDUSTRY_TYPE_ID" , "Retail");
-// This is the staging value. Production value is available in your dashboard
-            paramMap.put( "CALLBACK_URL", "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=order1");
-            paramMap.put( "CHECKSUMHASH" , "w2QDRMgp1234567JEAPCIOmNgQvsi+BhpqijfM9KvFfRiPmGSt3Ddzw+oTaGCLneJwxFFq5mqTMwJXdQE2EzK4px2xruDqKZjHupz9yXev4=")
-            val Order = PaytmOrder(paramMap);
-            // val Certificate = PaytmClientCertificate( inPassword:String, inFileName:String);
-            Service.initialize(Order, null);
-            Service.startPaymentTransaction(
-                this@SearchDriver,
-                true,
-                true,
-                object : PaytmPaymentTransactionCallback {
-                    /*Call Backs*/
-                    override fun someUIErrorOccurred(inErrorMessage: String) {}
-                    override fun onTransactionResponse(inResponse: Bundle?) {}
-                    override fun networkNotAvailable() {}
-                    override fun onErrorProceed(p0: String?) {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun clientAuthenticationFailed(inErrorMessage: String) {}
-                    override fun onErrorLoadingWebPage(
-                        iniErrorCode: Int,
-                        inErrorMessage: String,
-                        inFailingUrl: String
-                    ) {
-                    }
-
-                    override fun onBackPressedCancelTransaction() {}
-                    override fun onTransactionCancel(
-                        inErrorMessage: String,
-                        inResponse: Bundle
-                    ) {
-                    }
-                })*/
 
         }
 
         dialog.show()
         val window: Window? = dialog.getWindow()
-        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
 
     }
     private fun searchDriver() {
-       // progressDialog = ProgressDialog(this@SearchDriver)
-      //  progressDialog.show()
         val queue = Volley.newRequestQueue(this@SearchDriver)
         val json = JSONObject()
         json.put("ride_id" ,pref.getride_id())
@@ -488,7 +427,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
     }
 
-    @SuppressLint("UnspecifiedImmutableFlag")
+    @SuppressLint("UnspecifiedImmutableFlag", "NotificationPermission")
     private fun addNotification() {
         val mNotificationManager: NotificationManager
         val mBuilder = NotificationCompat.Builder(this@SearchDriver, "notify_001")
@@ -530,10 +469,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
     }
 
     private fun getRideStatus() {
-
-        val URL ="https://test.pearl-developer.com/figo/api/ride/check-ride-request-status"
-
-        Log.d("searchDriver", "json===" +URL )
+        val URL = Helper.CHECK_RIDE_REQUEST_STATUS
         Log.d("SendData", pref.getride_id() )
         val queue = Volley.newRequestQueue(this)
         val json = JSONObject()
@@ -554,7 +490,6 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                             val status = response.getString("status")
 
                             if (status.equals("true")) {
-
                                 if(pref.getNotify().equals("false")) {
                                     addNotification()
                                 }else  if(pref.getNotify().equals("true")) {
@@ -582,14 +517,6 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                                 activavehiclenumber?.setText(v_number)
                                 price?.setText(prices)
                                 pref.setPrice(prices)
-                                /*   if(!full_image.equals("")){
-                                Picasso.get().load(full_image).placeholder(R.drawable.girl_img).into(driverimg)
-                            }*/
-
-                                /* if(!taxi_image.equals("")){
-                                Picasso.get().load(taxi_image).placeholder(R.drawable.blueactiva_img).into(activaimg)
-                            }*/
-
 
                             } else if (status.equals("false")) {
                                 //  Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show()
@@ -631,7 +558,8 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
         try {
             transaction_id = s
-            getOtp()
+          //  getOtp()
+            getUpdatePayment()
         } catch (e: Exception) {
             Log.e(ContentValues.TAG, "Exception in onPaymentSuccess", e)
         }

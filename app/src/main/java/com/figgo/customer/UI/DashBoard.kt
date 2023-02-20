@@ -108,6 +108,7 @@ class DashBoard : BaseClass(){
     private val pickupLocation: LatLng? = null
     lateinit var navView : NavigationView
     lateinit var prefManager: PrefManager
+
     override fun setLayoutXml() {
         TODO("Not yet implemented")
     }
@@ -183,17 +184,6 @@ class DashBoard : BaseClass(){
 
 
 
-
-
-
-
-
-
-     /*   toggle = ActionBarDrawerToggle(this@DashBoard, drawerLayout, R.string.Change_MPIN, R.string.Rides)
-        drawerLayout.addDrawerListener(toggle)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toggle.syncState()
-*/
         iv_user.setOnClickListener {
             startActivity(Intent(this, Edit_Profile_Activity::class.java))
         }
@@ -265,14 +255,7 @@ class DashBoard : BaseClass(){
 
 
 
-       /* liveLoc?.setOnClickListener {
 
-            press = "live";
-            val field = Arrays.asList(Place.Field.ID, Place.Field.ADDRESS,Place.Field.LAT_LNG)
-            val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, field).build(this)
-            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
-        }
-*/
 
         continu.setOnClickListener {
            grantLocPer()
@@ -282,7 +265,6 @@ class DashBoard : BaseClass(){
 
 
         grantLocPer()
-
        var bottom = findViewById<BottomNavigationView>(R.id.navigation_bar)
         var home_top = findViewById<LinearLayout>(R.id.home_top)
         var home_bottom = findViewById<LinearLayout>(R.id.homebottom)
@@ -379,14 +361,10 @@ class DashBoard : BaseClass(){
         return if (ActivityCompat.checkSelfPermission(this@DashBoard, android.Manifest.permission.ACCESS_COARSE_LOCATION)
             != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this@DashBoard, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(
-                this@DashBoard,
+            ActivityCompat.requestPermissions(this@DashBoard,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION),
                 PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
 
-
-           // ActivityCompat.requestPermissions(this@DashBoard, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION),
-              //  requestcodes
 
             false
         } else {
@@ -395,10 +373,7 @@ class DashBoard : BaseClass(){
     }
 
     fun grantLocPer() {
-
         if (isLocationPermissionGranted()) {
-
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(
                         this@DashBoard,
@@ -427,14 +402,13 @@ class DashBoard : BaseClass(){
 
         }
     }
-    fun checkLocationService() {
 
+
+    fun checkLocationService() {
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(10 * 1000);
         locationRequest.setFastestInterval(2 * 1000);
-
-
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         // builder.setAlwaysShow(true);
         val client = LocationServices.getSettingsClient(this@DashBoard)
@@ -453,6 +427,9 @@ class DashBoard : BaseClass(){
             getLocation()
         }
 
+
+
+
         task.addOnFailureListener(this@DashBoard) { e ->
             if (e is ResolvableApiException) {
                 // Location settings are not satisfied, but this can be fixed
@@ -470,6 +447,7 @@ class DashBoard : BaseClass(){
             }
         }
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode== AUTOCOMPLETE_REQUEST_CODE){
@@ -585,8 +563,6 @@ class DashBoard : BaseClass(){
     }
     @SuppressLint("MissingPermission")
     private fun getLocation() {
-
-
         if (hasGps) {
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
@@ -595,7 +571,7 @@ class DashBoard : BaseClass(){
                 gpsLocationListener
             )
         }
-//------------------------------------------------------//
+
         if (hasNetwork) {
             locationManager.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER,
@@ -604,7 +580,6 @@ class DashBoard : BaseClass(){
                 networkLocationListener
             )
         }
-
 
         val lastKnownLocationByGps =
             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
@@ -637,28 +612,17 @@ class DashBoard : BaseClass(){
             }
         }else {
             if (locationByNetwork == null) {
-               // Toast.makeText(this, "No Network", Toast.LENGTH_LONG).show()
 
             } else {
-
-
-
                 to_lat = locationByNetwork?.latitude.toString()
                 to_lng = locationByNetwork?.longitude.toString()
 
-
             }
-            // use latitude and longitude as per your need
-            // }
-            // }
-
 
         }
         var geocoder: Geocoder
         val addresses: List<Address>
         geocoder = Geocoder(this, Locale.getDefault())
-
-
         var strAdd : String? = null
         try {
             val addresses = geocoder.getFromLocation(to_lat!!.toDouble(), to_lng!!.toDouble(), 1)

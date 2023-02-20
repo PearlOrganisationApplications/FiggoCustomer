@@ -21,6 +21,7 @@ import com.figgo.customer.R
 
 class WelcomeSlider : AppCompatActivity() {
 
+
     private var viewPager: ViewPager? = null
     private var myViewPagerAdapter: MyViewPagerAdapter? = null
     private var dotsLayout: LinearLayout? = null
@@ -29,7 +30,6 @@ class WelcomeSlider : AppCompatActivity() {
     private var btnSkip: Button? = null
     private var btnNext: Button? = null
     private var prefManager: PrefManager? = null
-    var count :Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -37,7 +37,7 @@ class WelcomeSlider : AppCompatActivity() {
 
         setContentView(R.layout.activity_welcome_slider)
         prefManager = PrefManager(this)
-       // prefManager!!.setToken("949|vBiS1sR6b5AICFuOTyP7zrkHoNhqzEsz7wu4AsKA")
+        // prefManager!!.setToken("949|vBiS1sR6b5AICFuOTyP7zrkHoNhqzEsz7wu4AsKA")
         if (!prefManager!!.isFirstTimeLaunch()) {
             launchHomeScreen()
             finish()
@@ -51,8 +51,8 @@ class WelcomeSlider : AppCompatActivity() {
 
         // layouts of welcome sliders
         layouts = intArrayOf(
-                R.layout.welcome_slide1,
-                R.layout.welcome_slide2
+            R.layout.welcome_slide1,
+            R.layout.welcome_slide2
         )
 
         // adding bottom dots
@@ -67,25 +67,18 @@ class WelcomeSlider : AppCompatActivity() {
         btnNext!!.setOnClickListener {
             // checking for last page if true launch MainActivity
 
-
-            if (count %2== 1){
+            if(prefManager!!.getToken().equals("")|| prefManager!!.getToken().equals("null"))
                 startActivity(Intent(this@WelcomeSlider, LoginActivity::class.java))
-        }/*else if (prefManager!!.getMpin().equals("") || prefManager!!.getMpin().equals("null")){
-                startActivity(Intent(this@WelcomeSlider, MPinGenerate::class.java))
-            }
-            */
-
             else{
-            val current = getItem(+1)
-            if (current < layouts.size) {
-                // move to next screen
-                viewPager!!.currentItem = current
-            } else {
-                launchHomeScreen()
-            }
+                val current = getItem(+1)
+                if (current < layouts.size) {
+                    // move to next screen
+                    viewPager!!.currentItem = current
+                } else {
+                    launchHomeScreen()
+                }
 
             }
-            count++
 
         }
     }
@@ -116,15 +109,6 @@ class WelcomeSlider : AppCompatActivity() {
             startActivity(Intent(this@WelcomeSlider, LoginActivity::class.java))
             finish()
         }else{
-
-           /* if (prefManager!!.getMpin().equals("")){
-                startActivity(Intent(this@WelcomeSlider, MPinGenerate::class.java))
-                finish()
-            }else {
-                startActivity(Intent(this@WelcomeSlider, DashBoard::class.java))
-                finish()
-            }*/
-
             startActivity(Intent(this@WelcomeSlider, DashBoard::class.java))
             finish()
         }
@@ -187,8 +171,4 @@ class WelcomeSlider : AppCompatActivity() {
             container.removeView(view)
         }
     }
-    override fun onBackPressed() {
-      finishAffinity()
-    }
-
 }

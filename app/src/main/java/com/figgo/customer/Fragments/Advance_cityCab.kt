@@ -257,9 +257,6 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
         }
 
         submit?.setOnClickListener {
-
-
-
             if (liveLoc?.text.toString().equals("")){
                 Toast.makeText(requireActivity(), "Please select Start Address", Toast.LENGTH_LONG).show()
             }else if (manualLoc?.text.toString().equals("")){
@@ -981,14 +978,11 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
 
 
     private fun getDestinationLoc(){
-
         from_lat = pref.getToLatM().toDouble()
         from_lng = pref.getToLngM().toDouble()
-
         val geocoder: Geocoder
         val addresses: List<Address>
         geocoder = Geocoder(requireActivity(), Locale.getDefault())
-
         var strAdd : String? = null
         try {
             val addresses = geocoder.getFromLocation(from_lat!!, from_lng!!, 1)

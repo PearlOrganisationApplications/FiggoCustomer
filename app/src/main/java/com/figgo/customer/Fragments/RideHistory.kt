@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.ProgressBar
-import android.widget.ScrollView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,11 +24,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.HashMap
 
-/**
- * A simple [Fragment] subclass.
- * Use the [RideHistory.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class RideHistory : Fragment() {
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
@@ -72,7 +67,6 @@ class RideHistory : Fragment() {
             {
                 if(it!=null) {
                     try {
-
 
                         progressbar.visibility = View.GONE
                         data_view.visibility = View.VISIBLE

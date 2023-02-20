@@ -83,11 +83,9 @@ class CurrentVehicleAdapter(var context: Activity, var cablist: ArrayList<Curren
                         progressDialog.hide()
                         try {
 
-
                             val status = response.getString("status")
                             if (status.equals("false")) {
-                                Toast.makeText(context, "Something Went Wrong!", Toast.LENGTH_LONG)
-                                    .show()
+                                Toast.makeText(context, "Something Went Wrong!", Toast.LENGTH_LONG).show()
                             } else {
                                 pref.setNotify("false")
                                 context.startActivity(Intent(context, SearchDriver::class.java))
