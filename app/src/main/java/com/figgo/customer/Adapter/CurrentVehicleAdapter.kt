@@ -35,7 +35,7 @@ class CurrentVehicleAdapter(var context: Activity, var cablist: ArrayList<Curren
     class CurrentVehicleHolder(itemview: View): RecyclerView.ViewHolder(itemview){
         var cab=itemview.findViewById<ImageView>(R.id.cab)
         var ratings=itemview.findViewById<TextView>(R.id.rating)
-        var min=itemview.findViewById<TextView>(R.id.min)
+      //  var min=itemview.findViewById<TextView>(R.id.min)
         var max=itemview.findViewById<TextView>(R.id.max)
         var linear=itemview.findViewById<LinearLayout>(R.id.linear)
 

@@ -13,6 +13,7 @@ import android.location.Geocoder
 import android.os.Build
 import android.os.CountDownTimer
 import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -91,7 +92,9 @@ rideID = prefManager.getride_id()
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var LAT = snapshot.child("LAT ").value
                     var LON = snapshot.child("LON ").value
+
                     try {
+                        Log.d("XXXX","$LAT $LON")
                         prefManager.setDriverlocation(LAT.toString().toFloat(),LON.toString().toFloat())
                     }
                     catch (e:Exception){

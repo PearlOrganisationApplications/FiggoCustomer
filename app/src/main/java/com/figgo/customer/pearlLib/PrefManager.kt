@@ -53,6 +53,15 @@ import android.content.SharedPreferences
      }
 
 
+     fun setWelcome(welcome: String){
+         editor!!.putString("welcome",welcome)
+         editor?.commit()
+     }
+
+
+     fun getWelcome():String{
+         return pref?.getString("welcome","").toString()
+     }
 
 
      fun setToken(token:String){

@@ -97,6 +97,7 @@ class LoginActivity : AppCompatActivity(){
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
+        pref.setWelcome("true")
       //  ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION)
         // mGoogleApiClient = GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this)
         //    .addOnConnectionFailedListener(this).build()

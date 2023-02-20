@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.AuthFailureError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.figgo.customer.Adapter.HistoryDataAdapter
 import com.figgo.customer.Adapter.RideHistoryRowAdapter
+import com.figgo.customer.Model.AdvanceCityCabModel
+import com.figgo.customer.Model.HistoryModel
 import com.figgo.customer.R
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.Helper
@@ -34,6 +37,7 @@ class RideHistory : Fragment() {
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
     private var mParam2: String? = null
+    var contentdata= ArrayList<HistoryModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
@@ -57,14 +61,14 @@ class RideHistory : Fragment() {
        // var url3 = "https://test.pearl-developer.com/figo/api/driver/ride-history"
         val URL = Helper.RIDE_HISTORY
         var progressbar = view.findViewById<ProgressBar>(R.id.ridehistory_progressbar)
-        var data_view = view.findViewById<HorizontalScrollView>(R.id.ridehisory_data)
+       var data_view = view.findViewById<HorizontalScrollView>(R.id.ridehisory_data)
         progressbar.visibility=View.VISIBLE
-        data_view.visibility=View.GONE
+       data_view.visibility=View.GONE
         val queue = Volley.newRequestQueue(requireContext())
 
         var headerData = listOf<String>("Booking ID","To","From","Status","Distance","View");
-        var contentdata = ArrayList<List<String>>()
-        contentdata.add(listOf("Booking ID","To location","From location","Status","Distance","View"))
+       // var contentdata = ArrayList<List<String>>()
+      //  contentdata.add(listOf("Booking ID","To location","From location","Status","Distance","View"))
        /* for (i in 0..40)
             contentdata.add(listOf("1","Sagar Bisht","01-02-2023","8:40am","50min","Chandigarh","Patiala","Pending","View"))*/
 
@@ -76,11 +80,20 @@ class RideHistory : Fragment() {
 
                         progressbar.visibility = View.GONE
                         data_view.visibility = View.VISIBLE
-                        data_view.isNestedScrollingEnabled = false
+                    //   data_view.isNestedScrollingEnabled = false
                         Log.d("Data Response", "" + it)
                         var allride: JSONObject = it.getJSONObject("data")
                         var allrideArray: JSONArray = allride.getJSONArray("all_rides")
-
+                        contentdata.add(
+                            HistoryModel(
+                                "Booking Id",
+                                "To Location",
+                                "From Location",
+                                "Status",
+                                "Distance",
+                                "View"
+                            )
+                        )
                         //  ride_details=allrideArray.optJSONObject(1).getJSONObject("ride_detail")
                         //Log.d("Ride Detail ",""+ride_details.toString())
                         for (p in 0..allrideArray.length() - 1) {
@@ -106,6 +119,8 @@ class RideHistory : Fragment() {
                             val time =
                                 it.getJSONObject("data").getJSONArray("all_rides")
                                     .getJSONObject(p).getString("time_only")
+
+
                             val paramMap = HashMap<String, String>()
                             paramMap.put( "booking_id", booking_id);
                             paramMap.put( "to_loc" , name);
@@ -119,7 +134,7 @@ class RideHistory : Fragment() {
                             MapUtility.paramMap.put(p,paramMap)
 
                             contentdata.add(
-                                listOf(
+                                HistoryModel(
                                     booking_id,
                                     name,
                                     name1,
@@ -129,7 +144,7 @@ class RideHistory : Fragment() {
                                 )
                             )
                         }
-                        header.adapter = RideHistoryRowAdapter(contentdata, requireContext())
+                        header.adapter = HistoryDataAdapter(requireActivity(),contentdata)
                         header.layoutManager = LinearLayoutManager(requireContext())
                         header.isNestedScrollingEnabled = false
                     }
