@@ -24,7 +24,14 @@ import android.content.SharedPreferences
         pref = _context
         editor =
     }*/
+ fun setWelcomeScreen(welcome: Boolean) {
+     editor!!.putBoolean("welcome", welcome)
+     editor!!.commit()
+ }
 
+     fun getWelcomeScreen(): Boolean {
+         return pref!!.getBoolean("welcome", true)
+     }
     fun setFirstTimeLaunch(isFirstTime: Boolean) {
         editor!!.putBoolean(IS_FIRST_TIME_LAUNCH, isFirstTime)
         editor!!.commit()

@@ -65,7 +65,7 @@ class DashBoard : BaseClass(){
     private lateinit var locationRequest: LocationRequest
     private val ADDRESS_PICKER_REQUEST = 1
     private var currentLocation: Location? = null
-    lateinit var locationManager: LocationManager
+     lateinit var locationManager: LocationManager
     private val requestcodes = 2
     private val permissionId = 2
     private var hasGps = false
@@ -132,7 +132,7 @@ class DashBoard : BaseClass(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
       setContentView(R.layout.a_dashboard)
-        prefManager = PrefManager(this)
+        prefManager = PrefManager(this@DashBoard)
 
         prefManager.setType("")
         prefManager.setToLatL("")
@@ -181,6 +181,7 @@ class DashBoard : BaseClass(){
          liveLoc = findViewById<TextView>(R.id.live_loc)
         var ll_logout = findViewById<LinearLayout>(R.id.ll_logout)
 
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
 
 
@@ -275,13 +276,14 @@ class DashBoard : BaseClass(){
 */
 
         continu.setOnClickListener {
-           grantLocPer()
+         //  grantLocPer()
             perm.isVisible = false
             main.isVisible = true
         }
 
 
-        grantLocPer()
+       setfragment(homeFrag)
+
 
        var bottom = findViewById<BottomNavigationView>(R.id.navigation_bar)
         var home_top = findViewById<LinearLayout>(R.id.home_top)
@@ -370,106 +372,7 @@ class DashBoard : BaseClass(){
         }
     }
 
-   private fun requestPermissions() {
-       ActivityCompat.requestPermissions(this@DashBoard,
-           arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), permissionId)
 
-   }
-    private fun isLocationPermissionGranted(): Boolean {
-        return if (ActivityCompat.checkSelfPermission(this@DashBoard, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this@DashBoard, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(
-                this@DashBoard,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION),
-                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
-
-
-           // ActivityCompat.requestPermissions(this@DashBoard, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION),
-              //  requestcodes
-
-            false
-        } else {
-            true
-        }
-    }
-
-    fun grantLocPer() {
-
-        if (isLocationPermissionGranted()) {
-
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(
-                        this@DashBoard,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    )
-                    == PackageManager.PERMISSION_GRANTED
-                ) {
-                    checkLocationService()
-
-                } else {
-                    ActivityCompat.requestPermissions(
-                        this@DashBoard,
-                        arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                        PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
-                    );
-                }
-            } else {
-                checkLocationService()
-            }
-
-        } else {
-            ActivityCompat.requestPermissions(
-                this@DashBoard,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION),
-                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
-
-        }
-    }
-    fun checkLocationService() {
-
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10 * 1000);
-        locationRequest.setFastestInterval(2 * 1000);
-
-
-        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        // builder.setAlwaysShow(true);
-        val client = LocationServices.getSettingsClient(this@DashBoard)
-        val task = client.checkLocationSettings(builder.build())
-        task.addOnSuccessListener(this@DashBoard){it->
-            it.locationSettingsStates;
-           setfragment(homeFrag)
-            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-            hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-//------------------------------------------------------//
-            hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-            liveLoc = findViewById<TextView>(R.id.live_loc)
-
-            getLocation()
-        }
-
-        task.addOnFailureListener(this@DashBoard) { e ->
-            if (e is ResolvableApiException) {
-                // Location settings are not satisfied, but this can be fixed
-                // by showing the user a dialog.
-                try {
-                    grantLocPer()
-                    // Show the dialog by calling startResolutionForResult(),
-                    // and check the result in onActivityResult().
-                    e.startResolutionForResult (this@DashBoard, REQUEST_CHECK_SETTINGS)
-
-                } catch (sendEx: IntentSender.SendIntentException) {
-                    // Ignore the error.
-                }
-
-            }
-        }
-    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode== AUTOCOMPLETE_REQUEST_CODE){
@@ -495,73 +398,9 @@ class DashBoard : BaseClass(){
                 }
             }
         }
-        if (resultCode == -1) {
-           setfragment(homeFrag)
-            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-            hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-//------------------------------------------------------//
-            hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-            liveLoc = findViewById<TextView>(R.id.live_loc)
-
-            getLocation()
-
-        } else {
-            grantLocPer()
-        }
-    }
-
-
-
-
-
-    @SuppressLint("SuspiciousIndentation")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            101-> {
-                if (grantResults.isNotEmpty() && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED) {
-                    if ((ContextCompat.checkSelfPermission(this@DashBoard,
-                            android.Manifest.permission.ACCESS_FINE_LOCATION) ===
-                                PackageManager.PERMISSION_GRANTED)) {
-
-                        main.isVisible = true
-                        perm.isVisible = false
-                           grantLocPer()
-
-                    }else{
-                        ActivityCompat.requestPermissions(
-                            this@DashBoard,
-                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION),
-                            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
-                    }
-                } else {
-                    if ((ContextCompat.checkSelfPermission(this@DashBoard,
-                            android.Manifest.permission.ACCESS_FINE_LOCATION) ===
-                                PackageManager.PERMISSION_GRANTED)) {
-
-                        main.isVisible = false
-                        perm.isVisible = true
-
-
-                    }else{
-                        ActivityCompat.requestPermissions(
-                            this@DashBoard,
-                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION),
-                            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
-                    }
-
-
-                }
-                return
-            }
-        }
-
 
     }
+
 
     val gpsLocationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
@@ -679,6 +518,10 @@ class DashBoard : BaseClass(){
             Log.w(" Current loction address",  e.printStackTrace().toString())
         }
         liveLoc?.setText(strAdd)
+    }
+    override fun onResume(){
+        super.onResume()
+        getLocation()
     }
 
 }

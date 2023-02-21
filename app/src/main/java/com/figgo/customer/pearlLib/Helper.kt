@@ -27,6 +27,7 @@ package com.figgo.customer.pearlLib
      var get_cab_work_details= baseurl+"driver/get-cab-work-details"
      var ride_history= baseurl+"driver/ride-history"
      var ride_delete = baseurl+"ride/ride-delete"
+     var EMERGENCY_LIVE = baseurl+"live-emergency-location"
 
 
 }
