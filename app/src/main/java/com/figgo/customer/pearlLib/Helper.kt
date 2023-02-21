@@ -28,7 +28,8 @@ package com.figgo.customer.pearlLib
      var ride_history= baseurl+"driver/ride-history"
      var ride_delete = baseurl+"ride/ride-delete"
      var check_ride_request_status = baseurl+"ride/check-ride-request-status"
-     var emergency = baseurl+"figo/api/emergency"
+     var Emergency = baseurl+"emergency"
+     var emeregncylivelocation = baseurl+"live-emergency-location"
 
 
 }

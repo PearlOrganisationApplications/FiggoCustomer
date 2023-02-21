@@ -53,6 +53,15 @@ import android.content.SharedPreferences
      }
 
 
+     fun setWelcome(welcome: String){
+         editor!!.putString("welcome",welcome)
+         editor?.commit()
+     }
+
+
+     fun getWelcome():String{
+         return pref?.getString("welcome","").toString()
+     }
 
 
      fun setToken(token:String){
@@ -436,6 +445,26 @@ import android.content.SharedPreferences
      }
      fun getDriverlng():Float{
          return pref!!.getFloat("d_lng",0.0f)
+     }
+
+     fun setLiveLoc(LiveLoc: String) {
+         editor?.putString("LiveLoc",LiveLoc)
+         editor?.commit()
+
+     }
+
+     fun getLiveLoc(): String {
+         return pref?.getString("LiveLoc","null").toString()
+     }
+
+     fun setManualLoc(ManualLoc: String) {
+         editor?.putString("ManualLoc",ManualLoc)
+         editor?.commit()
+
+     }
+
+     fun getManualLoc(): String {
+         return pref?.getString("ManualLoc","null").toString()
      }
 
  }

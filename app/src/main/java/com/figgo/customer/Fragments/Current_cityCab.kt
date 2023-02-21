@@ -75,7 +75,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
     private val REQUEST_CHECK_SETTINGS: Int=101
     private lateinit var mMap: GoogleMap
     var PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION=101
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient;
     private lateinit var lastLocation: Location
     private lateinit var locationRequest: LocationRequest
 
@@ -138,6 +138,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         ll_choose_vehicle = view?.findViewById<LinearLayout>(R.id.ll_choose_vehicle)!!
         manualLoc = view?.findViewById<TextView>(R.id.loc_manual)
         liveLoc = view?.findViewById<TextView>(R.id.live_loc)
+        /* nxtbtn = view.findViewById(R.id.nxtbtn)*/
         progress = view.findViewById<ProgressBar>(R.id.progress)
         val onewayvehiclelist = view.findViewById<RecyclerView>(R.id.onewayvehiclelist)
         var locLinear = view?.findViewById<LinearLayout>(R.id.linear_loc)
@@ -206,16 +207,28 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         watchimg?.setOnClickListener {
             val cal = Calendar.getInstance()
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
-                cal.set(Calendar.HOUR_OF_DAY, hour)
+                val am_pm = if (hour < 12) "AM" else "PM"
+                var selectedHour : Int
+                if (hour > 12){
+                    selectedHour = hour - 12
+                }else{
+                    if(hour == 0){
+                        selectedHour = 12
+
+                    }else {
+                        selectedHour = hour
+                    }
+                }
+                cal.set(Calendar.HOUR_OF_DAY, selectedHour)
                 cal.set(Calendar.MINUTE, minute)
                 if (timetext != null) {
                     if (::cTimer.isInitialized) {
                         cTimer.cancel()
                     }
-                    timetext?.text = SimpleDateFormat("HH:mm:ss").format(cal.time)
+                    timetext?.text = SimpleDateFormat("HH:mm:ss").format(cal.time)+""+am_pm+""
                 }
             }
-            TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+            TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show()
         }
 
         manualLoc?.setOnClickListener {
@@ -337,11 +350,44 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                     val currentDate = LocalDateTime.now().format(formatter)
-                    val formated = DateTimeFormatter.ofPattern("HH:mm:s")
-                    val currentTime = LocalDateTime.now().format(formated)
 
+                    val calendar = Calendar.getInstance()
+                    val hour = calendar[Calendar.HOUR_OF_DAY]
+                    val minutes = calendar[Calendar.MINUTE]
+                    val seconds = calendar[Calendar.SECOND]
+                    val am_pm = if (hour < 12) "AM" else "PM"
+                    var selectedHour : String
+                    var selectedMin : String
+                    var selectedSec : String
+
+                    if (hour > 12){
+                        selectedHour = (hour - 12).toString()
+                    }else{
+                        if(hour == 0){
+                            selectedHour = 12.toString()
+
+                        }else {
+                            if (hour < 10){
+                                selectedHour = "0"+hour.toString()
+                            }else {
+                                selectedHour = hour.toString()
+                            }
+                        }
+                    }
+                    if (minutes < 10){
+                        selectedMin = "0"+minutes.toString()
+                    }else{
+                        selectedMin = minutes.toString()
+                    }
+                    if (seconds < 10){
+                        selectedSec = "0"+seconds.toString()
+                    }else{
+                        selectedSec = seconds.toString()
+
+                    }
+                    val time = selectedHour+":"+selectedMin+":"+selectedSec+""+am_pm+""
                     datetext?.setText(currentDate)
-                    timetext?.setText(currentTime)
+                    timetext?.setText(time)
                 } else {
                     TODO("VERSION.SDK_INT < O")
                 }
@@ -364,6 +410,8 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         pref.setToLatMC(from_lat.toString())
         pref.setToLngMC(from_lng.toString())
         pref.setTime(datetext?.text.toString())
+        pref.setLiveLoc( liveLoc?.text.toString())
+        pref.setManualLoc( manualLoc?.text.toString())
         progress?.isVisible = true
         ll_location?.isVisible = false
         ll_choose_vehicle?.isVisible  =false
@@ -386,41 +434,28 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
             override fun onResponse(response: JSONObject?) {
                 Log.d("SendData", "response===" + response)
                 if (response != null) {
+
                     if (response != null) {
 
                         progressDialog.hide()
                         try {
 
-
                             ll_location?.isVisible = false
                             ll_choose_vehicle?.isVisible = true
                             pref.setCount("vehicle")
 
-                            val size = response.getJSONObject("data").getJSONArray("vehicle_types")
-                                .length()
+                            val size = response.getJSONObject("data").getJSONArray("vehicle_types").length()
                             val ride_id = response.getJSONObject("data").getString("ride_id")
 
                             for (p2 in 0 until size) {
 
-                                val name =
-                                    response.getJSONObject("data").getJSONArray("vehicle_types")
-                                        .getJSONObject(p2).getString("name")
-                                val image =
-                                    response.getJSONObject("data").getJSONArray("vehicle_types")
-                                        .getJSONObject(p2).getString("full_image")
-                                val driver_id =
-                                    response.getJSONObject("data").getJSONArray("vehicle_types")
-                                        .getJSONObject(p2).getString("id")
-                                val min_price =
-                                    response.getJSONObject("data").getJSONArray("vehicle_types")
-                                        .getJSONObject(p2).getString("min_price")
-                                val max_price =
-                                    response.getJSONObject("data").getJSONArray("vehicle_types")
-                                        .getJSONObject(p2).getString("max_price")
+                                val name = response.getJSONObject("data").getJSONArray("vehicle_types").getJSONObject(p2).getString("name")
+                                val image = response.getJSONObject("data").getJSONArray("vehicle_types").getJSONObject(p2).getString("full_image")
+                                val driver_id = response.getJSONObject("data").getJSONArray("vehicle_types").getJSONObject(p2).getString("id")
+                                val min_price = response.getJSONObject("data").getJSONArray("vehicle_types").getJSONObject(p2).getString("min_price")
+                                val max_price = response.getJSONObject("data").getJSONArray("vehicle_types").getJSONObject(p2).getString("max_price")
 
-                                cablist.add(CurrentVehicleModel(name, image, ride_id, driver_id, min_price, max_price))
-
-
+                                cablist.add(CurrentVehicleModel(name, image, ride_id, driver_id, min_price,max_price))
                             }
 
 
@@ -431,6 +466,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
                             progress?.isVisible = false
                             ll_location?.isVisible = false
                             ll_choose_vehicle?.isVisible = true
+
                         }catch (e:Exception){
                             MapUtility.showDialog(e.toString(),requireActivity())
 
@@ -450,12 +486,12 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
                 val headers: MutableMap<String, String> = HashMap()
-                headers.put("Content-Type", "application/json; charset=UTF-8");
+                headers.put("Content-Type", "application/json; charset=UTF-8")
                 headers.put("Authorization", "Bearer " + pref.getToken());
                 return headers
             }
         }
-        jsonOblect.setRetryPolicy(DefaultRetryPolicy(10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT))
+        jsonOblect.setRetryPolicy(DefaultRetryPolicy(20000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT))
 
         queue.add(jsonOblect)
 

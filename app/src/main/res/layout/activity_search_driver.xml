@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-
         android:orientation="vertical"
         android:visibility="visible">
 
@@ -30,8 +29,9 @@
             android:layout_marginHorizontal="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/bottom_header_relativelayout"
-            />
+            android:layout_above="@+id/bottom_header_relativelayout" />
+
+
         <TextView
             android:id="@+id/txt_timer"
             android:layout_width="wrap_content"
@@ -59,17 +59,17 @@
 
 
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:visibility="gone"
         android:id="@+id/ll_details"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="110dp"
             android:text="We are happy to inform you that your booking is confirmed ! Get ready to create some unforgettable memories"
             android:textSize="16sp"
             android:id="@+id/text"
@@ -79,11 +79,30 @@
             android:background="@drawable/mpin_gradinet"
             android:textColor="@color/white"/>
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_20sdp"
+            android:orientation="vertical">
+
+            <include
+                layout="@layout/driverdetails_screen"
+                android:id="@+id/layoutdriverdetails" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
 
 
-        <include
-            layout="@layout/layout_driver_details"
-            android:id="@+id/layoutdriverdetails" />
 
 
 

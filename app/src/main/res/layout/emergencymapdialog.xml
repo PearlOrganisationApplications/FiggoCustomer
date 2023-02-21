@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/colorlightpurple"
+    android:layout_margin="2dp"
+    android:padding="35dp"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content">
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/gifImageViewman"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/emergency_light"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/cb_errorRed"
+        android:textSize="16sp"
+        android:id="@+id/error"
+        android:text="Please wait few some time take quick action our team side"
+        android:textAlignment="center" />
+
+
+
+</LinearLayout>

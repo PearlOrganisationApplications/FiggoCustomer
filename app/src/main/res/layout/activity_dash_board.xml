@@ -23,14 +23,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- <LinearLayout
-                 android:id="@+id/ll1"
-                 android:layout_width="match_parent"
-                 android:layout_height="43dp"
-                 android:background="@drawable/dashboard_white_searchbar"
-                 android:layout_marginTop="-18dp"
-                 android:layout_marginLeft="12sp"
-                 android:layout_marginRight="12sp">-->
 
             <TextView
                 android:id="@+id/live_loc"
@@ -46,7 +38,7 @@
                 android:hint="Current location"/>
 
 
-            <!-- </LinearLayout>-->
+
 
 
 
@@ -81,18 +73,11 @@
 
 
 
-                 <!--       <LinearLayout
-                            android:id="@+id/backgrouund"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            app:layout_constraintTop_toBottomOf="@id/layout"
-                            tools:ignore="MissingConstraints">-->
+
                         <include
                             layout="@layout/layouthometop"
                             android:visibility="visible"
-                            android:id="@+id/home_top"
-                            />
+                            android:id="@+id/home_top"/>
 
                             <FrameLayout
                                 android:id="@+id/framedash"

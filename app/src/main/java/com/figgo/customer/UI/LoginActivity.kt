@@ -54,6 +54,7 @@ class LoginActivity : AppCompatActivity(){
     lateinit var otp_Verify_button: Button
     lateinit var progress: ProgressBar
     lateinit var cTimer : CountDownTimer
+     var count : Int = 0
     lateinit var txt_mpin : TextView
     lateinit var txt_otp : TextView
     lateinit var login_mpin : CardView
@@ -96,7 +97,8 @@ class LoginActivity : AppCompatActivity(){
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        //  ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION)
+        pref.setWelcome("true")
+      //  ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION)
         // mGoogleApiClient = GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this)
         //    .addOnConnectionFailedListener(this).build()
 
@@ -165,8 +167,8 @@ class LoginActivity : AppCompatActivity(){
             //getotp()
 
         }
-        // val s = pref.getMpin()
-        //  Log.d("MPIN ", "" + pref.getMpin())
+       // val s = pref.getMpin()
+      //  Log.d("MPIN ", "" + pref.getMpin())
 
         txt_mpin.setOnClickListener {
 
@@ -200,22 +202,22 @@ class LoginActivity : AppCompatActivity(){
 
         btn_login_mpin.setOnClickListener {
 
-            if (mPin.text.toString().equals("")){
-                Toast.makeText(this@LoginActivity, "Enter MPIN", Toast.LENGTH_SHORT).show()
+          if (mPin.text.toString().equals("")){
+              Toast.makeText(this@LoginActivity, "Enter MPIN", Toast.LENGTH_SHORT).show()
 
-            }else{
-                if (mPin.text.toString().length < 4){
-                    Toast.makeText(this@LoginActivity, "Required 4 Digit", Toast.LENGTH_SHORT).show()
+          }else{
+              if (mPin.text.toString().length < 4){
+                  Toast.makeText(this@LoginActivity, "Required 4 Digit", Toast.LENGTH_SHORT).show()
 
-                }else{
-                    if (pref.getMpin().equals(mPin.text.toString())){
-                        startActivity(Intent(this,DashBoard::class.java))
-                    }else{
-                        Toast.makeText(this@LoginActivity, "Wrong MPIN", Toast.LENGTH_SHORT).show()
+              }else{
+                  if (pref.getMpin().equals(mPin.text.toString())){
+                      startActivity(Intent(this,DashBoard::class.java))
+                  }else{
+                      Toast.makeText(this@LoginActivity, "Wrong MPIN", Toast.LENGTH_SHORT).show()
 
-                    }
-                }
-            }
+                  }
+              }
+          }
 
         }
         otp_Verify_button.setOnClickListener {
@@ -238,7 +240,8 @@ class LoginActivity : AppCompatActivity(){
             }
 
             override fun onFinish() {
-                resend.setText("resend OTP!")
+                resend.setText("RESEND OTP!")
+                resend.setTextColor(Color.BLUE)
 
             }
         }
@@ -273,12 +276,12 @@ class LoginActivity : AppCompatActivity(){
             // prefManager.setToken("")
             Toast.makeText(this@LoginActivity, "Signed In :" + account.account.toString(), Toast.LENGTH_LONG).show()
 
-            if (pref.getMpin().equals("") || pref.getMpin().equals("null")) {
+           /* if (pref.getMpin().equals("") || pref.getMpin().equals("null")) {
                 startActivity(Intent(this,MPinGenerate::class.java))
             } else {
-                startActivity(Intent(this,DashBoard::class.java))
-            }
 
+            }*/
+            startActivity(Intent(this,DashBoard::class.java))
             // Signed in successfully, show authenticated UI.
             // updateUI(account)
         } catch (e: ApiException) {
@@ -365,7 +368,7 @@ class LoginActivity : AppCompatActivity(){
                 }
             }, object : Response.ErrorListener {
                 override fun onErrorResponse(error: VolleyError?) {
-                    //  Toast.makeText(this@LoginActivity, "Something went wrong!", Toast.LENGTH_LONG).show()
+                  //  Toast.makeText(this@LoginActivity, "Something went wrong!", Toast.LENGTH_LONG).show()
 
                     MapUtility.showDialog(error.toString(),this@LoginActivity)
                 }
@@ -415,7 +418,7 @@ class LoginActivity : AppCompatActivity(){
                                 ).show()
                                 //  Log.d("SendData", "token===" + token)
                                 //  startActivity(Intent(this@LoginActivity,MPinGenerate::class.java))
-                                if (pref.getMpin().equals("")) {
+                               /* if (pref.getMpin().equals("")) {
                                     startActivity(
                                         Intent(
                                             this@LoginActivity,
@@ -429,8 +432,13 @@ class LoginActivity : AppCompatActivity(){
                                             DashBoard::class.java
                                         )
                                     )
-                                }
-
+                                }*/
+                                startActivity(
+                                    Intent(
+                                        this@LoginActivity,
+                                        DashBoard::class.java
+                                    )
+                                )
 
                             } else {
                                 val token = response.getString("token")
@@ -455,7 +463,7 @@ class LoginActivity : AppCompatActivity(){
                 override fun onErrorResponse(error: VolleyError?) {
                     progressDialog.hide()
                     MapUtility.showDialog(error.toString(),this@LoginActivity)
-                    //  Toast.makeText(this@LoginActivity, "Something went wrong!", Toast.LENGTH_LONG).show()
+                  //  Toast.makeText(this@LoginActivity, "Something went wrong!", Toast.LENGTH_LONG).show()
                 }
             }) {
                 @Throws(AuthFailureError::class)
@@ -476,7 +484,13 @@ class LoginActivity : AppCompatActivity(){
 
 
     override fun onBackPressed() {
-        finishAffinity();
+        if (count == 0) {
+            cc_number.isVisible = true
+            otp_screen.isVisible = false
+        }else{
+            finishAffinity()
+        }
+        count++
     }
 
 }

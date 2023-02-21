@@ -810,11 +810,11 @@ class LocationPickerActivityCurr :AppCompatActivity(), OnMapReadyCallback, RideC
         override fun onPostExecute(userAddress: Bundle?) {
             super.onPostExecute(userAddress)
             this@LocationPickerActivityCurr.userAddress = userAddress!!.getString("addressline2").toString()
-            userCity = userAddress.getString("city")!!
+            /*userCity = userAddress.getString("city")!!
             userState = userAddress.getString("state")!!
             userPostalCode = userAddress.getString("postalcode")!!
             userCountry = userAddress.getString("country")!!
-            userAddressline2 = userAddress.getString("addressline2")!!
+            userAddressline2 = userAddress.getString("addressline2")!!*/
             MapUtility.hideProgress()
             addMarker()
         }
