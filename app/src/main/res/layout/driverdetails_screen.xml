@@ -170,7 +170,7 @@
                 android:layout_height="wrap_content"
                 android:text="to location"
                 android:gravity="center"
-                android:textSize="@dimen/_13sdp"
+                android:textSize="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_8sdp"
                 android:textColor="@color/black"/>
 
@@ -181,8 +181,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="from location"
+
                 android:gravity="center"
-                android:textSize="@dimen/_13sdp"
+                android:textSize="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_8sdp"
                 android:textColor="@color/black"/>
 
