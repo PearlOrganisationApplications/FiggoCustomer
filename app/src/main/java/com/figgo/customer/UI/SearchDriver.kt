@@ -337,7 +337,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
             val amt = pref.getPrice()
             val amount = Math.round(amt.toFloat() * 100).toInt()
             val checkout = Checkout()
-            checkout.setKeyID("rzp_test_capDM1KlnUhj5f")
+            checkout.setKeyID("rzp_test_9N5qfy5gXIQ81Y")
             checkout.setImage(R.drawable.appicon)
             val obj = JSONObject()
             try {
@@ -426,7 +426,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
         dialog.show()
         val window: Window? = dialog.getWindow()
-        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
 
     }
@@ -631,8 +631,8 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
         try {
             transaction_id = s
-         //  getOtp()
-           getAcceptRide()
+           getOtp()
+          // getAcceptRide()
 
         } catch (e: Exception) {
             Log.e(ContentValues.TAG, "Exception in onPaymentSuccess", e)

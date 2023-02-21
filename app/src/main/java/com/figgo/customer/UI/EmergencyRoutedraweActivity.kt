@@ -16,10 +16,17 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.android.volley.AuthFailureError
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.figgo.cabs.figgodriver.MapData
 import com.figgo.cabs.figgodriver.Service.FireBaseService
 import com.figgo.customer.R
+import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.BaseClass
+import com.figgo.customer.pearlLib.Helper
 import com.figgo.customer.pearlLib.PrefManager
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -39,6 +46,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONObject
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
@@ -65,7 +75,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     var dropLocation: LatLng? = null
     var line: Polyline? = null
     private var provider: String? = null
-    var waypoints = ""
+    var waypoints :LatLng? = null
     var customerLoc:LatLng? = null
     private var locationManager: LocationManager? = null
     override fun setLayoutXml() {
@@ -131,7 +141,89 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
         }
 
         tv_emrgencybtn.setOnClickListener {
-            startActivity(Intent(this,DriveRatingActivity::class.java))
+            //startActivity(Intent(this,DriveRatingActivity::class.java))
+            var geocoder: Geocoder
+            val addresses: List<Address>
+            geocoder = Geocoder(this@EmergencyRoutedraweActivity, Locale.getDefault())
+
+
+            var strAdd : String? = null
+            try {
+                val addresses = geocoder.getFromLocation(waypointsLatitude!!, waypointsLongitude!!, 1)
+                if (addresses != null) {
+                    val returnedAddress = addresses[0]
+                    val strReturnedAddress = java.lang.StringBuilder("")
+                    for (i in 0..returnedAddress.maxAddressLineIndex) {
+                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+                    }
+                    strAdd = strReturnedAddress.toString()
+                    Log.w(" Current loction address", strReturnedAddress.toString())
+                } else {
+                    Log.w(" Current loction address", "No Address returned!")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.w(" Current loction address",  e.printStackTrace().toString())
+            }
+            val URL = Helper.EMERGENCY_LIVE
+            val queue = Volley.newRequestQueue(this)
+            val json = JSONObject()
+            json.put("ride_id", pref.getride_id())
+            json.put("location_name", strAdd)
+            json.put("lat", waypointsLatitude)
+            json.put("lng", waypointsLongitude)
+
+            //  Log.d("transac",transaction_id.toString())
+            //  Log.d("rides",pref.getride_id())
+            val jsonOblect: JsonObjectRequest =
+                object : JsonObjectRequest(Method.POST, URL, json, object :
+                    Response.Listener<JSONObject?>               {
+                    @SuppressLint("SuspiciousIndentation")
+                    override fun onResponse(response: JSONObject?) {
+
+                        Log.d("SendData", "response===" + response)
+                        if (response != null) {
+                            try {
+
+                                val status = response.getString("status")
+                                if (status.equals("true")) {
+
+
+                                    /*startActivity(Intent).(this@SearchDriver,EmergencyRoutedraweActivity::class.java))*/
+
+
+                                } else {
+
+                                }
+                            }catch (e:Exception){
+                                MapUtility.showDialog(e.toString(),this@EmergencyRoutedraweActivity)
+
+                            }
+                        }
+
+                    }
+                }, object : Response.ErrorListener {
+                    override fun onErrorResponse(error: VolleyError?) {
+                        // progressDialog.hide()
+                        Log.d("SendData", "error===" + error)
+                        // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
+
+                        MapUtility.showDialog(error.toString(),this@EmergencyRoutedraweActivity)
+                    }
+                }) {
+
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val headers: MutableMap<String, String> = java.util.HashMap()
+                        headers.put("Content-Type", "application/json; charset=UTF-8");
+                        headers.put("Authorization", "Bearer " + pref.getToken());
+                        headers.put("Accept", "application/vnd.api+json");
+                        return headers
+                    }
+                }
+
+            queue.add(jsonOblect)
+
         }
 
         iv_call.setOnClickListener {
@@ -196,7 +288,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                 }
                 (timer as CountDownTimer).start()
 
-                mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(originLocation, 14F))
+                mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(waypoints!!, 14F))
 
 
             }
@@ -267,8 +359,8 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     }
 
     private fun getDirectionURL(origin:LatLng, dest:LatLng, secret: String) : String{
-        waypoints = "waypoints="
-        waypoints += waypointsLatitude.toString() + "," + waypointsLongitude.toString() + "|";
+
+        waypoints = LatLng(waypointsLatitude.toDouble() , waypointsLongitude.toDouble())
         return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" +
                 "&destination=${dest.latitude},${dest.longitude}" +
                 "&sensor=false" +
@@ -421,6 +513,7 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker3))
                 .title("My Location")
         )
+       // mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(customerLoc!!, 2F))
 
 
         val source = "$originLatitude,$originLongitude"

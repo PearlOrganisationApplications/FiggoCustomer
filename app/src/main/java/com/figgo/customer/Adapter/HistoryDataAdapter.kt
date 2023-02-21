@@ -70,6 +70,8 @@ class HistoryDataAdapter(var context:Activity, var historyData:List<HistoryModel
             }
 
             holder.view.setBackgroundColor(context.getColor(R.color.appcolorlight))
+            holder.view.setTextColor(context.getColor(R.color.white))
+
             holder.view.setOnClickListener {
 
 
