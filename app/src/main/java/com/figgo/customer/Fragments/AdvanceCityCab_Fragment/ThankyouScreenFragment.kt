@@ -1,19 +1,19 @@
-package com.figgo.customer.Fragments.Shared_Cab_Fragment
+package com.figgo.customer.Fragments.AdvanceCityCab_Fragment
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.figgo.customer.pearlLib.PrefManager
 import com.figgo.customer.R
 import com.figgo.customer.UI.CityCabActivity
 import com.figgo.customer.UI.DashBoard
 
-class ThankyouScreenFragment : Fragment() {
+class ThankyouScreenFragment :  Fragment() {
     lateinit var pref: PrefManager
     var booking_id: TextView? = null
     var otpText: TextView? = null

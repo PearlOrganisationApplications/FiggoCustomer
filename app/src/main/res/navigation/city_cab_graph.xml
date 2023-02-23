@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/advance"
-        android:name="com.figgo.customer.Fragments.Advance_cityCab"
+        android:name="com.figgo.customer.Fragments.AdvanceCityCab_Fragment.Advance_cityCab"
         android:label="fragment_advance_city_cab"
         tools:layout="@layout/fragment_advance_city_cab" >
         <action
@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/current"
-        android:name="com.figgo.customer.Fragments.Current_cityCab"
+        android:name="com.figgo.customer.Fragments.CityCab_Fragment.Current_cityCab"
         android:label="fragment_current_city_cab"
         tools:layout="@layout/fragment_current_city_cab" >
         <action

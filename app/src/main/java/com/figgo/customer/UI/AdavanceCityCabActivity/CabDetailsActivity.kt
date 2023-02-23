@@ -1,4 +1,4 @@
-package com.figgo.customer.UI
+package com.figgo.customer.UI.AdavanceCityCabActivity
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
@@ -14,11 +14,12 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.figgo.customer.Fragments.AdvanceCityCab_Fragment.ThankyouScreenFragment
 import com.figgo.customer.pearlLib.PrefManager
 import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.R
-import com.figgo.customer.Fragments.Shared_Cab_Fragment.ThankyouScreenFragment
 import com.figgo.customer.Util.MapUtility
+import com.figgo.customer.pearlLib.Helper
 import com.razorpay.PaymentResultListener
 import org.json.JSONObject
 import java.util.*
@@ -84,12 +85,13 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
     private fun getOtp() {
         val progressDialog = ProgressDialog(this@CabDetailsActivity)
         progressDialog.show()
-        val URL ="https://test.pearl-developer.com/figo/api/ride/update-city-ride-payment-status"
+        val URL = Helper.UPDATE_CITY_RIDE_PAYMENT_STATUS
         val queue = Volley.newRequestQueue(this@CabDetailsActivity)
         val json = JSONObject()
         json.put("transaction_id", transaction_id.toString())
         json.put("payment_type", "card")
         json.put("ride_id", pref.getRideId())
+        json.put("ride_request_id", pref.getReqRideId())
         Log.d("transac",transaction_id.toString())
         Log.d("rides",pref.getride_id())
         val jsonOblect: JsonObjectRequest =
@@ -108,6 +110,7 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
 
                             pref.setOtp(otp.toString())
                             pref.setBookingNo(booking_no)
+
                             supportFragmentManager.beginTransaction().apply {
                                 replace(R.id.nav_controller, thankyouScreenFragment)
                                 commit()

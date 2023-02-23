@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.figgo.customer.pearlLib.PrefManager
 import com.figgo.customer.Model.AdvanceCityCabModel
 import com.figgo.customer.R
-import com.figgo.customer.UI.CabDetailsActivity
+import com.figgo.customer.UI.AdavanceCityCabActivity.CabDetailsActivity
 import com.squareup.picasso.Picasso
 
 

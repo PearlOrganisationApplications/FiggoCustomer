@@ -16,7 +16,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/appicon"
@@ -33,9 +33,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-        <activity
-            android:name="com.figgo.customer.UI.DashBoard_NewChange"
-            android:exported="false" />
+
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
@@ -45,6 +43,10 @@
 
        <activity android:name="com.figgo.customer.UI.HelpAndSupportActivity"
            android:exported="false"/>
+
+        <activity android:name="com.figgo.customer.UI.Thankyou_RatingCityCab"
+            android:exported="false"/>
+
 
         <activity android:name="com.figgo.customer.UI.Edit_Profile_Activity"
             android:exported="false"/>
@@ -64,11 +66,11 @@
            android:exported="false"/>
       <activity android:name="com.figgo.customer.UI.Current_Driver_Details_List"
           android:exported="false"/>
-        <activity android:name="com.figgo.customer.UI.EmergencyRoutedraweActivity"
+        <activity android:name="com.figgo.customer.UI.CurrentCityCabActivity.EmergencyRoutedraweActivity"
             android:exported="true">
 
         </activity>
-        <activity android:name="com.figgo.customer.UI.SearchDriver"
+        <activity android:name="com.figgo.customer.UI.CurrentCityCabActivity.SearchDriver"
             android:exported="false">
 
         </activity>
@@ -82,17 +84,13 @@
         <activity
             android:name="com.figgo.customer.UI.CurrentMap.EmergencyMapsActivity"
             android:exported="false" />
+
+
         <activity
-            android:name="com.figgo.customer.UI.VerifyOtp"
+            android:name="com.figgo.customer.UI.AdavanceCityCabActivity.LocationPickerActivity"
             android:exported="false" />
         <activity
-            android:name="com.figgo.customer.UI.LocationDisActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.figgo.customer.UI.LocationPickerActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.figgo.customer.UI.LocationPickerActivityCurr"
+            android:name="com.figgo.customer.UI.CurrentCityCabActivity.LocationPickerActivityCurr"
             android:exported="false"
             android:noHistory="false" />
         <activity
@@ -153,7 +151,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name="com.figgo.customer.UI.CabDetailsActivity"
+            android:name="com.figgo.customer.UI.AdavanceCityCabActivity.CabDetailsActivity"
             android:exported="false"
             android:label="@string/title_activity_cab_details"
             android:theme="@style/Theme.Figgo.NoActionBar">

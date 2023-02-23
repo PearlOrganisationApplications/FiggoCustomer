@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.CabDetailsActivity">
+    tools:context=".UI.AdavanceCityCabActivity.CabDetailsActivity">
 
     <fragment
         android:id="@+id/nav_controller"

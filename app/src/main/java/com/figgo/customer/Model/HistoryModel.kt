@@ -6,5 +6,6 @@ data class HistoryModel (
     var from_loc: String,
     var status:String,
     var distance:String,
-    var view:String
+    var view:String,
+    var type:String
         )

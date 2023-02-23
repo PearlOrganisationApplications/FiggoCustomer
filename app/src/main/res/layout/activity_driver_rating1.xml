@@ -73,7 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/_14sdp"
-                    android:fontFamily="@font/red_hat_text_bold"
+
                     android:layout_marginTop="@dimen/_8sdp"
                     android:textColor="@color/colorRed"
                     android:text="Rs. 205/- "/>
@@ -100,12 +100,14 @@
                     android:background="@color/white"
                     android:text="  Rider Service   "
                     android:textSize="@dimen/_9sdp" />
+
                 <RatingBar
+                    android:id="@+id/ride_service_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:max="5"
                     android:numStars="5"
-                    android:id="@+id/ride_service_rating"/>
+                    tools:ignore="SpeakableTextPresentCheck" />
 
 
                 <TextView
@@ -113,7 +115,8 @@
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:text="                        "
-                    android:textSize="@dimen/_9sdp" />
+                    android:textSize="@dimen/_9sdp"
+                    tools:ignore="SpeakableTextPresentCheck" />
 
             </LinearLayout>
 
@@ -135,13 +138,14 @@
                     android:background="@color/white"
                     android:text="  Figgo Service   "
                     android:textSize="@dimen/_9sdp" />
+
                 <RatingBar
+                    android:id="@+id/figgo_service_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:max="5"
                     android:numStars="5"
-                    android:id="@+id/figgo_service_rating"
-                    />
+                    tools:ignore="SpeakableTextPresentCheck" />
 
 
 

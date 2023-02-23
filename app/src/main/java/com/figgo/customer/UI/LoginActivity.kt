@@ -97,7 +97,6 @@ class LoginActivity : AppCompatActivity(){
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        pref.setWelcome("true")
       //  ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION)
         // mGoogleApiClient = GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this)
         //    .addOnConnectionFailedListener(this).build()
@@ -145,7 +144,13 @@ class LoginActivity : AppCompatActivity(){
             //var mobile_num=binding.inputNumber.text.toString()
 
             if (press.equals("otp")) {
-                login()
+                if (input_number.length() < 10){
+                    Toast.makeText(this@LoginActivity, "Required 10 Digit", Toast.LENGTH_SHORT).show()
+
+                }else {
+
+                    login()
+                }
             }else if (press.equals("mpin")) {
                 if (mPin.text.toString().equals("")){
                     Toast.makeText(this@LoginActivity, "Enter MPIN", Toast.LENGTH_SHORT).show()
@@ -224,7 +229,14 @@ class LoginActivity : AppCompatActivity(){
             if (enteredOTP.text.toString().equals("") || enteredOTP.text.toString().equals("null")) {
                 Toast.makeText(this@LoginActivity, "Enter Otp", Toast.LENGTH_SHORT).show()
             } else {
-                verifyOtp()
+
+                if (enteredOTP.length() < 6){
+                    Toast.makeText(this@LoginActivity, "Required 6 Digit", Toast.LENGTH_SHORT).show()
+
+
+                }else {
+                    verifyOtp()
+                }
             }
         }
         resend.setOnClickListener {

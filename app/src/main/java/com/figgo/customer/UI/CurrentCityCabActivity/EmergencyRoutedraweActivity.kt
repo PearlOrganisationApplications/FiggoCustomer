@@ -1,6 +1,7 @@
-package com.figgo.customer.UI
+package com.figgo.customer.UI.CurrentCityCabActivity
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -23,7 +24,10 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.figgo.cabs.figgodriver.MapData
 import com.figgo.cabs.figgodriver.Service.FireBaseService
+
 import com.figgo.customer.R
+import com.figgo.customer.UI.NotificationBellIconActivity
+import com.figgo.customer.UI.Thankyou_RatingCityCab
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.pearlLib.Helper
@@ -42,13 +46,13 @@ import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.libraries.places.api.Places
-import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
+import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
@@ -66,8 +70,13 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     private lateinit var driverlocation:LatLng
     private var customerLAT:Double=0.0
     var rideId:String=""
+    var  driverimg:ImageView? = null
+    lateinit var cTimer : CountDownTimer
+    var tv_otp:TextView? = null
+    var transaction_id:String=""
     private var customerLON:Double=0.0
     private var count:Int=0
+    private var countT:Int=0
     var rideID:Int = 0
     private var timer: CountDownTimer?=null
     lateinit var fusedLocationProviderClient:FusedLocationProviderClient
@@ -78,6 +87,8 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     var waypoints :LatLng? = null
     var customerLoc:LatLng? = null
     private var locationManager: LocationManager? = null
+    var activaimg:ImageView? = null
+
     override fun setLayoutXml() {
         TODO("Not yet implemented")
     }
@@ -109,24 +120,41 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
         var tv_emrgencybtn = findViewById<TextView>(R.id.tv_emrgencybtn)
         var tv_vehiclenumber = findViewById<TextView>(R.id.tv_vehiclenumber)
         var iv_drivername = findViewById<TextView>(R.id.iv_drivername)
+        driverimg = findViewById<CircleImageView>(R.id.crl_driverimg)
+        activaimg = findViewById<ImageView>(R.id.iv_activaimg)
+        var vehiclename = findViewById<TextView>(R.id.vehiclename)
 
-       rideId=pref.getride_id()
+
         var tv_activanumber = findViewById<TextView>(R.id.tv_activanumber)
         var tv_drivername = findViewById<TextView>(R.id.tv_drivername)
         var tv_dl_number = findViewById<TextView>(R.id.tv_dl_number)
         var iv_call = findViewById<ImageView>(R.id.iv_call)
-
+        tv_otp = findViewById<TextView>(R.id.tv_otp)
+        rideId=pref.getride_id()
      //   var tv_emrgencybtn = findViewById<TextView>(R.id.tv_emrgencybtn)
         val profileName=intent.getStringExtra("name")
         val dl_number=intent.getStringExtra("dl_number")
         val veh_number=intent.getStringExtra("veh_number")
         val price=intent.getStringExtra("price")
+        val taxi_image=intent.getStringExtra("taxi_image")
+        val driver_image=intent.getStringExtra("driver_image")
+        val veh_name=intent.getStringExtra("veh_name")
+        transaction_id= intent.getStringExtra("transaction_id")!!
 
 
+        if(!driver_image.equals("")){
+            Picasso.get().load(driver_image).placeholder(R.drawable.girl_img).into(driverimg)
+        }
+
+        if(!taxi_image.equals("")){
+            Picasso.get().load(taxi_image).placeholder(R.drawable.blueactiva_img).into(activaimg)
+        }
+        vehiclename.setText(veh_name)
         tv_activanumber.setText(veh_number)
         tv_drivername.setText(profileName)
         tv_dl_number.setText(dl_number)
 
+        getOtp()
         startService(Intent(this, FireBaseService::class.java))
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
@@ -165,7 +193,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                 e.printStackTrace()
                 Log.w(" Current loction address",  e.printStackTrace().toString())
             }
-            val URL = Helper.EMERGENCY_LIVE
+            val URL = Helper.EMERGENCY
             val queue = Volley.newRequestQueue(this)
             val json = JSONObject()
             json.put("ride_id", pref.getride_id())
@@ -361,7 +389,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     private fun getDirectionURL(origin:LatLng, dest:LatLng, secret: String) : String{
 
         waypoints = LatLng(waypointsLatitude.toDouble() , waypointsLongitude.toDouble())
-        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" +
+        return "https://maps.googleapis.com/maps/api/directions/json?origin=${waypointsLatitude},${waypointsLongitude}" +
                 "&destination=${dest.latitude},${dest.longitude}" +
                 "&sensor=false" +
                 "&mode=driving" +
@@ -513,7 +541,18 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker3))
                 .title("My Location")
         )
-       // mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(customerLoc!!, 2F))
+        if(count == 0) {
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(customerLoc!!, 10F))
+        }
+        count++
+       /* val circle: Circle = mMap.addCircle(
+            CircleOptions().center(LatLng(waypointsLatitude, waypointsLongitude)).radius(1000.0)
+                .strokeColor(
+                    Color.RED
+                )
+        )
+        circle.isVisible = true
+        getZoomLevel(circle)*/
 
 
         val source = "$originLatitude,$originLongitude"
@@ -525,6 +564,169 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
         Handler().postDelayed({
             //do something
         }, 5000)
+    }
+   /* fun getZoomLevel(circle: Circle?): Int {
+        if (circle != null) {
+            val radius = circle.radius
+            val scale = radius / 500
+            zoomLevel = (16 - Math.log(scale) / Math.log(2.0)).toInt()
+        }
+        return zoomLevel
+    }*/
+   private fun getOtp() {
+       val progressDialog = ProgressDialog(this)
+       progressDialog.show()
+       val URL =Helper.UPDATE_CITY_RIDE_PAYMENT_STATUS
+       val queue = Volley.newRequestQueue(this)
+       val json = JSONObject()
+       json.put("transaction_id", transaction_id)
+       json.put("payment_type", "card")
+       json.put("ride_id", pref.getride_id())
+       json.put("ride_request_id", pref.getReqRideId())
+     //  Log.d("transac",transaction_id.toString())
+       Log.d("rides",pref.getride_id())
+       val jsonOblect: JsonObjectRequest =
+           object : JsonObjectRequest(Method.POST, URL, json, object :
+               Response.Listener<JSONObject?>               {
+               @SuppressLint("SuspiciousIndentation")
+               override fun onResponse(response: JSONObject?) {
+
+                   Log.d("SendData", "response===" + response)
+                   if (response != null) {
+                       progressDialog.hide()
+                       try {
+
+                           val booking_no = response.getJSONObject("ride").getString("booking_id")
+                           val otp = response.getInt("otp")
+
+                           pref.setOtp(otp.toString())
+                           pref.setBookingNo(booking_no)
+
+                           tv_otp?.setText(otp.toString())
+                        startTimer()
+                       }catch (e:Exception){
+                           MapUtility.showDialog(e.toString(),this@EmergencyRoutedraweActivity)
+
+                       }
+                   }
+
+               }
+           }, object : Response.ErrorListener {
+               override fun onErrorResponse(error: VolleyError?) {
+                   progressDialog.hide()
+                   Log.d("SendData", "error===" + error)
+                   // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
+
+                   MapUtility.showDialog(error.toString(),this@EmergencyRoutedraweActivity)
+               }
+           }) {
+
+               @Throws(AuthFailureError::class)
+               override fun getHeaders(): Map<String, String> {
+                   val headers: MutableMap<String, String> = java.util.HashMap()
+                   headers.put("Content-Type", "application/json; charset=UTF-8");
+                   headers.put("Authorization", "Bearer " + pref.getToken());
+                   headers.put("Accept", "application/vnd.api+json");
+                   return headers
+               }
+           }
+
+       queue.add(jsonOblect)
+
+   }
+
+
+
+    private fun getRideStatus() {
+        // val progressDialog = ProgressDialog(this)
+        //  progressDialog.show()
+        val URL =Helper.Ride_Status
+        val queue = Volley.newRequestQueue(this)
+        val json = JSONObject()
+        json.put("ride_id", pref.getride_id())
+        //  Log.d("transac",transaction_id.toString())
+        //  Log.d("rides",pref.getride_id())
+        val jsonOblect: JsonObjectRequest =
+            object : JsonObjectRequest(Method.POST, URL, json, object :
+                Response.Listener<JSONObject?>               {
+                @SuppressLint("SuspiciousIndentation")
+                override fun onResponse(response: JSONObject?) {
+
+                    Log.d("SendData", "response===" + response)
+                    if (response != null) {
+                        try {
+
+                            val status = response.getString("status")
+                            if (status.equals("true")) {
+
+
+                                val ride_status = response.getString("ride_status")
+
+
+                                if (ride_status.equals("completed")){
+                                    if (::cTimer.isInitialized) {
+                                        cTimer.cancel()
+                                    }
+
+                                    val intent = Intent(this@EmergencyRoutedraweActivity, Thankyou_RatingCityCab::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                            } else {
+
+                            }
+                        }catch (e:Exception){
+                            MapUtility.showDialog(e.toString(),this@EmergencyRoutedraweActivity)
+
+                        }
+                    }
+
+                }
+            }, object : Response.ErrorListener {
+                override fun onErrorResponse(error: VolleyError?) {
+                    // progressDialog.hide()
+                    Log.d("SendData", "error===" + error)
+                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
+
+                    MapUtility.showDialog(error.toString(),this@EmergencyRoutedraweActivity)
+                }
+            }) {
+
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val headers: MutableMap<String, String> = java.util.HashMap()
+                    headers.put("Content-Type", "application/json; charset=UTF-8");
+                    headers.put("Authorization", "Bearer " + pref.getToken());
+                    headers.put("Accept", "application/vnd.api+json");
+                    return headers
+                }
+            }
+
+        queue.add(jsonOblect)
+
+    }
+    fun startTimer() {
+
+        cTimer = object : CountDownTimer(50000000000000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {//300000
+               // txtTimer?.setText("seconds remaining: " +""+ (millisUntilFinished / 1000).toString())
+
+
+                if (countT % 10 ==  0) {
+                    getRideStatus()
+
+                    // Toast.makeText(this@SearchDriver, "fetching driver...", Toast.LENGTH_LONG).show()
+
+                }
+                countT++
+            }
+
+            override fun onFinish() {
+              startTimer()
+
+            }
+        }
+        cTimer.start()
     }
 
 

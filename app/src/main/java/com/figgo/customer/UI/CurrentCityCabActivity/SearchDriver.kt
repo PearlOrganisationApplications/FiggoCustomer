@@ -1,18 +1,16 @@
-package com.figgo.customer.UI
+package com.figgo.customer.UI.CurrentCityCabActivity
 
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.*
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.view.isVisible
 import com.android.volley.AuthFailureError
@@ -21,12 +19,15 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.figgo.customer.R
+import com.figgo.customer.UI.CityCabActivity
+import com.figgo.customer.UI.PaymentMethodActivity
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.pearlLib.Helper
 import com.figgo.customer.pearlLib.PrefManager
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONObject
 
@@ -42,26 +43,31 @@ class SearchDriver : BaseClass() , PaymentResultListener {
     var  driver_id:String? = null
     var  ride_id:String? = null
     var toLat:String = ""
-    lateinit var driverlayout:ConstraintLayout
+  //  lateinit var driverlayout:ConstraintLayout
     var v_number:String = ""
     var prices:String = ""
     var name:String = ""
+    var v_name:String = ""
     var dlnumber:String = ""
+    var driver_image:String = ""
+    var taxi_image:String = ""
     var activavehiclenumber:TextView? = null
     var dl_number:TextView? = null
     var drivername:TextView? = null
+    var vehiclename:TextView? = null
     var price:TextView? = null
     var textView:TextView? = null
     var mobilenumber:TextView? = null
     var activaimg:ImageView? = null
-    var  driverimg:ImageView? = null
+    var  driverimg:CircleImageView? = null
     var ll_search:LinearLayout? = null
     var  ll_details:LinearLayout? = null
     var x:Int=-1
    lateinit var mProgressBar: ProgressBar
 
     var i = 0
-
+    var tv_tolocationdetails:TextView? = null
+    var tv_fromlocationdetails:TextView? = null
     lateinit var intents:String
     lateinit var notificationManager: NotificationManager
     lateinit var notificationChannel: NotificationChannel
@@ -97,24 +103,27 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         setContentView(R.layout.activity_search_driver)
         pref = PrefManager(this@SearchDriver)
 //        var tv_click = findViewById<TextView>(R.id.tv_click)
-        driverlayout  = findViewById<ConstraintLayout>(R.id.layoutdriverdetails)
+       // ll_details  = findViewById<ConstraintLayout>(R.id.ll_details)
          txtTimer = findViewById<TextView>(R.id.txt_timer)
          txtPer = findViewById<TextView>(R.id.txt_per)
         var tv_accept = findViewById<TextView>(R.id.tv_accept)
-        var shareimg = findViewById<ImageView>(R.id.shareimg)
-        var backimg = findViewById<ImageView>(R.id.backimg)
+     //   var shareimg = findViewById<ImageView>(R.id.shareimg)
+     //   var backimg = findViewById<ImageView>(R.id.backimg)
          activaimg = findViewById<ImageView>(R.id.activaimg)
          activavehiclenumber = findViewById<TextView>(R.id.activavehiclenumber)
          driverimg = findViewById<CircleImageView>(R.id.driverimg)
          drivername = findViewById<TextView>(R.id.drivername)
+        vehiclename = findViewById<TextView>(R.id.vehiclename)
          price = findViewById<TextView>(R.id.price)
+        tv_tolocationdetails = findViewById<TextView>(R.id.tv_tolocationdetails)
+        tv_fromlocationdetails = findViewById<TextView>(R.id.tv_fromlocationdetails)
        // textView = findViewById<TextView>(R.id.textView)
-        var iv_bellicon = findViewById<ImageView>(R.id.iv_bellicon)
-        var ride_service_rating = findViewById<RatingBar>(R.id.ride_service_rating)
+      //  var iv_bellicon = findViewById<ImageView>(R.id.iv_bellicon)
+     //   var ride_service_rating = findViewById<RatingBar>(R.id.ride_service_rating)
          dl_number = findViewById<TextView>(R.id.dl_number)
         ll_search = findViewById<LinearLayout>(R.id.ll_main)
         ll_details = findViewById<LinearLayout>(R.id.ll_details)
-        var ll_back = findViewById<LinearLayout>(R.id.ll_back)
+       // var ll_back = findViewById<LinearLayout>(R.id.ll_back)
         var tv_reject_btn = findViewById<TextView>(R.id.tv_reject_btn)
         driver_id = intent.getStringExtra("driver_id")
         ride_id = intent.getStringExtra("ride_id")
@@ -122,15 +131,17 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
         mProgressBar=findViewById<ProgressBar>(R.id.progressbar)
         mProgressBar.setProgress(i)
-
+        tv_tolocationdetails?.text = pref.getLiveLoc()
+        tv_fromlocationdetails?.text = pref.getManualLoc()
         /* getcurrentdriverdetails()*/
+
 
         tv_accept.setOnClickListener {
             showPendingPopup()
         }
-        iv_bellicon.setOnClickListener {
+/*        iv_bellicon.setOnClickListener {
             startActivity(Intent(this, NotificationBellIconActivity::class.java))
-        }
+        }*/
         tv_reject_btn.setOnClickListener {
             val URL = Helper.ride_delete
             val progressDialog = ProgressDialog(this)
@@ -160,7 +171,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                                 val canBtn = dialog.findViewById(R.id.cancel) as Button
                                 yesBtn.setOnClickListener {
                                     pref.setSearchBack("")
-                                    startActivity(Intent(this@SearchDriver,CityCabActivity::class.java))
+                                    startActivity(Intent(this@SearchDriver, CityCabActivity::class.java))
                                     finish()
                                 }
                                 canBtn.setOnClickListener {
@@ -210,7 +221,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
             queue.add(jsonOblect)
 
         }
-        ll_back.setOnClickListener {
+       /* ll_back.setOnClickListener {
             val URL = Helper.ride_delete
             val progressDialog = ProgressDialog(this)
             progressDialog.show()
@@ -290,7 +301,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
 
 
-        }
+        }*/
 
 
         pref.setSearchBack("1")
@@ -308,13 +319,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
     }
 
-    private fun RunAnimation() {
-        val a: Animation = AnimationUtils.loadAnimation(this, R.anim.scale)
-        a.reset()
-        val tv = findViewById<View>(R.id.text) as TextView
-        tv.clearAnimation()
-        tv.startAnimation(a)
-    }
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -502,28 +507,32 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         }
         val bigText = NotificationCompat.BigTextStyle()
         bigText.setBigContentTitle("Booking is Accepted")
-        bigText.bigText("Your Booking Accepted by driver Please wait...")
+        bigText.bigText("Your Booking is Accepted by driver...")
         bigText.setSummaryText("Text in detail")
 
         mBuilder.setContentIntent(pendingIntent)
         mBuilder.setSmallIcon(R.drawable.appicon)
         mBuilder.setContentTitle("Booking is Accepted")
-        mBuilder.setContentText("Your Booking Accepted by driver Please wait...")
+        mBuilder.setContentText("Your Booking is Accepted by driver...")
         mBuilder.priority = Notification.PRIORITY_MAX
         mBuilder.setStyle(bigText)
 
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "Your_channel_id"
+            val channelId = "notify_001"
             val channel = NotificationChannel(channelId, "Channel human readable title", NotificationManager.IMPORTANCE_HIGH)
             mNotificationManager.createNotificationChannel(channel)
             mBuilder.setChannelId(channelId)
         }
 
-        mNotificationManager.notify(0, mBuilder.build())
+        mNotificationManager.notify(10, mBuilder.build())
     }
-
+    fun cancelNotification(ctx: Context, notifyId: Int) {
+        val ns: String = Context.NOTIFICATION_SERVICE
+        val nMgr = ctx.getSystemService(ns) as NotificationManager
+        nMgr.cancel(notifyId)
+    }
     private fun String(s: String): String? {
 
         return s
@@ -531,8 +540,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
     private fun getRideStatus() {
 
-        val URL ="https://test.pearl-developer.com/figo/api/ride/check-ride-request-status"
-
+        val URL = Helper.CHECK_RIDE_REQUEST_STATUS
         Log.d("searchDriver", "json===" +URL )
         Log.d("SendData", pref.getride_id() )
         val queue = Volley.newRequestQueue(this)
@@ -547,7 +555,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                             if (::cTimer.isInitialized) {
                                 cTimer.cancel()
                             }
-                            driverlayout.visibility = View.VISIBLE
+                            ll_details?.visibility = View.VISIBLE
                             x = 1
                             Log.d("Ride Status", "response===" + response)
 
@@ -564,6 +572,9 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                                 ll_details?.isVisible = true
                                // RunAnimation()
                                 prices = response.getJSONObject("data").getString("price")
+
+                                driver_id = response.getJSONObject("data").getString("driver_id")
+                                pref.setdriver_id(driver_id!!)
                                 name = response.getJSONObject("data").getJSONObject("ride_driver")
                                     .getString("name")
                                 dlnumber =
@@ -572,23 +583,30 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                                 v_number =
                                     response.getJSONObject("data").getJSONObject("ride_driver")
                                         .getJSONObject("cab").getString("v_number")
+
+
+                                v_name =
+                                    response.getJSONObject("data").getJSONObject("ride_driver")
+                                        .getJSONObject("cab").getJSONObject("cab_detail").getString("name")
                                // val full_image = response.getJSONObject("data").getJSONObject("ride_driver").getJSONObject("cab").getJSONObject("cab_detail").getString("full_image")
                                 pref.setReqRideId(response.getJSONObject("data").getString("id"))
                                 val rating_avg = response.getJSONObject("data").getJSONObject("ride_driver").getString("rating_avg")
-
+                                 driver_image = response.getJSONObject("data").getJSONObject("ride_driver").getJSONObject("documents").getString("driver_image")
+                                 taxi_image = response.getJSONObject("data").getJSONObject("ride_driver").getJSONObject("documents").getString("taxi_image")
                                // Picasso.get().load(full_image).into(activaimg)
                                 drivername?.setText(name)
                                 dl_number?.setText(dlnumber)
                                 activavehiclenumber?.setText(v_number)
                                 price?.setText(prices)
+                                vehiclename?.setText(v_name)
                                 pref.setPrice(prices)
-                                /*   if(!full_image.equals("")){
-                                Picasso.get().load(full_image).placeholder(R.drawable.girl_img).into(driverimg)
-                            }*/
+                                   if(!driver_image.equals("")){
+                                Picasso.get().load(driver_image).placeholder(R.drawable.girl_img).into(driverimg)
+                            }
 
-                                /* if(!taxi_image.equals("")){
+                                 if(!taxi_image.equals("")){
                                 Picasso.get().load(taxi_image).placeholder(R.drawable.blueactiva_img).into(activaimg)
-                            }*/
+                            }
 
 
                             } else if (status.equals("false")) {
@@ -627,12 +645,17 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
     }
     override fun onPaymentSuccess(s: String?) {
+         progressDialog = ProgressDialog(this)
+        progressDialog.show()
         Toast.makeText(this, "payment successful", Toast.LENGTH_SHORT).show()
 
         try {
             transaction_id = s
-           getOtp()
-          // getAcceptRide()
+
+
+            cancelNotification(this@SearchDriver,10)
+
+           getAcceptRide()
 
         } catch (e: Exception) {
             Log.e(ContentValues.TAG, "Exception in onPaymentSuccess", e)
@@ -645,6 +668,74 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
     }
 
+    private fun getAcceptRide() {
+
+        val URL =Helper.ACCEPT_CURRENT_CITYRIDE
+        val queue = Volley.newRequestQueue(this)
+        val json = JSONObject()
+        json.put("ride_request_id", pref.getReqRideId())
+        json.put("ride_id", pref.getride_id())
+        //  Log.d("transac",transaction_id.toString())
+        //  Log.d("rides",pref.getride_id())
+        val jsonOblect: JsonObjectRequest =
+            object : JsonObjectRequest(Method.POST, URL, json, object :
+                Response.Listener<JSONObject?>               {
+                @SuppressLint("SuspiciousIndentation")
+                override fun onResponse(response: JSONObject?) {
+
+                    Log.d("SendData", "response===" + response)
+                    if (response != null) {
+                        try {
+
+                            val status = response.getString("status")
+                            if (status.equals("true")) {
+
+                                progressDialog.hide()
+                                val intent = Intent(this@SearchDriver, EmergencyRoutedraweActivity::class.java)
+                                intent.putExtra("name", name)
+                                intent.putExtra("dl_number", dlnumber)
+                                intent.putExtra("veh_number", v_number)
+                                intent.putExtra("price", prices)
+                                intent.putExtra("transaction_id",transaction_id)
+                                intent.putExtra("driver_image",driver_image)
+                                intent.putExtra("taxi_image",taxi_image)
+                                intent.putExtra("veh_name",v_name)
+
+                                startActivity(intent)
+
+                            } else {
+
+                            }
+                        }catch (e:Exception){
+                            MapUtility.showDialog(e.toString(),this@SearchDriver)
+
+                        }
+                    }
+
+                }
+            }, object : Response.ErrorListener {
+                override fun onErrorResponse(error: VolleyError?) {
+                    // progressDialog.hide()
+                    Log.d("SendData", "error===" + error)
+                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
+
+                    MapUtility.showDialog(error.toString(),this@SearchDriver)
+                }
+            }) {
+
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val headers: MutableMap<String, String> = java.util.HashMap()
+                    headers.put("Content-Type", "application/json; charset=UTF-8");
+                    headers.put("Authorization", "Bearer " + pref.getToken());
+                    headers.put("Accept", "application/vnd.api+json");
+                    return headers
+                }
+            }
+
+        queue.add(jsonOblect)
+
+    }
 
 
     fun startTimer() {
@@ -658,6 +749,9 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                 txtPer?.setText("" +""+ i as Int * 100 / (300000 / 1000)+" %")
 
                 if (mProgressBar.progress == 100){
+                    if (::cTimer.isInitialized) {
+                        cTimer.cancel()
+                    }
                     Toast.makeText(this@SearchDriver, "Unable to found nearby drivers...", Toast.LENGTH_LONG).show()
                     val URL = Helper.ride_delete
                     val progressDialog = ProgressDialog(this@SearchDriver)
@@ -697,7 +791,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
 
                                     } catch (e: Exception) {
-                                        MapUtility.showDialog(e.toString(), this@SearchDriver)
+                                        MapUtility.showDialog(e.toString(), applicationContext)
 
                                     }
                                 }
@@ -726,7 +820,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                     queue.add(jsonOblect)
 
 
-                    finish()
+                   // finish()
                 }
                 if (count % 10 ==  0) {
                     getRideStatus()
@@ -746,205 +840,18 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                 mProgressBar.setProgress(100);
 
                 /* deletePendingReq()*/
-                finish()
+              //  finish()
 
             }
         }
         cTimer.start()
     }
-    private fun getUpdatePayment() {
-      //  val progressDialog = ProgressDialog(this)
-      //  progressDialog.show()
-        val URL =Helper.UPDATE_CITYRIDE_RIDE_PAYMENT_STATUS
-        val queue = Volley.newRequestQueue(this)
-        val json = JSONObject()
-        json.put("transaction_id", transaction_id.toString())
-        json.put("payment_type", "card")
-        json.put("ride_id", pref.getRideId())
-        Log.d("transac",transaction_id.toString())
-        Log.d("rides",pref.getride_id())
-        val jsonOblect: JsonObjectRequest =
-            object : JsonObjectRequest(Method.POST, URL, json, object :
-                Response.Listener<JSONObject?>               {
-                @SuppressLint("SuspiciousIndentation")
-                override fun onResponse(response: JSONObject?) {
-
-                    Log.d("SendData", "response===" + response)
-                    if (response != null) {
-                      //  progressDialog.hide()
-                        try {
-
-                            val status = response.getString("status")
-                            if (status.equals("true")) {
-
-                            } else {
-
-                            }
-                        }catch (e:Exception){
-                            MapUtility.showDialog(e.toString(),this@SearchDriver)
-
-                        }
-                    }
-
-                }
-            }, object : Response.ErrorListener {
-                override fun onErrorResponse(error: VolleyError?) {
-                  //  progressDialog.hide()
-                    Log.d("SendDataE", "error===" + error)
-                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
-
-
-                    MapUtility.showDialog(error.toString(),this@SearchDriver)
-                }
-            }) {
-
-
-
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers: MutableMap<String, String> = java.util.HashMap()
-                    headers.put("Content-Type", "application/json; charset=UTF-8");
-                    headers.put("Authorization", "Bearer " + pref.getToken());
-                    headers.put("Accept", "application/vnd.api+json");
-                    return headers
-                }
-            }
-
-        queue.add(jsonOblect)
-
-    }
-
-
-    private fun getAcceptRide() {
-       // val progressDialog = ProgressDialog(this)
-      //  progressDialog.show()
-        val URL =Helper.ACCEPT_CURRENT_CITYRIDE
-        val queue = Volley.newRequestQueue(this)
-        val json = JSONObject()
-        json.put("ride_request_id", pref.getReqRideId())
-        json.put("ride_id", pref.getride_id())
-      //  Log.d("transac",transaction_id.toString())
-      //  Log.d("rides",pref.getride_id())
-        val jsonOblect: JsonObjectRequest =
-            object : JsonObjectRequest(Method.POST, URL, json, object :
-                Response.Listener<JSONObject?>               {
-                @SuppressLint("SuspiciousIndentation")
-                override fun onResponse(response: JSONObject?) {
-
-                    Log.d("SendData", "response===" + response)
-                    if (response != null) {
-                        try {
-
-                            val status = response.getString("status")
-                            if (status.equals("true")) {
-                                val intent = Intent(this@SearchDriver, EmergencyRoutedraweActivity::class.java)
-                                intent.putExtra("name", name)
-                                intent.putExtra("dl_number", dlnumber)
-                                intent.putExtra("veh_number", v_number)
-                                intent.putExtra("price", prices)
-
-
-
-                                startActivity(intent)
-
-                                /*startActivity(Intent).(this@SearchDriver,EmergencyRoutedraweActivity::class.java))*/
-
-
-                            } else {
-
-                            }
-                        }catch (e:Exception){
-                            MapUtility.showDialog(e.toString(),this@SearchDriver)
-
-                        }
-                    }
-
-                }
-            }, object : Response.ErrorListener {
-                override fun onErrorResponse(error: VolleyError?) {
-                   // progressDialog.hide()
-                    Log.d("SendData", "error===" + error)
-                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
-
-                    MapUtility.showDialog(error.toString(),this@SearchDriver)
-                }
-            }) {
-
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers: MutableMap<String, String> = java.util.HashMap()
-                    headers.put("Content-Type", "application/json; charset=UTF-8");
-                    headers.put("Authorization", "Bearer " + pref.getToken());
-                    headers.put("Accept", "application/vnd.api+json");
-                    return headers
-                }
-            }
-
-        queue.add(jsonOblect)
-
-    }
 
 
 
 
-    private fun getOtp() {
-        val progressDialog = ProgressDialog(this)
-        progressDialog.show()
-        val URL =Helper.UPDATE_CITY_RIDE_PAYMENT_STATUS
-        val queue = Volley.newRequestQueue(this)
-        val json = JSONObject()
-        json.put("transaction_id", transaction_id.toString())
-        json.put("payment_type", "card")
-        json.put("ride_id", pref.getRideId())
-        Log.d("transac",transaction_id.toString())
-        Log.d("rides",pref.getride_id())
-        val jsonOblect: JsonObjectRequest =
-            object : JsonObjectRequest(Method.POST, URL, json, object :
-                Response.Listener<JSONObject?>               {
-                @SuppressLint("SuspiciousIndentation")
-                override fun onResponse(response: JSONObject?) {
 
-                    Log.d("SendData", "response===" + response)
-                    if (response != null) {
-                        progressDialog.hide()
-                        try {
 
-                            val booking_no = response.getJSONObject("ride").getString("booking_id")
-                            val otp = response.getInt("otp")
-
-                            pref.setOtp(otp.toString())
-                            pref.setBookingNo(booking_no)
-                            getAcceptRide()
-                        }catch (e:Exception){
-                            MapUtility.showDialog(e.toString(),this@SearchDriver)
-
-                        }
-                    }
-
-                }
-            }, object : Response.ErrorListener {
-                override fun onErrorResponse(error: VolleyError?) {
-                    progressDialog.hide()
-                    Log.d("SendData", "error===" + error)
-                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
-
-                    MapUtility.showDialog(error.toString(),this@SearchDriver)
-                }
-            }) {
-
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers: MutableMap<String, String> = java.util.HashMap()
-                    headers.put("Content-Type", "application/json; charset=UTF-8");
-                    headers.put("Authorization", "Bearer " + pref.getToken());
-                    headers.put("Accept", "application/vnd.api+json");
-                    return headers
-                }
-            }
-
-        queue.add(jsonOblect)
-
-    }
     override fun onBackPressed() {
 
         val URL = Helper.ride_delete
