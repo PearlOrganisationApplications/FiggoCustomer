@@ -13,7 +13,6 @@ package com.figgo.customer.pearlLib
      var  Selectcityvehicletype = baseurl + "ride/select-city-vehicle-type"
      var Searching_driver= baseurl+"ride/searching-driver"
      var CHECK_RIDE_REQUEST_STATUS= baseurl+"ride/check-ride-request-status"
-     var UPDATE_CITYRIDE_RIDE_PAYMENT_STATUS= baseurl+"ride/update-city-ride-payment-status"
      var ACCEPT_CURRENT_CITYRIDE= baseurl+"ride/accept-current-city-ride"
      var UPDATE_CITY_RIDE_PAYMENT_STATUS= baseurl+"ride/update-city-ride-payment-status"
      var ENTER_PASSENGER_DETAILS= baseurl+"ride/enter-passenger-details"
@@ -27,7 +26,10 @@ package com.figgo.customer.pearlLib
      var get_cab_work_details= baseurl+"driver/get-cab-work-details"
      var ride_history= baseurl+"driver/ride-history"
      var ride_delete = baseurl+"ride/ride-delete"
-     var EMERGENCY_LIVE = baseurl+"live-emergency-location"
+     var EMERGENCY = baseurl+"emergency"
+
+     var Ride_Status = baseurl+"ride/check-ride-status"
+     var SUBMIT_RATING = baseurl+"submit-rating"
 
 
 }

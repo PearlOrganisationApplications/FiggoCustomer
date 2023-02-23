@@ -194,7 +194,7 @@ class SplashActivity : AppCompatActivity() {
                         startActivity(Intent(this, WelcomeSlider::class.java))
                         //    }
 
-                    },3000)
+                    },5000)
                 RESULT_CANCELED -> {
                     checkLocationService()
                 }

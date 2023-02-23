@@ -50,19 +50,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
-                android:text="Thank you"
+                android:text="Thanks for riding figgo"
                 android:textColor="@color/black"
+                android:layout_marginTop="10dp"
+                android:textAllCaps="true"
                 android:textSize="@dimen/_14sdp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-black"
-                android:text="Mr. ABC Sharma"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_10sdp" />
 
-            <TextView
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="80dp"
+              android:layout_marginVertical="10dp"
+                android:src="@drawable/appicon"/>
+
+
+            <!--    <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Mr. ABC Sharma"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10sdp" />-->
+
+           <!-- <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/_10sdp"
@@ -75,13 +87,12 @@
                 android:textSize="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:textColor="@color/black"
-                android:text="Invoice save in your Ride details also register e-mail"/>
+                android:text="Invoice save in your Ride details also register e-mail"/>-->
 
-            <TextView
+           <!-- <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/_14sdp"
-                android:fontFamily="@font/red_hat_text_bold"
                 android:layout_marginTop="@dimen/_8sdp"
                 android:textColor="@color/colorRed"
                 android:text="Rs. 205/- "/>
@@ -91,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/_10sdp"
                 android:textColor="@color/black"
-                android:text="Kindly pay to driver"/>
+                android:text="Kindly pay to driver"/>-->
         </LinearLayout>
 
         <LinearLayout
@@ -108,12 +119,14 @@
                 android:background="@color/white"
                 android:text="  Rider Service   "
                 android:textSize="@dimen/_9sdp" />
-           <RatingBar
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:max="5"
-               android:numStars="5"
-               android:id="@+id/ride_service_rating"/>
+
+            <RatingBar
+                android:id="@+id/ride_service_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:max="5"
+                android:numStars="5"
+                tools:ignore="SpeakableTextPresentCheck" />
 
 
             <TextView
@@ -121,7 +134,8 @@
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:text="                        "
-                android:textSize="@dimen/_9sdp" />
+                android:textSize="@dimen/_9sdp"
+                tools:ignore="SpeakableTextPresentCheck" />
 
         </LinearLayout>
 
@@ -143,26 +157,27 @@
                 android:background="@color/white"
                 android:text="  Figgo Service   "
                 android:textSize="@dimen/_9sdp" />
+
             <RatingBar
+                android:id="@+id/figgo_service_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:max="5"
                 android:numStars="5"
-                android:id="@+id/figgo_service_rating"
-                />
+                tools:ignore="SpeakableTextPresentCheck" />
 
 
 
         </LinearLayout>
 
-            <TextView
+        <!--    <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Note your experience please "
                 android:textColor="@color/black"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/_24sdp"
-                android:gravity="center"/>
+                android:gravity="center"/>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -173,24 +188,26 @@
             <TextView
                 android:layout_width="@dimen/_85sdp"
                 android:layout_height="@dimen/_29sdp"
-                android:textColor="@color/white"
                 android:layout_marginStart="@dimen/_39sdp"
                 android:layout_marginTop="@dimen/_28sdp"
-                android:text="Letter"
-                android:textSize="@dimen/_12sdp"
                 android:background="@color/light_grey"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:text="Later"
+                android:id="@+id/tv_later"
+                android:textColor="#546E7A"
+                android:textSize="@dimen/_12sdp" />
 
             <TextView
+                android:id="@+id/tv_submit"
                 android:layout_width="@dimen/_85sdp"
                 android:layout_height="@dimen/_29sdp"
-                android:textColor="@color/white"
                 android:layout_marginStart="@dimen/_29sdp"
                 android:layout_marginTop="@dimen/_28sdp"
-                android:text="Submit"
-                android:textSize="@dimen/_12sdp"
                 android:background="@color/light_grey"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:text="Submit"
+                android:textColor="#546E7A"
+                android:textSize="@dimen/_12sdp" />
 
 
         </LinearLayout>

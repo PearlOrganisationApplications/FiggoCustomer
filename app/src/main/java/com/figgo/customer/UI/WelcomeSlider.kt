@@ -39,7 +39,7 @@ class WelcomeSlider : AppCompatActivity() {
         setContentView(R.layout.activity_welcome_slider)
         prefManager = PrefManager(this@WelcomeSlider)
        // prefManager!!.setToken("949|vBiS1sR6b5AICFuOTyP7zrkHoNhqzEsz7wu4AsKA")
-        if (!prefManager!!.isFirstTimeLaunch()) {
+        if (prefManager!!.getWelcomeSkip().equals("yes")) {
             launchHomeScreen()
             finish()
         }
@@ -70,6 +70,8 @@ class WelcomeSlider : AppCompatActivity() {
 
 
             if (count %2== 1){
+
+
                 startActivity(Intent(this@WelcomeSlider, LoginActivity::class.java))
         }/*else if (prefManager!!.getMpin().equals("") || prefManager!!.getMpin().equals("null")){
                 startActivity(Intent(this@WelcomeSlider, MPinGenerate::class.java))
@@ -81,6 +83,8 @@ class WelcomeSlider : AppCompatActivity() {
             if (current < layouts.size) {
                 // move to next screen
                 viewPager!!.currentItem = current
+
+                prefManager?.setWelcomeSkip("yes")
             } else {
                 launchHomeScreen()
             }
@@ -113,7 +117,7 @@ class WelcomeSlider : AppCompatActivity() {
 
     private fun launchHomeScreen() {
         prefManager!!.setFirstTimeLaunch(false)
-        if(prefManager!!.getToken().equals("")){
+        if(prefManager!!.getToken().equals("") || prefManager!!.getToken().equals("null")){
             startActivity(Intent(this@WelcomeSlider, LoginActivity::class.java))
             finish()
         }else{
@@ -126,7 +130,7 @@ class WelcomeSlider : AppCompatActivity() {
                 finish()
             }*/
 
-            Log.d("pref",prefManager!!.getToken())
+
             startActivity(Intent(this@WelcomeSlider, DashBoard::class.java))
             finish()
         }
@@ -142,6 +146,7 @@ class WelcomeSlider : AppCompatActivity() {
             // changing the next button text 'NEXT' / 'GOT IT'
             if (position == layouts.size - 1) {
                 // last page. make button text to GOT IT
+                prefManager?.setWelcomeSkip("yes")
                 btnNext!!.text = getString(R.string.start)
                 btnSkip!!.visibility = View.GONE
             } else {

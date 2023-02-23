@@ -8,19 +8,13 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.figgo.customer.pearlLib.PrefManager
-import com.figgo.customer.Model.AdvanceCityCabModel
 import com.figgo.customer.Model.HistoryModel
 import com.figgo.customer.R
-import com.figgo.customer.UI.CabDetailsActivity
 import com.figgo.customer.UI.HistoryMapsActivity
-import com.squareup.picasso.Picasso
 
 
 class HistoryDataAdapter(var context:Activity, var historyData:List<HistoryModel>): Adapter<HistoryDataAdapter.HistoryHolder>() {
@@ -75,6 +69,17 @@ class HistoryDataAdapter(var context:Activity, var historyData:List<HistoryModel
             holder.view.setOnClickListener {
 
 
+                if (historyData.get(position).type.equals("advance_booking")){
+
+                    if (historyData.get(position).status.equals("pending")){
+
+                    }
+
+                }else if (historyData.get(position).type.equals("current_booking")){
+                    if (historyData.get(position).status.equals("pending")){
+
+                    }
+                }
                 context.startActivity(
                     Intent(context, HistoryMapsActivity::class.java)
                         .putExtra("position",position))

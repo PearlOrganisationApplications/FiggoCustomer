@@ -19,7 +19,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.figgo.customer.pearlLib.PrefManager
-import com.figgo.customer.UI.SearchDriver
+import com.figgo.customer.UI.CurrentCityCabActivity.SearchDriver
 import com.figgo.customer.Model.CurrentVehicleModel
 import com.figgo.customer.R
 import com.figgo.customer.Util.MapUtility

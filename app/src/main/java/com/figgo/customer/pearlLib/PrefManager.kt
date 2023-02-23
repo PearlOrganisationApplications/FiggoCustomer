@@ -60,13 +60,13 @@ import android.content.SharedPreferences
      }
 
 
-     fun setWelcome(welcome: String){
+     fun setWelcomeSkip(welcome: String){
          editor!!.putString("welcome",welcome)
          editor?.commit()
      }
 
 
-     fun getWelcome():String{
+     fun getWelcomeSkip():String{
          return pref?.getString("welcome","").toString()
      }
 
@@ -453,4 +453,24 @@ import android.content.SharedPreferences
          return pref!!.getFloat("d_lng",0.0f)
      }
 
+
+     fun setLiveLoc(LiveLoc: String) {
+         editor?.putString("LiveLoc",LiveLoc)
+         editor?.commit()
+
+     }
+
+     fun getLiveLoc(): String {
+         return pref?.getString("LiveLoc","null").toString()
+     }
+
+     fun setManualLoc(ManualLoc: String) {
+         editor?.putString("ManualLoc",ManualLoc)
+         editor?.commit()
+
+     }
+
+     fun getManualLoc(): String {
+         return pref?.getString("ManualLoc","null").toString()
+     }
  }

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorlightblue"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragments.PayFragment">
+    tools:context=".Fragments.AdvanceCityCab_Fragment.PayFragment">
 
 
    <!-- <androidx.constraintlayout.widget.ConstraintLayout

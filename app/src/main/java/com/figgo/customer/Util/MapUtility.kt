@@ -15,8 +15,10 @@ import android.net.ConnectivityManager
 import android.widget.Toast
 import android.view.Gravity
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.location.Location
 import android.view.LayoutInflater
 import android.view.View
@@ -84,8 +86,28 @@ object MapUtility {
             e.printStackTrace()
         }
     }
-    fun showDialog(title: String,requireActivity :Activity) {
-        val dialog = Dialog(requireActivity)
+    fun showDialog(title: String,requireActivity :Context) {
+
+        val builder = AlertDialog.Builder(requireActivity)
+        //set title for alert dialog
+       // builder.setTitle(R.string.dialogTitle)
+        //set message for alert dialog
+        builder.setMessage("Error! We are unable to commmunicate with servers, please try again in few mintues. if still problem persists, kindly contact with Figgo Support. with all the details")
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+        val alertDialog: AlertDialog = builder.create()
+        //performing positive action
+        builder.setPositiveButton("Ok"){dialogInterface, which ->
+           alertDialog.cancel()
+        }
+        //performing cancel action
+
+        // Create the AlertDialog
+
+        // Set other dialog properties
+        alertDialog.setCancelable(true)
+        alertDialog.show()
+
+       /* val dialog = Dialog(requireActivity)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.custom_layout)
         val body = dialog.findViewById(R.id.error) as TextView
@@ -98,7 +120,7 @@ object MapUtility {
 
         dialog.show()
         val window: Window? = dialog.getWindow()
-        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)*/
     }
 
 }

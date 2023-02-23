@@ -91,7 +91,7 @@ class RideHistory : Fragment() {
                                 "From Location",
                                 "Status",
                                 "Distance",
-                                "View"
+                                "View","Type"
                             )
                         )
                         //  ride_details=allrideArray.optJSONObject(1).getJSONObject("ride_detail")
@@ -102,12 +102,14 @@ class RideHistory : Fragment() {
                                     .getJSONObject(p).getString("booking_id")
                             val name = it.getJSONObject("data").getJSONArray("all_rides")
                                 .getJSONObject(p).getJSONObject("to_location").getString("name")
+                            val status = it.getJSONObject("data").getJSONArray("all_rides")
+                                .getJSONObject(p).getString("status")
+                            val type = it.getJSONObject("data").getJSONArray("all_rides")
+                                .getJSONObject(p).getString("type")
                             val name1 = it.getJSONObject("data").getJSONArray("all_rides")
                                 .getJSONObject(p).getJSONObject("from_location")
                                 .getString("name")
-                            val status =
-                                it.getJSONObject("data").getJSONArray("all_rides")
-                                    .getJSONObject(p).getString("status")
+
                             val actual_distance =
                                 it.getJSONObject("data").getJSONArray("all_rides")
                                     .getJSONObject(p).getString("actual_distance")
@@ -129,6 +131,7 @@ class RideHistory : Fragment() {
                             paramMap.put( "distance" , actual_distance);
                             paramMap.put( "date" , date);
                             paramMap.put( "time" , time);
+                            paramMap.put( "type" , type);
 
 
                             MapUtility.paramMap.put(p,paramMap)
@@ -140,7 +143,7 @@ class RideHistory : Fragment() {
                                     name1,
                                     status,
                                     actual_distance,
-                                    "View"
+                                    "View",type
                                 )
                             )
                         }

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/cabBookFragment"
-        android:name="com.figgo.customer.Fragments.CabBookFragment"
+        android:name="com.figgo.customer.Fragments.AdvanceCityCab_Fragment.CabBookFragment"
         android:label="fragment_cab_book"
         tools:layout="@layout/fragment_cab_book" >
         <action
@@ -26,7 +26,7 @@
 
     <fragment
         android:id="@+id/payFragment"
-        android:name="com.figgo.customer.Fragments.PayFragment"
+        android:name="com.figgo.customer.Fragments.AdvanceCityCab_Fragment.PayFragment"
         android:label="fragment_pay"
         tools:layout="@layout/fragment_pay" >
         <action
@@ -49,7 +49,7 @@
 
     <fragment
         android:id="@+id/thankyouScreenFragment"
-        android:name="com.figgo.customer.Fragments.Shared_Cab_Fragment.ThankyouScreenFragment"
+        android:name="com.figgo.customer.Fragments.AdvanceCityCab_Fragment.ThankyouScreenFragment"
         android:label="fragment_thankyou_screen"
         tools:layout="@layout/fragment_thankyou_screen" >
        <action

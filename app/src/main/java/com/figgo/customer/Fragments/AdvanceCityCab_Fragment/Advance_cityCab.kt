@@ -1,10 +1,7 @@
-package com.figgo.customer.Fragments
-
+package com.figgo.customer.Fragments.AdvanceCityCab_Fragment
+//Neeraj
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.DatePickerDialog
-import android.app.ProgressDialog
-import android.app.TimePickerDialog
+import android.app.*
 import android.content.Context
 import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
@@ -21,6 +18,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -28,13 +26,26 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.AuthFailureError
-import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.figgo.customer.Adapter.AdvanceCityDataAdapter
+import com.figgo.customer.Model.AdvanceCityCabModel
+import com.figgo.customer.R
+import com.figgo.customer.UI.AdavanceCityCabActivity.CabDetailsActivity
+import com.figgo.customer.UI.IOnBackPressed
+import com.figgo.customer.UI.AdavanceCityCabActivity.LocationPickerActivity
+import com.figgo.customer.Util.MapUtility
+import com.figgo.customer.databinding.ActivityMainBinding
+import com.figgo.customer.databinding.FragmentAdvanceCityCabBinding
+
+import com.figgo.customer.pearlLib.Helper
+import com.figgo.customer.pearlLib.PrefManager
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
@@ -44,23 +55,13 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-import com.figgo.customer.Adapter.CurrentVehicleAdapter
-import com.figgo.customer.Model.CurrentModel
-import com.figgo.customer.Model.CurrentVehicleModel
-import com.figgo.customer.R
-import com.figgo.customer.UI.IOnBackPressed
-import com.figgo.customer.UI.LocationPickerActivityCurr
-import com.figgo.customer.Util.MapUtility
-import com.figgo.customer.databinding.ActivityMainBinding
-import com.figgo.customer.databinding.FragmentCurrentCityCabBinding
-import com.figgo.customer.pearlLib.Helper
-import com.figgo.customer.pearlLib.PrefManager
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -68,112 +69,116 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 
-class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener,
+class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+    GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerDragListener,
+    GoogleMap.OnCameraMoveStartedListener,
     GoogleMap.OnCameraMoveListener,
-    GoogleMap.OnCameraMoveCanceledListener,GoogleMap.OnCameraIdleListener  {
-
-    private val REQUEST_CHECK_SETTINGS: Int=101
+    GoogleMap.OnCameraMoveCanceledListener,
+    GoogleMap.OnCameraIdleListener, IOnBackPressed {
+    private val REQUEST_CHECK_SETTINGS: Int=101;
     private lateinit var mMap: GoogleMap
-    var PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION=101
+    var marker: Marker? = null
+    var PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION=101;
     private lateinit var fusedLocationClient: FusedLocationProviderClient;
-    private lateinit var lastLocation: Location
-    private lateinit var locationRequest: LocationRequest
+    private lateinit var lastLocation: Location;
+    private lateinit var locationRequest: LocationRequest;
 
-    lateinit var binding: FragmentCurrentCityCabBinding
-    lateinit var currentVehicleAdapter: CurrentVehicleAdapter
-    private lateinit var recyclerView: RecyclerView
-    var cablist=ArrayList<CurrentVehicleModel>()
-    var mList= ArrayList<CurrentModel>()
+    lateinit var binding: FragmentAdvanceCityCabBinding
+    lateinit var advanceCityAdapter: AdvanceCityDataAdapter
+    var cablist=ArrayList<AdvanceCityCabModel>()
     var manualLoc: TextView? = null
     var liveLoc: TextView? = null
     var AUTOCOMPLETE_REQUEST_CODE = -1
-    var to_lat :String ?= ""
-    var from_lat :String ?= ""
-    var to_lng :String ?= ""
-    var from_lng :String ?= ""
+    private val ADDRESS_PICKER_REQUEST = 1
+    private lateinit var mainBinding: ActivityMainBinding
+    private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private val permissionId = 2
+     var to_lat :Double ?= 0.0
+    var from_lat :Double ?= 0.0
+    var to_lng :Double ?= 0.0
+    var from_lng :Double ?= 0.0
     lateinit var pref: PrefManager
-    var current_loc:TextView? = null
-    var destination_loc:TextView? = null
-    var to_location_name:String ?= null
-    var from_location_name:String? = null
-    var linear_des:String ? = " "
-    var live_loc:String ? = " "
-    var selects : String ?= "";
+    var selects : String ?= ""
     lateinit var ll_location : LinearLayout
     lateinit var ll_choose_vehicle : LinearLayout
-    var press : String ?= "";
-    var datetext: TextView? = null
-    var timetext: TextView? = null
-    var progress: ProgressBar? = null
-    var nxtbtn: Button? = null
-    private val ADDRESS_PICKER_REQUEST = 1
-
-    private var currentLocation: Location? = null
+    var  myLocation : LatLng ?= null
     lateinit var locationManager: LocationManager
     private val requestcodes = 2
-    private val permissionId = 2
     private var hasGps = false
     private var hasNetwork = false
     private var locationByGps: Location? = null
     private var locationByNetwork: Location? = null
     private var lastKnownLocationByGps: Location? = null
+    private lateinit var googleApiClient: GoogleApiClient
+    var press : String ?= "";
+    var datetext: TextView? = null
+    var timetext: TextView? = null
+    var mapFragment: Fragment? = null
     private var onResu: String? = ""
-    private lateinit var mainBinding: ActivityMainBinding
-    private lateinit var mFusedLocationClient: FusedLocationProviderClient
     lateinit var cTimer : CountDownTimer
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding=DataBindingUtil.inflate(inflater,R.layout.fragment_current_city_cab, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+       binding=DataBindingUtil.inflate(inflater,R.layout.fragment_advance_city_cab, container, false)
         return binding.root
     }
 
+    @SuppressLint("MissingPermission")
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         pref = PrefManager(requireActivity())
+       /* if (pref.getTypeC().equals("1") || pref.getTypeC().equals("2")){
+
+            Navigation.findNavController(view).navigate(R.id.current)
+
+        }*/
+
         var calenderimg = view.findViewById<LinearLayout>(R.id.calenderimg)
-        datetext = view.findViewById<TextView>(R.id.datetext)
+         datetext = view.findViewById<TextView>(R.id.datetext)
         var watchimg = view?.findViewById<LinearLayout>(R.id.watchimg)
-        timetext = view?.findViewById<TextView>(R.id.timetext)
-        ll_location = view?.findViewById<LinearLayout>(R.id.ll_location)!!
-        ll_choose_vehicle = view?.findViewById<LinearLayout>(R.id.ll_choose_vehicle)!!
+         timetext = view?.findViewById<TextView>(R.id.timetext)
+         ll_location = view?.findViewById<LinearLayout>(R.id.ll_location)!!
+         ll_choose_vehicle = view?.findViewById<LinearLayout>(R.id.ll_choose_vehicle)!!
         manualLoc = view?.findViewById<TextView>(R.id.loc_manual)
-        liveLoc = view?.findViewById<TextView>(R.id.live_loc)
-        /* nxtbtn = view.findViewById(R.id.nxtbtn)*/
-        progress = view.findViewById<ProgressBar>(R.id.progress)
-        val onewayvehiclelist = view.findViewById<RecyclerView>(R.id.onewayvehiclelist)
+         liveLoc = view?.findViewById<TextView>(R.id.live_loc)
         var locLinear = view?.findViewById<LinearLayout>(R.id.linear_loc)
-        var submit = view?.findViewById<Button>(R.id.submitC)
+        var submit = view?.findViewById<Button>(R.id.submit)
+        var next = view?.findViewById<Button>(R.id.next)
         var destLinear = view?.findViewById<LinearLayout>(R.id.linear_des)
         var advance_li = view?.findViewById<LinearLayout>(R.id.adLinear)
-      //  var map_li = view?.findViewById<RelativeLayout>(R.id.mapLinear)
         var set = view?.findViewById<TextView>(R.id.img_marker)
-        ll_choose_vehicle?.isVisible = false
 
-      //  map_li?.isVisible = false
         ll_choose_vehicle?.isVisible = false
+        pref.setCount("location")
         pref.setBookingNo("")
         pref.setOtp("")
         pref.setRideId("")
         pref.setVehicleId("")
-        pref.setType("")
-        pref.setType("")
-        pref.setToLatL("")
-        pref.setToLngL("")
-        pref.setToLatM("")
-        pref.setToLngM("")
+        pref.setTypeC("")
+        pref.setToLatLC("")
+        pref.setToLngLC("")
+        pref.setToLatMC("")
+        pref.setToLngMC("")
+        startTimer()
         val apiKey = getString(R.string.api_key)
+
         if (!Places.isInitialized()) {
             Places.initialize(requireActivity(), apiKey)
         }
-        set?.setOnClickListener {
-            advance_li?.isVisible = true
-          //  map_li?.isVisible = false
-        }
-        locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-       startTimer()
+        set?.setOnClickListener {
+            mMap!!.clear()
+            advance_li?.isVisible = true
+           // map_li?.isVisible = false
+
+        }
+
+
+
+
+
+
 
 
         calenderimg.setOnClickListener {
@@ -186,9 +191,12 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
                     it1,
                     { view, year, monthOfYear, dayOfMonth ->
                         val dat : String
+                        val datApi : String
                         if (monthOfYear < 9){
+                           // dat = (dayOfMonth.toString() + "-0" + (monthOfYear + 1) + "-" + year.toString())
                             dat = (year.toString() + "-0" + (monthOfYear + 1) + "-" + dayOfMonth.toString())
                         }else {
+                             //dat = (dayOfMonth.toString() + "-" + (monthOfYear + 1) + "-" + year.toString())
                             dat = (year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth.toString())
                         }
                         datetext?.setText(dat)
@@ -208,7 +216,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
             val cal = Calendar.getInstance()
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 val am_pm = if (hour < 12) "AM" else "PM"
-                var selectedHour : Int
+               var selectedHour : Int
                 if (hour > 12){
                     selectedHour = hour - 12
                 }else{
@@ -232,114 +240,72 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         }
 
         manualLoc?.setOnClickListener {
-            press = "manual";
-            val field = Arrays.asList(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG)
-            val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, field).build(requireActivity())
-            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
-        }
-
-        liveLoc?.setOnClickListener {
-
-            press = "live";
-            val field = Arrays.asList(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG)
+            press = "manual"
+            val field = Arrays.asList(Place.Field.ID, Place.Field.ADDRESS,Place.Field.LAT_LNG)
             val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, field)
                 .build(requireActivity())
             startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
         }
 
+        liveLoc?.setOnClickListener {
 
+            press = "live"
+            val field = Arrays.asList(Place.Field.ID, Place.Field.ADDRESS,Place.Field.LAT_LNG)
+            val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, field)
+                .build(requireActivity())
+            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
+        }
 
         submit?.setOnClickListener {
-            if (to_lat == ""){
-                //  startActivity(Intent(requireActivity(), OneWay_Km_CountActivity::class.java))
+
+
+
+            if (liveLoc?.text.toString().equals("")){
                 Toast.makeText(requireActivity(), "Please select Start Address", Toast.LENGTH_LONG).show()
-            }else if (from_lat == ""){
+            }else if (manualLoc?.text.toString().equals("")){
                 Toast.makeText(requireActivity(), "Please select Destination Address", Toast.LENGTH_LONG).show()
 
             }else {
                 submitform()
             }
 
-            /* nxtbtn?.setOnClickListener {
-                 startActivity(Intent(requireActivity(), MapsActivity1::class.java))
-                     *//*vehicle_type_id.setvehicle_type_id("vehicle_type_id")
-                    ride_id.setride_id("ride_id")*//*
-
-            }*/
-
         }
-        mainBinding = ActivityMainBinding.inflate(layoutInflater)
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        next?.setOnClickListener {
+                startActivity(Intent(requireActivity(), CabDetailsActivity::class.java))
+        }
+
 
         locLinear?.setOnClickListener {
-          /*  val internet :Boolean = isOnline(requireActivity())
-            if(internet == true) {
-                mainBinding = ActivityMainBinding.inflate(layoutInflater)
-                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-                selects = "start"
-                if (isLocationPermissionGranted()) {
-                    advance_li?.isVisible = false
-                    map_li?.isVisible = true
-                    val mapFragment = getChildFragmentManager()
-                        .findFragmentById(R.id.map) as SupportMapFragment
-                    mapFragment.getMapAsync(this)
-                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-                    // startActivity(Intent(requireActivity(), MapsActivity::class.java))
-                }else{
-                    requestPermissions()
-                }
-            }else{
-
-                Toast.makeText(requireActivity(), "Please turn on internet", Toast.LENGTH_LONG).show()
-
-            }*/
             val internet :Boolean = isOnline(requireActivity())
             if(internet == true) {
-                selects = "start"
-                pref.setTypeC("1")
-                val i = Intent(requireActivity(), LocationPickerActivityCurr::class.java)
-                startActivityForResult(i, ADDRESS_PICKER_REQUEST)
+            selects = "start"
+            pref.setType("1")
+            val i = Intent(requireActivity(), LocationPickerActivity::class.java)
+            startActivityForResult(i, ADDRESS_PICKER_REQUEST)
             }else{
                 Toast.makeText(requireActivity(), "Please turn on internet", Toast.LENGTH_LONG).show()
 
             }
+
         }
 
         destLinear?.setOnClickListener {
+
             val internet :Boolean = isOnline(requireActivity())
             if(internet == true) {
-             /*   mainBinding = ActivityMainBinding.inflate(layoutInflater)
-                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+                pref.setType("2")
                 selects = "dest"
-                if (isLocationPermissionGranted()) {
-                    advance_li?.isVisible = false
-                    map_li?.isVisible = true
-                    val mapFragment = getChildFragmentManager()
-                        .findFragmentById(R.id.map) as SupportMapFragment
-                    mapFragment.getMapAsync(this)
-                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-                }else{
-                    requestPermissions()
-                }*/
-                pref.setTypeC("2")
-                selects = "dest"
-                val i = Intent(requireActivity(), LocationPickerActivityCurr::class.java)
+                val i = Intent(requireActivity(), LocationPickerActivity::class.java)
                 startActivityForResult(i, ADDRESS_PICKER_REQUEST)
+
             }else{
                 Toast.makeText(requireActivity(), "Please turn on internet", Toast.LENGTH_LONG).show()
 
             }
-
-
         }
 
-
-        /* cablist.add(AdvanceCityCab(R.drawable.figgo_auto,"75-100"))
-         cablist.add(AdvanceCityCab(R.drawable.figgo_bike,"45-65"))
-         cablist.add(AdvanceCityCab(R.drawable.figgo_e_rick,"25-40"))
-         cablist.add(AdvanceCityCab(R.drawable.figgo_lux,"125-400"))*/
-        //   advanceCityAdapter=AdvanceCityAdapter(requireActivity(),cablist)
-        //   binding.currentCabList.adapter=advanceCityAdapter
+       // Initialize Places.
 
     }
 
@@ -403,20 +369,12 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
     }
 
 
-
     private fun submitform() {
 
-
-        pref.setToLatLC(to_lat.toString())
-     pref.setToLngLC(to_lng.toString())
-         pref.setToLatMC(from_lat.toString())
-          pref.setToLngMC(from_lng.toString())
-        pref.setTime(datetext?.text.toString())
-        progress?.isVisible = true
-        ll_location?.isVisible = false
-        ll_choose_vehicle?.isVisible  =false
         val progressDialog = ProgressDialog(requireActivity())
         progressDialog.show()
+        val URL = Helper.create_ride
+        Log.d("url",URL)
         val queue = Volley.newRequestQueue(requireContext())
         val json = JSONObject()
         json.put("date", datetext?.text.toString())
@@ -425,19 +383,22 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         json.put("to_lng", to_lng)
         json.put("from_lat", from_lat)
         json.put("from_lng", from_lng)
+        json.put("type", "advance_booking")
         json.put("to_location_name", liveLoc?.text.toString())
         json.put("from_location_name", manualLoc?.text.toString())
-        json.put("type","current_booking")
-        Log.d("SendData", "json===" + json)
-        val jsonOblect: JsonObjectRequest = object : JsonObjectRequest(Method.POST, Helper.create_ride, json, object :
-            Response.Listener<JSONObject?>               {
-            override fun onResponse(response: JSONObject?) {
-                Log.d("SendData", "response===" + response)
-                if (response != null) {
-                    if (response != null) {
 
-                            progressDialog.hide()
-                            try {
+        Log.d("requestdata",""+json)
+
+
+        val jsonOblect: JsonObjectRequest = object : JsonObjectRequest(Method.POST, URL, json, object :
+                Response.Listener<JSONObject?>               {
+                @SuppressLint("SuspiciousIndentation")
+                override fun onResponse(response: JSONObject?) {
+                    Log.d("SendData", "response===" + response)
+                    if (response != null) {
+                        progressDialog.hide()
+                        try {
+
 
 
                             ll_location?.isVisible = false
@@ -446,7 +407,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
                             val size = response.getJSONObject("data").getJSONArray("vehicle_types")
                                 .length()
-                            val ride_id = response.getJSONObject("data").getString("ride_id")
+                            val rideId = response.getJSONObject("data").getString("ride_id")
 
                             for (p2 in 0 until size) {
 
@@ -456,270 +417,113 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
                                 val image =
                                     response.getJSONObject("data").getJSONArray("vehicle_types")
                                         .getJSONObject(p2).getString("full_image")
-                                val driver_id =
+                                val vehicle_id =
                                     response.getJSONObject("data").getJSONArray("vehicle_types")
                                         .getJSONObject(p2).getString("id")
-                                val min_price =
+                                val min =
                                     response.getJSONObject("data").getJSONArray("vehicle_types")
                                         .getJSONObject(p2).getString("min_price")
-                                val max_price =
+                                val max =
                                     response.getJSONObject("data").getJSONArray("vehicle_types")
                                         .getJSONObject(p2).getString("max_price")
 
                                 cablist.add(
-                                    CurrentVehicleModel(
+                                    AdvanceCityCabModel(
                                         name,
                                         image,
-                                        ride_id,
-                                        driver_id,
-                                        min_price,
-                                        max_price
+                                        rideId,
+                                        vehicle_id,
+                                        min,
+                                        max
                                     )
                                 )
-
-                                /*val status = response.getString("status")
-                    if(status.equals("false")){
-                        Toast.makeText(requireActivity(), "Something Went Wrong!", Toast.LENGTH_LONG).show()
-                    }else{
-                        progressDialog.hide()
-
-
-                        val data = response.getJSONObject("data")
-                        val ride_id = data.getString("ride_id")
-                        pref.setRideId(ride_id)
-                        val vehicle_types = data.getJSONArray("vehicle_types")
-                        for (i in 0 until vehicle_types.length()){
-                            val name = vehicle_types.getJSONObject(i).getString("name")
-                            val image = vehicle_types.getJSONObject(i).getString("full_image")
-                            val id = vehicle_types.getJSONObject(i).getString("id")
-                            val min_price = vehicle_types.getJSONObject(i).getString("min_price")
-                            val max_price = vehicle_types.getJSONObject(i).getString("max_price")*/
-
-
                             }
 
-
-                            currentVehicleAdapter =
-                                CurrentVehicleAdapter(requireContext() as Activity, cablist)
-                            binding.recylerCabList.adapter = currentVehicleAdapter
+                            advanceCityAdapter = AdvanceCityDataAdapter(requireActivity(), cablist)
                             binding.recylerCabList.layoutManager = GridLayoutManager(context, 3)
-                            progress?.isVisible = false
-                            ll_location?.isVisible = false
-                            ll_choose_vehicle?.isVisible = true
+                            binding.recylerCabList.adapter = advanceCityAdapter
+                            binding.recylerCabList.layoutManager = GridLayoutManager(context, 3)
                         }catch (e:Exception){
                             MapUtility.showDialog(e.toString(),requireActivity())
 
                         }
-                        }
+                    }
+                    // Get your json response and convert it to whatever you want.
                 }
+            }, object : Response.ErrorListener {
+                override fun onErrorResponse(error: VolleyError?) {
+                    Log.d("SendData", "error===" + error)
+                    progressDialog.hide()
+                    MapUtility.showDialog(error.toString(),requireActivity())
+                    //Toast.makeText(requireActivity(), "Something went wrong!", Toast.LENGTH_LONG).show()
 
+                }
+            }) {
+                @SuppressLint("SuspiciousIndentation")
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val headers: MutableMap<String, String> = HashMap()
+                    headers.put("Content-Type", "application/json; charset=UTF-8");
+                    headers.put("Authorization", "Bearer " + pref.getToken());
+                    headers.put("Accept", "application/vnd.api+json");
+                    return headers
+                }
             }
-        }, object : Response.ErrorListener {
-            override fun onErrorResponse(error: VolleyError?) {
-                Log.d("SendData", "error===" + error)
-                progressDialog.hide()
-                MapUtility.showDialog(error.toString(),requireActivity())
-                //Toast.makeText(requireActivity(), "Something Went Wrong!", Toast.LENGTH_LONG).show()
-            }
-        }) {
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val headers: MutableMap<String, String> = HashMap()
-                headers.put("Content-Type", "application/json; charset=UTF-8");
-                headers.put("Authorization", "Bearer " + pref.getToken());
-                return headers
-            }
-        }
-        jsonOblect.setRetryPolicy(DefaultRetryPolicy(10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT))
 
         queue.add(jsonOblect)
 
     }
 
+
     @SuppressLint("MissingPermission")
     private fun getLocation() {
-
-        if (isLocationPermissionGranted()){
+        if (isLocationPermissionGranted()) {
             if (hasGps) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    5000,
-                    0F,
-                    gpsLocationListener
-                )
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0F, gpsLocationListener)
             }
 //------------------------------------------------------//
             if (hasNetwork) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    5000,
-                    0F,
-                    networkLocationListener)
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0F, networkLocationListener)
             }
 
 
             val lastKnownLocationByGps =
                 locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
-            // locationByGps = getLastKnownLocation()
+
             lastKnownLocationByGps?.let {
                 locationByGps = lastKnownLocationByGps
             }
-            //------------------------------------------------------//
-
 
             val lastKnownLocationByNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
             lastKnownLocationByNetwork?.let {
                 locationByNetwork = lastKnownLocationByNetwork
             }
-//------------------------------------------------------//
-            //  if (locationByGps != null || locationByNetwork != null) {
-            /*  if (locationByGps!!.accuracy > locationByNetwork!!.accuracy) {
-                  if (selects.equals("start")) {
-
-                      to_lat = locationByGps?.latitude.toString()
-                      to_lng = locationByGps?.longitude.toString()
-
-                      val geocoder: Geocoder
-                      val addresses: List<Address>
-                      geocoder = Geocoder(requireActivity(), Locale.getDefault())
-
-                      addresses = locationByGps?.let {
-                          geocoder.getFromLocation(
-                              it.latitude,
-                              it.longitude,1
-                          )
-                      }!! // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-
-
-                      val address = addresses[0].getAddressLine(0)
-                      liveLoc?.setText(address)
-                  }else{
-
-                      from_lat = locationByGps?.latitude.toString()
-                      from_lng = locationByGps?.longitude.toString()
-
-                      val geocoder: Geocoder
-                      val addresses: List<Address>
-                      geocoder = Geocoder(requireActivity(), Locale.getDefault())
-
-                      addresses = locationByGps?.let {
-                          geocoder.getFromLocation(
-                              it.latitude,
-                              it.longitude,1
-                          )
-                      }!! // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-
-
-                      val address = addresses[0].getAddressLine(0)
-                      manualLoc?.setText(address)
-                  }
-                  // use latitude and longitude as per your need
-              } else {*/
-            if (locationByNetwork == null){
+            if (locationByNetwork == null) {
                 Toast.makeText(requireActivity(), "No Network", Toast.LENGTH_LONG).show()
 
-            }else {
-                if (selects.equals("start")) {
+            } else {
 
 
-                    to_lat = locationByNetwork?.latitude.toString()
-                    to_lng = locationByNetwork?.longitude.toString()
-                    val geocoder: Geocoder
-                    val addresses: List<Address>
-                    geocoder = Geocoder(requireActivity(), Locale.getDefault())
+                    to_lat = locationByNetwork?.latitude
+                    to_lng = locationByNetwork?.longitude
 
-                    addresses = locationByNetwork?.let {
-                        geocoder.getFromLocation(
-                            it.latitude,
-                            it.longitude, 1
-                        )
-                    }!! // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                    direction
 
-
-                    val address = addresses[0].getAddressLine(0)
-                    liveLoc?.setText(address)
-                } else {
-
-                    from_lat = locationByNetwork?.latitude.toString()
-                    from_lng = locationByNetwork?.longitude.toString()
-
-                    val geocoder: Geocoder
-                    val addresses: List<Address>
-                    geocoder = Geocoder(requireActivity(), Locale.getDefault())
-
-                    addresses = locationByNetwork?.let {
-                        geocoder.getFromLocation(
-                            it.latitude,
-                            it.longitude, 1
-                        )
-                    }!! // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-
-
-                    val address = addresses[0].getAddressLine(0)
-                    manualLoc?.setText(address)
-                }
             }
-            // use latitude and longitude as per your need
-            // }
-            // }
-        }else{
+
+        } else {
             requestPermissions()
         }
-
-
-        /* if (ActivityCompat.checkSelfPermission(
-                 requireActivity(),
-                 Manifest.permission.ACCESS_FINE_LOCATION
-             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                 requireActivity(),
-                 Manifest.permission.ACCESS_COARSE_LOCATION
-             ) != PackageManager.PERMISSION_GRANTED
-         ) {
-             // TODO: Consider calling
-             //    ActivityCompat#requestPermissions
-             // here to request the missing permissions, and then overriding
-             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-             //                                          int[] grantResults)
-             // to handle the case where the user grants the permission. See the documentation
-             // for ActivityCompat#requestPermissions for more details.
-             return
-         }else {
-             requestPermissions()
-         }checkLocationService
-         mFusedLocationClient.lastLocation.addOnCompleteListener(requireActivity()) { task ->
-                     val location: Location? = task.result
-
-                     if (location != null) {
-                         val geocoder = Geocoder(requireActivity(), Locale.getDefault())
-                         val list: List<Address> =
-                             geocoder.getFromLocation(location.latitude, location.longitude, 1) as List<Address>
-                         mainBinding.apply {
-                             if (selects.equals("start")) {
-                                 //   tvLatitude.text = "Latitude\n${list[0].latitude}"
-                                  to_lat = "${list[0].latitude}"
-                                 to_lng = "${list[0].longitude}"
-                                 // tvCountryName.text = "Country Name\n${list[0].countryName}"
-                                 var location: String? = "${list[0].getAddressLine(0)}"
-                                 liveLoc!!.text = location?.replace("133", "")?.replace(",","")
-                                 //tvAddress.text = "Address\n${list[0].getAddressLine(0)}"
-                             }else{
-                                     from_lat  = "${list[0].latitude}"
-                                  from_lng = "${list[0].longitude}"
-
-
-                                 var location: String? = "${list[0].getAddressLine(0)}"
-                                 manualLoc!!.text = location?.replace("133", "")?.replace(",","")
-                                 //tvAddress.text = "Address\n${list[0].getAddressLine(0)}"
-                             }
-                         }
-                     }else{
-                         getLocation()
-                     }
-                 }*/
     }
 
 
+    private fun moveMap() {
+        val latLng = LatLng(to_lat!!, to_lng!!)
+        mMap!!.addMarker(MarkerOptions().position(latLng)) //Adding a title
+        mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        mMap!!.animateCamera(CameraUpdateFactory.zoomTo(15f))
+    }
 
 
 
@@ -731,25 +535,23 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
                 val place = Autocomplete.getPlaceFromIntent(data!!)
                 if (press.equals("manual")) {
                     manualLoc!!.setText(place.address)
-                    from_lat = place.latLng.latitude.toString()
-                    from_lng = place.latLng.longitude.toString()
+                    from_lat = place.latLng.latitude
+                    from_lng = place.latLng.longitude
                     onResu = "false"
                 }else if (press.equals("live")){
-                    to_lat = place.latLng.latitude.toString()
-                    to_lng = place.latLng.longitude.toString()
+                    to_lat = place.latLng.latitude
+                    to_lng = place.latLng.longitude
                     liveLoc!!.setText(place.address)
                     onResu = "false"
                 }
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                val status = Autocomplete.getStatusFromIntent(
-                    data!!
-                )
+                val status = Autocomplete.getStatusFromIntent(data!!)
             } else if (resultCode == AppCompatActivity.RESULT_CANCELED) {
             }
         }else if (requestCode == REQUEST_CHECK_SETTINGS) {
             if (resultCode == Activity.RESULT_OK) {
                 val result = data!!.getStringExtra("result")
-                fetchCurrentLocation();
+                fetchCurrentLocation()
             }
             else if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -782,16 +584,19 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
     }
 
     override fun onBackPressed(): Boolean {
-        ll_location?.isVisible = true
+        ll_location.isVisible = true
         ll_choose_vehicle?.isVisible  =false
 
         return true
     }
 
-    override fun Any.onBackPressed(): Boolean {
-        TODO("Not yet implemented")
-    }
 
+    override fun Any.onBackPressed(): Boolean {
+        ll_location.isVisible = true
+        ll_choose_vehicle?.isVisible  =false
+
+        return true
+    }
 
     private fun requestPermissions() {
         ActivityCompat.requestPermissions(
@@ -830,16 +635,16 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         override fun onLocationChanged(location: Location) {
             locationByGps = location
         }
-        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
-        override fun onProviderEnabled(provider: String) {}
-        override fun onProviderDisabled(provider: String) {}
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+            override fun onProviderEnabled(provider: String) {}
+            override fun onProviderDisabled(provider: String) {}
 
     }
-    //------------------------------------------------------//
+
     val networkLocationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             locationByNetwork= location
-            // locationByNetwork= location
+           // locationByNetwork= location
         }
 
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
@@ -865,27 +670,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         return bestLocation
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
-
-            mMap.isMyLocationEnabled = true;
-            mMap.uiSettings.isMapToolbarEnabled = true;
-            mMap.uiSettings.isMyLocationButtonEnabled = true;
-            checkLocationService();
-        }
-
-        mMap.setOnCameraMoveStartedListener (this)
-        mMap.setOnCameraIdleListener (this)
-        mMap.setOnCameraMoveListener  (this)
-
-    }
     override fun openSomeActivityForResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (ContextCompat.checkSelfPermission(requireActivity(),
@@ -897,7 +682,20 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
             checkLocationService();
         }
     }
+    override fun onMapReady(googleMap: GoogleMap) {
+        @SuppressLint("MissingPermission")
 
+
+        mMap = googleMap
+          val latLng = LatLng(to_lat!!, to_lng!!)
+
+         mMap!!.addMarker(MarkerOptions().position(latLng).draggable(true))
+        mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        mMap!!.animateCamera(CameraUpdateFactory.zoomTo(10f))
+        mMap!!.setOnMarkerDragListener(this)
+         //  mMap!!.setOnMapLongClickListener(this)
+
+    }
     @SuppressLint("MissingPermission")
     fun fetchCurrentLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener(requireActivity()) { location ->
@@ -908,43 +706,65 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
                 if (selects.equals("start")){
                     lastLocation = location
                     val currentLatLng = LatLng(location.latitude, location.longitude)
-                    to_lat = location.latitude.toString()
-                    to_lng = location.longitude.toString()
+                    to_lat = location.latitude
+                    to_lng = location.longitude
 
                     val geocoder: Geocoder
                     val addresses: List<Address>
                     geocoder = Geocoder(requireActivity(), Locale.getDefault())
 
-                    addresses = lastLocation?.let {
-                        geocoder.getFromLocation(
-                            it.latitude,
-                            it.longitude, 1
-                        )
-                    }!! // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                    var strAdd : String? = null
+                    try {
+                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        if (addresses != null) {
+                            val returnedAddress = addresses[0]
+                            val strReturnedAddress = java.lang.StringBuilder("")
+                            for (i in 0..returnedAddress.maxAddressLineIndex) {
+                                strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+                            }
+                            strAdd = strReturnedAddress.toString()
+                            Log.w(" Current loction address", strReturnedAddress.toString())
+                        } else {
+                            Log.w(" Current loction address", "No Address returned!")
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.w(" Current loction address", "Canont get Address!")
+                    }
+                    liveLoc?.setText(strAdd)
 
-
-                    val address = addresses[0].getAddressLine(0)
-                    liveLoc?.setText(address)
 
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 }else{
                     lastLocation = location
                     val currentLatLng = LatLng(location.latitude, location.longitude)
-                    from_lat = location.latitude.toString()
-                    from_lng = location.longitude.toString()
+                    from_lat = location.latitude
+                    from_lng = location.longitude
 
 
                     val geocoder: Geocoder
                     val addresses: List<Address>
                     geocoder = Geocoder(requireActivity(), Locale.getDefault())
 
-                    addresses = lastLocation?.let {
-                        geocoder.getFromLocation(it.latitude, it.longitude, 1)
-                    }!!
-
-
-                    val address = addresses[0].getAddressLine(0)
-                    manualLoc?.setText(address)
+                    var strAdd : String? = null
+                    try {
+                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        if (addresses != null) {
+                            val returnedAddress = addresses[0]
+                            val strReturnedAddress = java.lang.StringBuilder("")
+                            for (i in 0..returnedAddress.maxAddressLineIndex) {
+                                strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+                            }
+                            strAdd = strReturnedAddress.toString()
+                            Log.w(" Current loction address", strReturnedAddress.toString())
+                        } else {
+                            Log.w(" Current loction address", "No Address returned!")
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.w(" Current loction address", "Canont get Address!")
+                    }
+                    manualLoc?.setText(strAdd)
 
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 }
@@ -972,10 +792,15 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
         task.addOnFailureListener(requireActivity()) { e ->
             if (e is ResolvableApiException) {
-
+                // Location settings are not satisfied, but this can be fixed
+                // by showing the user a dialog.
                 try {
-
-                    e.startResolutionForResult(requireActivity(), REQUEST_CHECK_SETTINGS)
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult().
+                    e.startResolutionForResult(
+                        requireActivity(),
+                        REQUEST_CHECK_SETTINGS
+                    )
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore the error.
                 }
@@ -983,6 +808,12 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
             }
         }
     }
+    override fun onConnected(bundle: Bundle?) {
+       getLocation()
+    }
+
+    override fun onConnectionSuspended(i: Int) {}
+    override fun onConnectionFailed(connectionResult: ConnectionResult) {}
 
     override fun onCameraMoveStarted(p0: Int) {
         Log.v("Onmove start","Onmove "+p0);
@@ -1006,47 +837,128 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         val position: LatLng = markerOptions.getPosition()
 
 
+    }
+    private val direction: Unit
+
+    //Showing a dialog till we get the route
+
+        //Creating a string request
+        private get() {
+            //Getting the URL
+
+            val url = makeURL(to_lat!!, to_lng!!, to_lat!!, to_lng!!)
+
+            //Showing a dialog till we get the route
+            val loading = ProgressDialog.show(requireActivity(), "Getting User Location", "Please wait...", false, false)
+
+            //Creating a string request
+            val stringRequest = StringRequest(url,
+                { response ->
+                    loading.dismiss()
+                    //Calling the method drawPath to draw the path
+                    //drawPath(response)
+                }
+            ) { loading.dismiss() }
+
+            //Adding the request to request queue
+            val requestQueue = Volley.newRequestQueue(requireActivity())
+            requestQueue.add(stringRequest)
+        }
+
+    fun makeURL(sourcelat: Double, sourcelog: Double, destlat: Double, destlog: Double): String {
+        val urlString = StringBuilder()
+        urlString.append("https://maps.googleapis.com/maps/api/directions/json")
+        urlString.append("?origin=") // from
+        urlString.append(java.lang.Double.toString(sourcelat))
+        urlString.append(",")
+        urlString
+            .append(java.lang.Double.toString(sourcelog))
+        urlString.append("&destination=") // to
+        urlString
+            .append(java.lang.Double.toString(destlat))
+        urlString.append(",")
+        urlString.append(java.lang.Double.toString(destlog))
+        urlString.append("&sensor=false&mode=driving&alternatives=true")
+        urlString.append("&key=AIzaSyCbd3JqvfSx0p74kYfhRTXE7LZghirSDoU")
+        return urlString.toString()
+    }//Calling the method drawPath to draw the path
+
+
+
+    override fun onMarkerDragStart(marker: Marker) {
+
+    }
+    override fun onMarkerDrag(marker: Marker) {}
+    override fun onMarkerDragEnd(marker: Marker) {
+        val position = marker.position
+
         if (selects.equals("start")){
 
-            to_lat = position.latitude.toString()
-            to_lng = position.longitude.toString()
+            to_lat = position.latitude
+            to_lng = position.longitude
 
-            val geocoder: Geocoder
+            var geocoder: Geocoder
             val addresses: List<Address>
             geocoder = Geocoder(requireActivity(), Locale.getDefault())
 
-            addresses = position?.let {
-                geocoder.getFromLocation(it.latitude, it.longitude, 1)
-            }!!
 
-
-            val address = addresses[0].getAddressLine(0)
-            liveLoc?.setText(address)
+            var strAdd : String? = null
+            try {
+                val addresses = geocoder.getFromLocation(position.latitude, position.longitude, 1)
+                if (addresses != null) {
+                    val returnedAddress = addresses[0]
+                    val strReturnedAddress = java.lang.StringBuilder("")
+                    for (i in 0..returnedAddress.maxAddressLineIndex) {
+                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+                    }
+                    strAdd = strReturnedAddress.toString()
+                    Log.w(" Current loction address", strReturnedAddress.toString())
+                } else {
+                    Log.w(" Current loction address", "No Address returned!")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.w(" Current loction address",  e.printStackTrace().toString())
+            }
+            liveLoc?.setText(strAdd)
 
 
         }else{
 
-            from_lat = position.latitude.toString()
-            from_lng = position.longitude.toString()
+            from_lat = position.latitude
+            from_lng = position.longitude
 
 
             val geocoder: Geocoder
             val addresses: List<Address>
             geocoder = Geocoder(requireActivity(), Locale.getDefault())
 
-            addresses = position?.let {
-                geocoder.getFromLocation(it.latitude, it.longitude, 1)
-            }!!
-
-
-            val address = addresses[0].getAddressLine(0)
-            manualLoc?.setText(address)
+            var strAdd : String? = null
+            try {
+                val addresses = geocoder.getFromLocation(position.latitude, position.longitude, 1)
+                if (addresses != null) {
+                    val returnedAddress = addresses[0]
+                    val strReturnedAddress = java.lang.StringBuilder("")
+                    for (i in 0..returnedAddress.maxAddressLineIndex) {
+                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+                    }
+                    strAdd = strReturnedAddress.toString()
+                    Log.w(" Current loction address", strReturnedAddress.toString())
+                } else {
+                    Log.w(" Current loction address", "No Address returned!")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.w(" Current loction address", "Canont get Address!")
+            }
+            manualLoc?.setText(strAdd)
 
         }
-    }
+}
+
     private fun getCurrentLoc(){
-        to_lat = pref.getToLatLC()
-        to_lng = pref.getToLngLC()
+        to_lat = pref.getToLatL().toDouble()
+        to_lng = pref.getToLngL().toDouble()
 
         var geocoder: Geocoder
         val addresses: List<Address>
@@ -1055,7 +967,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
         var strAdd : String? = null
         try {
-            val addresses = geocoder.getFromLocation(to_lat!!.toDouble(), to_lng!!.toDouble(), 1)
+            val addresses = geocoder.getFromLocation(to_lat!!, to_lng!!, 1)
             if (addresses != null) {
                 val returnedAddress = addresses[0]
                 val strReturnedAddress = java.lang.StringBuilder("")
@@ -1077,9 +989,8 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
     private fun getDestinationLoc(){
 
-        from_lat = pref.getToLatMC()
-        from_lng = pref.getToLngMC()
-
+        from_lat = pref.getToLatM().toDouble()
+        from_lng = pref.getToLngM().toDouble()
 
         val geocoder: Geocoder
         val addresses: List<Address>
@@ -1087,7 +998,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
         var strAdd : String? = null
         try {
-            val addresses = geocoder.getFromLocation(from_lat!!.toDouble(), from_lng!!.toDouble(), 1)
+            val addresses = geocoder.getFromLocation(from_lat!!, from_lng!!, 1)
             if (addresses != null) {
                 val returnedAddress = addresses[0]
                 val strReturnedAddress = java.lang.StringBuilder("")
@@ -1106,52 +1017,57 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         manualLoc?.setText(strAdd)
 
     }
-
     override fun onResume() {
         super.onResume()
 
-        pref.setSearchBack("")
+
+
         if (onResu.equals("false")){
             onResu = ""
-        }else{
+        }
+        else {
+            if (pref.getType().equals("1")) {
 
-
-            if (pref.getTypeC().equals("1")) {
-
-                if (pref.getToLatLC().equals("")) {
+                if (pref.getToLatL().equals("")) {
 
                 } else {
                     getCurrentLoc()
+
                 }
-                if (pref.getToLatMC().equals("")) {
+                if (pref.getToLatM().equals("")) {
 
 
                 } else {
-                    if (pref.getToLatMC().equals("")) {
+                    if (pref.getToLatM().equals("")) {
 
                     } else {
                         getDestinationLoc()
                     }
                 }
 
-            } else if (pref.getTypeC().equals("2")) {
-                if (pref.getToLatLC().equals("")) {
+
+            } else if (pref.getType().equals("2")) {
+                if (pref.getToLatL().equals("")) {
 
                 } else {
-                    if (pref.getToLatLC().equals("")) {
+                    if (pref.getToLatL().equals("")) {
 
                     } else {
                         getCurrentLoc()
+
                     }
                 }
-                if (pref.getToLatMC().equals("")) {
+                if (pref.getToLatM().equals("")) {
 
                 } else {
                     getDestinationLoc()
                 }
 
+
             }
         }
+
     }
+
 
 }

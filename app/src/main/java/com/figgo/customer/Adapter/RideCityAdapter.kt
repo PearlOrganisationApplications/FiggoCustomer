@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.figgo.customer.Model.Data
 import com.figgo.customer.R
-import com.figgo.customer.UI.LocationPickerActivity
+import com.figgo.customer.UI.AdavanceCityCabActivity.LocationPickerActivity
 
 
 class RideCityAdapter(var context:Activity, var ride: ArrayList<LocationPickerActivity>): Adapter<RideCityAdapter.RideCityHolder>() {

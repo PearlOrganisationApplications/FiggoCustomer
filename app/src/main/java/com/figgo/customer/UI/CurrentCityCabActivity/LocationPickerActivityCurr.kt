@@ -1,4 +1,4 @@
-package com.figgo.customer.UI
+package com.figgo.customer.UI.CurrentCityCabActivity
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -13,8 +13,6 @@ import android.location.LocationListener
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -46,11 +44,10 @@ import java.io.IOException
 import java.util.*
 import java.util.regex.Pattern
 
-
-class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityAdapter.ItemListener {
+class LocationPickerActivityCurr :AppCompatActivity(), OnMapReadyCallback, RideCityAdapter.ItemListener {
     private val REQUEST_CHECK_SETTINGS = 2
     private val REQUEST_ID_MULTIPLE_PERMISSIONS = 2
-    private val TAG = LocationPickerActivity::class.java.simpleName
+    private val TAG = LocationPickerActivityCurr::class.java.simpleName
     var PLACE_AUTOCOMPLETE_REQUEST_CODE = 1
     var regex = "^(-?\\d+(\\.\\d+)?),\\s*(-?\\d+(\\.\\d+)?)$"
     var latLongPattern = Pattern.compile(regex)
@@ -104,13 +101,10 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
     private var locationPick = false
     private var type: String? = null
     private var count: String? = ""
-    private var address: String? = ""
     private var rl_current_location: LinearLayout? = null
-    private var edt_search: EditText? = null
     lateinit var pref: PrefManager
-    lateinit var historyAddAdapter: HistoryAdapter
     var historyAddList=ArrayList<HistoryAdd>()
-
+    lateinit var historyAddAdapter: HistoryAdapter
     @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,35 +120,13 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         val recycler_history = findViewById<RecyclerView>(R.id.recycler_history)
         txt_showmap = findViewById(R.id.txt_show_map)
         moving_pointer = findViewById(R.id.moving_pointer)
-        edt_search = findViewById<EditText>(R.id.edt_search)
+
         imgSearch = findViewById(R.id.imgSearch)
         addressline2 = findViewById(R.id.addressline2)
         citydetail = findViewById(R.id.citydetails)
 
 
-
-        edt_search?.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable) {
-                // TODO Auto-generated method stub
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // TODO Auto-generated method stub
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-
-
-
-            }
-        })
-
-
-
-
-
-
-        val db = DBHelper(this@LocationPickerActivity, null)
+        val db = DBHelper(this@LocationPickerActivityCurr, null)
 
         // below is the variable for cursor
         // we have called method to get
@@ -169,7 +141,9 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
                 HistoryAdd(
                     cursor.getString(cursor.getColumnIndex(DBHelper.ADDRESS)),
                     cursor.getString(cursor.getColumnIndex(DBHelper.LAT)),
-                    cursor.getString(cursor.getColumnIndex(DBHelper.LNG))))
+                    cursor.getString(cursor.getColumnIndex(DBHelper.LNG))
+                )
+            )
 
 
             // moving our cursor to next
@@ -179,21 +153,21 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
                     HistoryAdd(
                         cursor.getString(cursor.getColumnIndex(DBHelper.ADDRESS)),
                         cursor.getString(cursor.getColumnIndex(DBHelper.LAT)),
-                        cursor.getString(cursor.getColumnIndex(DBHelper.LNG))))
+                        cursor.getString(cursor.getColumnIndex(DBHelper.LNG))
+                    )
+                )
 
             }
 
             // at last we close our cursor
             cursor.close()
         }
-
         if (historyAddList.size > 0) {
-            historyAddAdapter = HistoryAdapter(this@LocationPickerActivity, historyAddList)
-            recycler_history.layoutManager = GridLayoutManager(this@LocationPickerActivity, 1)
+            historyAddAdapter = HistoryAdapter(this@LocationPickerActivityCurr, historyAddList)
+            recycler_history.layoutManager = GridLayoutManager(this@LocationPickerActivityCurr, 1)
             recycler_history.adapter = historyAddAdapter
 
         }
-
 
         pref = PrefManager(this)
         imgSearch?.isVisible = false
@@ -311,18 +285,17 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
                 )
                     .show()
             }else{
-                val db = DBHelper(this@LocationPickerActivity, null)
+                val db = DBHelper(this@LocationPickerActivityCurr, null)
 
-                if (pref.getType().equals("1")) {
-                    pref.setToLatL(mLatitude.toString())
-                    pref.setToLngL(mLongitude.toString())
+                if (pref.getTypeC().equals("1")) {
+                    pref.setToLatLC(mLatitude.toString())
+                    pref.setToLngLC(mLongitude.toString())
                     db.addAddress(addressline2?.text.toString(),mLatitude.toString(),mLongitude.toString())
-                    // historyAddList.add(HistoryAdd(addressline2?.text.toString(),mLatitude.toString(),mLongitude.toString()))
+
                 }else{
-                    pref.setToLatM(mLatitude.toString())
-                    pref.setToLngM(mLongitude.toString())
+                    pref.setToLatMC(mLatitude.toString())
+                    pref.setToLngMC(mLongitude.toString())
                     db.addAddress(addressline2?.text.toString(),mLatitude.toString(),mLongitude.toString())
-                    //  historyAddList.add(HistoryAdd(addressline2?.text.toString(),mLatitude.toString(),mLongitude.toString()))
 
                 }
                 finish()
@@ -336,7 +309,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
 
             count = "map"
             locationPick = false
-            this@LocationPickerActivity.showCurrentLocationOnMap(false)
+            this@LocationPickerActivityCurr.showCurrentLocationOnMap(false)
             imgSearch?.isVisible = true
             ll_history?.setVisibility(View.GONE)
             txt_showmap?.setVisibility(View.GONE)
@@ -353,7 +326,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         })
 
         imgCurrentloc?.setOnClickListener(View.OnClickListener {
-            this@LocationPickerActivity.showCurrentLocationOnMap(false)
+            this@LocationPickerActivityCurr.showCurrentLocationOnMap(false)
             doAfterPermissionProvided = 2
             doAfterLocationSwitchedOn = 2
         })
@@ -363,7 +336,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         directionTool?.setOnClickListener(
             object : View.OnClickListener {
                 override fun onClick(v: View) {
-                    this@LocationPickerActivity.showCurrentLocationOnMap(true)
+                    this@LocationPickerActivityCurr.showCurrentLocationOnMap(true)
                     doAfterPermissionProvided = 3
                     doAfterLocationSwitchedOn = 3
                 }
@@ -378,9 +351,10 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
                             "http://maps.google.com/maps?q=loc:$mLatitude, $mLongitude"
                         )
                     )
-                    this@LocationPickerActivity.startActivity(intent)
+                    this@LocationPickerActivityCurr.startActivity(intent)
                 }
             })
+
 
         /* arrayList = ArrayList()
          rideHistoryAdapter = RideCityAdapter(this, arrayList, this, type)
@@ -428,7 +402,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
             if (resultCode != RESULT_OK) {
                 //Location not switched ON
                 Toast.makeText(
-                    this@LocationPickerActivity,
+                    this@LocationPickerActivityCurr,
                     "Location Not Available..",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -459,19 +433,19 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
                             "http://maps.google.com/maps?saddr=$currentLatitude, $currentLongitude&daddr=$mLatitude, $mLongitude"
                         )
                     )
-                    this@LocationPickerActivity.startActivity(intent)
+                    this@LocationPickerActivityCurr.startActivity(intent)
                 } else {
                     //Go to Current Location
                     mLatitude = location.latitude
                     mLongitude = location.longitude
-                    this@LocationPickerActivity.getAddressByGeoCodingLatLng()
+                    this@LocationPickerActivityCurr.getAddressByGeoCodingLatLng()
                 }
             }
         }
         lastLocation.addOnFailureListener { //If perm provided then gps not enabled
             //                getSettingsLocation();
             Toast.makeText(
-                this@LocationPickerActivity,
+                this@LocationPickerActivityCurr,
                 "Location Not Availabe",
                 Toast.LENGTH_SHORT
             )
@@ -575,9 +549,11 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         if (mMap!!.isIndoorEnabled()) {
             mMap?.setIndoorEnabled(false)
         }
-        this@LocationPickerActivity.showCurrentLocationOnMap(false)
+        this@LocationPickerActivityCurr.showCurrentLocationOnMap(false)
         doAfterPermissionProvided = 2
         doAfterLocationSwitchedOn = 2
+
+
         mMap?.setInfoWindowAdapter(object : InfoWindowAdapter {
             // Use default InfoWindow frame
             override fun getInfoWindow(arg0: Marker): View? {
@@ -619,10 +595,10 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
             Log.e("latlng", latLng.toString() + "")
             isZooming = true
             addMarker()
-            if (!MapUtility.isNetworkAvailable(this@LocationPickerActivity)) {
-                MapUtility.showToast(this@LocationPickerActivity, "Please Connect to Internet")
+            if (!MapUtility.isNetworkAvailable(this@LocationPickerActivityCurr)) {
+                MapUtility.showToast(this@LocationPickerActivityCurr, "Please Connect to Internet")
             }
-            this@LocationPickerActivity.getAddressByGeoCodingLatLng()
+            this@LocationPickerActivityCurr.getAddressByGeoCodingLatLng()
         })
 
         doAfterPermissionProvided = 1
@@ -713,7 +689,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         // add data into intent and send back to Parent Activity
         intent.putExtra("lift_data", data.toString())
         intent.putExtra("type", type)
-        this@LocationPickerActivity.setResult(RESULT_OK, intent)
+        this@LocationPickerActivityCurr.setResult(RESULT_OK, intent)
         finish()
     }
     override fun onDestroy() {
@@ -751,7 +727,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             Toast.makeText(
-                this@LocationPickerActivity,
+                this@LocationPickerActivityCurr,
                 "Location not Available",
                 Toast.LENGTH_SHORT
             ).show()
@@ -784,7 +760,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         var longitude: Double? = null
         override fun onPreExecute() {
             super.onPreExecute()
-            MapUtility.showProgress(this@LocationPickerActivity)
+            MapUtility.showProgress(this@LocationPickerActivityCurr)
         }
 
         protected override fun doInBackground(vararg p0: Double?): Bundle? {
@@ -793,7 +769,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
                 longitude = p0[1]
                 val geocoder: Geocoder
                 val addresses: List<Address>?
-                geocoder = Geocoder(this@LocationPickerActivity, Locale.getDefault())
+                geocoder = Geocoder(this@LocationPickerActivityCurr, Locale.getDefault())
                 val sb = StringBuilder()
                 //get location from lat long if address string is null
                 addresses = geocoder.getFromLocation(latitude!!, longitude!!, 1)
@@ -833,7 +809,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         // setting address into different components
         override fun onPostExecute(userAddress: Bundle?) {
             super.onPostExecute(userAddress)
-            this@LocationPickerActivity.userAddress = userAddress!!.getString("addressline2").toString()
+            this@LocationPickerActivityCurr.userAddress = userAddress!!.getString("addressline2").toString()
             userCity = userAddress.getString("city")!!
             userState = userAddress.getString("state")!!
             userPostalCode = userAddress.getString("postalcode")!!
@@ -847,7 +823,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
     private inner class GetLatLngFromAddress : AsyncTask<String?, Void?, LatLng>() {
         override fun onPreExecute() {
             super.onPreExecute()
-            MapUtility.showProgress(this@LocationPickerActivity)
+            MapUtility.showProgress(this@LocationPickerActivityCurr)
         }
 
         protected override fun doInBackground(vararg p0: String?): LatLng? {
@@ -855,7 +831,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
             try {
                 val geocoder: Geocoder
                 val addresses: List<Address>?
-                geocoder = Geocoder(this@LocationPickerActivity, Locale.getDefault())
+                geocoder = Geocoder(this@LocationPickerActivityCurr, Locale.getDefault())
 
                 //get location from lat long if address string is null
                 addresses = geocoder.getFromLocationName(userAddress!![0].toString(), 1)
@@ -918,39 +894,37 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         if (locationByGps != null && locationByNetwork != null) {
             if (locationByGps!!.accuracy > locationByNetwork!!.accuracy) {
 
-                if (pref.getType().equals("1")) {
-                    pref.setToLatL(locationByGps?.latitude.toString())
-                    pref.setToLngL(locationByGps?.longitude.toString())
+                if (pref.getTypeC().equals("1")) {
+                    pref.setToLatLC(locationByGps?.latitude.toString())
+                    pref.setToLngLC(locationByGps?.longitude.toString())
                 }else{
-                    pref.setToLatM(locationByGps?.latitude.toString())
-                    pref.setToLngM(locationByGps?.longitude.toString())
+                    pref.setToLatMC(locationByGps?.latitude.toString())
+                    pref.setToLngMC(locationByGps?.longitude.toString())
                 }
                 finish()
             }else{
-                if (pref.getType().equals("1")) {
-                    pref.setToLatL(locationByNetwork?.latitude.toString())
-                    pref.setToLngL(locationByNetwork?.longitude.toString())
+                if (pref.getTypeC().equals("1")) {
+                    pref.setToLatLC(locationByNetwork?.latitude.toString())
+                    pref.setToLngLC(locationByNetwork?.longitude.toString())
                 }else{
-                    pref.setToLatM(locationByNetwork?.latitude.toString())
-                    pref.setToLngM(locationByNetwork?.longitude.toString())
+                    pref.setToLatMC(locationByNetwork?.latitude.toString())
+                    pref.setToLngMC(locationByNetwork?.longitude.toString())
                 }
                 finish()
-
             }
-
         }else {
             if (locationByNetwork == null) {
-                Toast.makeText(this@LocationPickerActivity, "No Network", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@LocationPickerActivityCurr, "No Network", Toast.LENGTH_LONG).show()
 
             } else {
 
 
-                if (pref.getType().equals("1")) {
-                    pref.setToLatL(locationByNetwork?.latitude.toString())
-                    pref.setToLngL(locationByNetwork?.longitude.toString())
+                if (pref.getTypeC().equals("1")) {
+                    pref.setToLatLC(locationByNetwork?.latitude.toString())
+                    pref.setToLngLC(locationByNetwork?.longitude.toString())
                 }else{
-                    pref.setToLatM(locationByNetwork?.latitude.toString())
-                    pref.setToLngM(locationByNetwork?.longitude.toString())
+                    pref.setToLatMC(locationByNetwork?.latitude.toString())
+                    pref.setToLngMC(locationByNetwork?.longitude.toString())
                 }
                 finish()
             }
@@ -984,7 +958,6 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
         override fun onProviderDisabled(provider: String) {}
     }
     override fun onBackPressed() {
-
         if (count.equals("map")) {
             imgSearch?.isVisible = false
             ll_history?.setVisibility(View.VISIBLE)
@@ -997,6 +970,7 @@ class LocationPickerActivity :AppCompatActivity(), OnMapReadyCallback, RideCityA
             count = ""
         }else{
             super.onBackPressed()
+            // startActivity(Intent(this, DashBoard::class.java))
         }
     }
 }

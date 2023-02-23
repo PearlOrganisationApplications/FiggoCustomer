@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorlightblue"
-    tools:context=".Fragments.Shared_Cab_Fragment.ThankyouScreenFragment">
+    tools:context=".Fragments.AdvanceCityCab_Fragment.ThankyouScreenFragment">
 
 
     <include layout="@layout/headerbackwithnotification"/>
