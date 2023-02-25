@@ -6,7 +6,11 @@ import android.content.ContentValues.TAG
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.android.volley.AuthFailureError
@@ -27,6 +31,7 @@ import java.util.*
 
 class CabDetailsActivity : BaseClass(), PaymentResultListener {
     lateinit var nav_controller: NavController
+    lateinit var mainConst: ConstraintLayout
     var transaction_id :String ?= ""
     var thankyouScreenFragment = ThankyouScreenFragment()
     lateinit var pref: PrefManager
@@ -56,6 +61,8 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
         var window=window
         window.setStatusBarColor(Color.parseColor("#000F3B"))
 
+        mainConst = findViewById<ConstraintLayout>(R.id.mainConst)
+
         var nav_host_fragment=supportFragmentManager.findFragmentById(R.id.nav_controller) as NavHostFragment
         nav_controller=nav_host_fragment.navController
         pref = PrefManager(this@CabDetailsActivity)
@@ -64,9 +71,13 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
 //            Toast.makeText(this,"your cab is book successfully",Toast.LENGTH_LONG)
 //
 //        }
+
+        mainConst.isVisible = true
+
     }
 
     override fun onPaymentSuccess(s: String?) {
+        mainConst.isVisible = false
         Toast.makeText(this@CabDetailsActivity, "payment successful", Toast.LENGTH_SHORT).show()
 
               try {
@@ -85,13 +96,13 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
     private fun getOtp() {
         val progressDialog = ProgressDialog(this@CabDetailsActivity)
         progressDialog.show()
-        val URL = Helper.UPDATE_CITY_RIDE_PAYMENT_STATUS
+        val URL = Helper.ADVANCE_UPDATE_CITY_RIDE_PAYMENT_STATUS
         val queue = Volley.newRequestQueue(this@CabDetailsActivity)
         val json = JSONObject()
         json.put("transaction_id", transaction_id.toString())
         json.put("payment_type", "card")
         json.put("ride_id", pref.getRideId())
-        json.put("ride_request_id", pref.getReqRideId())
+      //  json.put("ride_request_id", pref.getReqRideId())
         Log.d("transac",transaction_id.toString())
         Log.d("rides",pref.getride_id())
         val jsonOblect: JsonObjectRequest =
@@ -106,14 +117,15 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
 
                             progressDialog.hide()
                             val booking_no = response.getJSONObject("ride").getString("booking_id")
-                            val otp = response.getInt("otp")
+                           // val otp = response.getInt("otp")
 
-                            pref.setOtp(otp.toString())
+                          //  pref.setOtp(otp.toString())
                             pref.setBookingNo(booking_no)
 
                             supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.nav_controller, thankyouScreenFragment)
+                                replace(R.id.cabdetailsframe, thankyouScreenFragment)
                                 commit()
+                                mainConst.isVisible = true
                             }
                         }catch (e:Exception){
                             MapUtility.showDialog(e.toString(),this@CabDetailsActivity)

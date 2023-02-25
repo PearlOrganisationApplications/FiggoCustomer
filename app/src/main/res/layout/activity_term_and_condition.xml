@@ -14,6 +14,7 @@
         android:layout_marginTop="@dimen/_5sdp"
         android:fontFamily="sans-serif-black"
         android:text="Terms of Use"
+        android:gravity="center"
         android:textColor="@color/black"
         android:textSize="@dimen/_14sdp" />
 
@@ -34,7 +35,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_8sdp"
-                    android:text="1.1These Terms of Use (“Terms”) govern the access or use by you, an individual, from within any country in the world of applications, websites, content, products, and services (the “Services”) made available by FiggoCabs, House No. 88, New DefenceColony, Zirakpur, Mohali, Punjab 140603"
+                    android:text="1.1 :These Terms of Use (“Terms”) govern the access or use by you, an individual, from within any country in the world of applications, websites, content, products, and services (the “Services”) made available by FiggoCabs, House No. 88, New DefenceColony, Zirakpur, Mohali, Punjab 140603"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_12sdp"/>
 
@@ -44,7 +45,7 @@
                     android:layout_marginTop="@dimen/_8sdp"
                     android:textSize="@dimen/_12sdp"
                     android:textColor="@color/black"
-                    android:text="1.2.1Your access and use of the Services constitute your agreement to be bound by these Terms, which establishes a contractual relationship between you and FiggoCabs. If you do not agree to these Terms, you may not access or use the Services. These Terms expressly super cede all prior agreements or arrangements with you. FiggoCabs may immediately terminate these Terms or any Services with respect to you, or generally cease offering or deny access to the Services or any portion thereof, at any time for any reason.
+                    android:text="1.2.1 :Your access and use of the Services constitute your agreement to be bound by these Terms, which establishes a contractual relationship between you and FiggoCabs. If you do not agree to these Terms, you may not access or use the Services. These Terms expressly super cede all prior agreements or arrangements with you. FiggoCabs may immediately terminate these Terms or any Services with respect to you, or generally cease offering or deny access to the Services or any portion thereof, at any time for any reason.
 
 1.2.2Supplemental terms may apply to certain Services, such as policies for a particular event, activity or promotion, and such supplemental terms will be disclosed to you in connection with the applicable Services. Supplemental terms are in addition to, and shall be deemed a part of, the Terms for the purposes of the applicable Services. Supplemental terms shall prevail over these Terms in the event of a conflict with respect to the applicable Services.
 
@@ -55,7 +56,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_8sdp"
-                    android:text="2.1The Services constitute a technology platform that enables users of FiggoCabs mobile applications or websites or phone numbers provided as part of the Services (each, an “Application”) to arrange and schedule transportation with independent third party providers of such services, including independent third party transportation providers under agreement with FiggoCabs or certain of FiggoCabs affiliates (“Third Party Providers”). Unless otherwise agreed by FiggoCabsb in a separate written agreement with you, the Services are made available solely for your personal, non-commercial use. YOU ACKNOWLEDGE THAT FiggoCabs DOES NOT PROVIDE TRANSPORTATION SERVICES OR FUNCTION AS A TRANSPORTATION CARRIER AND THAT ALL SUCH TRANSPORTATION SERVICES ARE PROVIDED BY INDEPENDENT THIRD PARTY CONTRACTORS WHO ARE NOT EMPLOYED BY OR AGENT OF FiggoCabs OR ANY OF ITS AFFILIATES."
+                    android:text="2.1 :The Services constitute a technology platform that enables users of FiggoCabs mobile applications or websites or phone numbers provided as part of the Services (each, an “Application”) to arrange and schedule transportation with independent third party providers of such services, including independent third party transportation providers under agreement with FiggoCabs or certain of FiggoCabs affiliates (“Third Party Providers”). Unless otherwise agreed by FiggoCabsb in a separate written agreement with you, the Services are made available solely for your personal, non-commercial use. YOU ACKNOWLEDGE THAT FiggoCabs DOES NOT PROVIDE TRANSPORTATION SERVICES OR FUNCTION AS A TRANSPORTATION CARRIER AND THAT ALL SUCH TRANSPORTATION SERVICES ARE PROVIDED BY INDEPENDENT THIRD PARTY CONTRACTORS WHO ARE NOT EMPLOYED BY OR AGENT OF FiggoCabs OR ANY OF ITS AFFILIATES."
                     android:textColor="@color/black"
                     android:textSize="@dimen/_12sdp"/>
 
@@ -65,7 +66,7 @@
                     android:layout_marginTop="@dimen/_8sdp"
                     android:textSize="@dimen/_12sdp"
                     android:textColor="@color/black"
-                    android:text="2.2.1Subject to your compliance with these Terms, FiggoCabs grants you a limited, non-exclusive, non-sublicensable, revocable, non-transferrable license to: (i) access and use the Applications on your personal device solely in connection with your use of the Services; and (ii) access and use any content, information and related materials that may be made available through the Services, in each case solely for your personal, non- commercial use. Any rights not expressly granted herein are reserved by FiggoCabs"/>
+                    android:text="2.2.1 :Subject to your compliance with these Terms, FiggoCabs grants you a limited, non-exclusive, non-sublicensable, revocable, non-transferrable license to: (i) access and use the Applications on your personal device solely in connection with your use of the Services; and (ii) access and use any content, information and related materials that may be made available through the Services, in each case solely for your personal, non- commercial use. Any rights not expressly granted herein are reserved by FiggoCabs"/>
 
 
 

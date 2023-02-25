@@ -217,6 +217,9 @@ class DashBoard : BaseClass(){
         ll_faqs.setOnClickListener {
             Toast.makeText(this, "Faqs", Toast.LENGTH_LONG).show()
         }
+        ll_helpsupport.setOnClickListener {
+                //Toast.makeText(this, "Faqs", Toast.LENGTH_LONG).show()
+            }
 
 
         img_webview.setOnClickListener {

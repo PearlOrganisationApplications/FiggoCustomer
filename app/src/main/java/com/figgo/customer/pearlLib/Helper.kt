@@ -15,6 +15,7 @@ package com.figgo.customer.pearlLib
      var CHECK_RIDE_REQUEST_STATUS= baseurl+"ride/check-ride-request-status"
      var ACCEPT_CURRENT_CITYRIDE= baseurl+"ride/accept-current-city-ride"
      var UPDATE_CITY_RIDE_PAYMENT_STATUS= baseurl+"ride/update-city-ride-payment-status"
+     var ADVANCE_UPDATE_CITY_RIDE_PAYMENT_STATUS= baseurl+"advance-ride/update-advance-city-ride-payment-status"
      var ENTER_PASSENGER_DETAILS= baseurl+"ride/enter-passenger-details"
      var RIDE_HISTORY= baseurl+"user/ride-history"
      var check_status= baseurl+"check-status"
@@ -30,6 +31,8 @@ package com.figgo.customer.pearlLib
 
      var Ride_Status = baseurl+"ride/check-ride-status"
      var SUBMIT_RATING = baseurl+"submit-rating"
+     var UPDATE_PROFILE = baseurl+"update-user-profile"
+     var USER_PROFILE = baseurl+"get-user-profile"
 
 
 }

@@ -1,6 +1,7 @@
 package com.figgo.customer.UI
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,20 +10,24 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.View
+import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import com.android.volley.AuthFailureError
 import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.BuildConfig
 import com.figgo.customer.Model.SpinnerObj
-import com.figgo.cabs.figgodriver.Adapter.SpinnerAdapter
 import com.figgo.customer.R
+import com.figgo.customer.Util.MapUtility
+import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.pearlLib.Helper
+import com.figgo.customer.pearlLib.PrefManager
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONObject
 import java.io.File
@@ -38,12 +43,20 @@ class Edit_Profile_Activity : BaseClass() {
     val MEDIA_TYPE_IMAGE = 2
     private val PICK_FROM_GALLERY = 1
     private var mMediaUri: Uri? = null
+    private var dataIntent: Intent? = null
     var profile: CircleImageView? = null
     var state: CircleImageView? = null
     var spinnerCity: Spinner? = null
     var spinnerState: Spinner? = null
+    var extension: String? = null
+    var base64: String? = null
+    var update_button: Button? = null
+    var update_name: EditText? = null
+    var update_email: EditText? = null
+    var update_number: TextView? = null
     val statehashMap = HashMap<String, Int>()
     val cityhashMap = HashMap<String, Int>()
+    lateinit var pref: PrefManager
 
     override fun setLayoutXml() {
         TODO("Not yet implemented")
@@ -73,12 +86,34 @@ class Edit_Profile_Activity : BaseClass() {
          profile = findViewById<CircleImageView>(R.id.profile)
         spinnerState = findViewById<Spinner>(R.id.update_state)
         spinnerCity = findViewById<Spinner>(R.id.update_city)
-
+        update_button = findViewById<Button>(R.id.update_button)
+        update_name = findViewById<EditText>(R.id.update_name)
+        update_email = findViewById<EditText>(R.id.update_email)
+        update_number = findViewById<TextView>(R.id.update_number)
+        pref = PrefManager(this@Edit_Profile_Activity)
 
         iv_bellicon.setOnClickListener {
             startActivity(Intent(this, NotificationBellIconActivity::class.java))
         }
 
+
+        update_button?.setOnClickListener {
+            if(validateName(update_name!!)){
+
+                if (validateEmail(update_email!!)){
+
+                    if (mMediaUri == null){
+                        Toast.makeText(
+                            applicationContext,
+                            "Please Change Profile Picture.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }else{
+                        postUpdateProfile()
+                    }
+                }
+            }
+        }
 
         img_select_profile.setOnClickListener {
             try {
@@ -150,7 +185,140 @@ class Edit_Profile_Activity : BaseClass() {
         shareimg()
         onBackPress()
 
-        fetchState()
+       getUserProfile()
+    }
+
+
+    private fun getUserProfile() {
+
+        val progressDialog = ProgressDialog(this)
+        progressDialog.show()
+        val URL =Helper.USER_PROFILE
+        val queue = Volley.newRequestQueue(this)
+        val json = JSONObject()
+        //  Log.d("transac",transaction_id.toString())
+        //  Log.d("rides",pref.getride_id())
+        val jsonOblect: JsonObjectRequest =
+            object : JsonObjectRequest(Method.POST, URL, json, object :
+                Response.Listener<JSONObject?>               {
+                @SuppressLint("SuspiciousIndentation")
+                override fun onResponse(response: JSONObject?) {
+
+                    Log.d("SendData", "response===" + response)
+                    if (response != null) {
+                        try {
+                            progressDialog.hide()
+
+                            val name = response.getString("name")
+                            val email = response.getString("email")
+                            val contact_no = response.getString("contact_no")
+                            val user_image = response.getString("user_image")
+
+
+                            Picasso.get().load(user_image).into(profile)
+
+                            update_name?.setText(name)
+                            update_email?.setText(email)
+                            update_number?.setText(contact_no)
+
+                        }catch (e:Exception){
+                            MapUtility.showDialog(e.toString(),this@Edit_Profile_Activity)
+
+                        }
+                    }
+
+                }
+            }, object : Response.ErrorListener {
+                override fun onErrorResponse(error: VolleyError?) {
+                    // progressDialog.hide()
+                    Log.d("SendData", "error===" + error)
+                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
+                    progressDialog.hide()
+                    // Log.d("appl0",applicationContext.toString())
+                    MapUtility.showDialog(error.toString(), this@Edit_Profile_Activity)
+                }
+            }) {
+
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val headers: MutableMap<String, String> = java.util.HashMap()
+                    headers.put("Content-Type", "application/json; charset=UTF-8");
+                    headers.put("Authorization", "Bearer " + pref.getToken());
+                    headers.put("Accept", "application/vnd.api+json");
+                    return headers
+                }
+            }
+
+        queue.add(jsonOblect)
+
+    }
+
+
+
+
+
+    private fun postUpdateProfile() {
+
+
+
+
+        val progressDialog= ProgressDialog(this)
+        progressDialog.show()
+        val URL =Helper.UPDATE_PROFILE
+        val queue = Volley.newRequestQueue(this)
+        val json = JSONObject()
+       json.put("name", update_name?.text.toString())
+        json.put("email",update_email?.text.toString())
+        json.put("pic", base64)
+        json.put("pic_ext",extension)
+        //  Log.d("transac",transaction_id.toString())
+        //  Log.d("rides",pref.getride_id())
+        val jsonOblect: JsonObjectRequest =
+            object : JsonObjectRequest(Method.POST, URL, json, object :
+                Response.Listener<JSONObject?>               {
+                @SuppressLint("SuspiciousIndentation")
+                override fun onResponse(response: JSONObject?) {
+
+                    Log.d("SendData", "response===" + response)
+                    if (response != null) {
+                        try {
+                            progressDialog.hide()
+                            Toast.makeText(applicationContext, "Uploaded Successfully!", Toast.LENGTH_LONG).show()
+
+                                 startActivity(Intent(this@Edit_Profile_Activity, this@Edit_Profile_Activity::class.java))
+
+
+
+                        }catch (e:Exception){
+                            MapUtility.showDialog(e.toString(),this@Edit_Profile_Activity)
+
+                        }
+                    }
+
+                }
+            }, object : Response.ErrorListener {
+                override fun onErrorResponse(error: VolleyError?) {
+                    // progressDialog.hide()
+                    Log.d("SendData", "error===" + error)
+                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
+                    progressDialog.hide()
+                   // Log.d("appl0",applicationContext.toString())
+                    MapUtility.showDialog(error.toString(), this@Edit_Profile_Activity)
+                }
+            }) {
+
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val headers: MutableMap<String, String> = java.util.HashMap()
+                    headers.put("Content-Type", "application/json; charset=UTF-8");
+                   headers.put("Authorization", "Bearer " + pref.getToken());
+                    headers.put("Accept", "application/vnd.api+json");
+                    return headers
+                }
+            }
+
+        queue.add(jsonOblect)
+
     }
 
     private fun getOutputMediaFileUri(mediaTypeImage: Int): Uri? {
@@ -210,10 +378,20 @@ class Edit_Profile_Activity : BaseClass() {
         if (resultCode == RESULT_OK) {
             if (requestCode == CHOOSE_PIC_REQUEST_CODE) {
                 if (data == null) {
+
+
                     Toast.makeText(applicationContext, "Image cannot be null!", Toast.LENGTH_LONG)
                         .show()
                 } else {
+                    dataIntent = data
                     mMediaUri = data.data
+
+                    val mimeType: String? = mMediaUri?.let { applicationContext?.getContentResolver()!!.getType(it).toString() }
+                    extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+                    val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, mMediaUri)
+
+                     base64 = BitMapToString(bitmap)
+
                     profile?.setImageURI(mMediaUri)
                     //set previews
                    // mPreviewImageView.setImageURI(mMediaUri)
@@ -286,7 +464,7 @@ class Edit_Profile_Activity : BaseClass() {
 
 
 
-    private fun fetchState() {
+   /* private fun fetchState() {
         statehashMap.clear()
         statelist.clear()
         val URL = Helper.GET_STATE
@@ -410,7 +588,7 @@ class Edit_Profile_Activity : BaseClass() {
         queue.add(jsonOblect)
 
 
-    }
+    }*/
 
 
 }

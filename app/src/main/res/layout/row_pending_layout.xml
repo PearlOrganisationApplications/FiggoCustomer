@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/colorlightblue"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_gravity="center"
+    android:layout_height="wrap_content">
 
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="@dimen/_1sdp"
         android:background="@drawable/mpin_gradinet"
@@ -41,18 +42,19 @@
                 android:layout_marginTop="5dp"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
 
-            <Button
+            <TextView
                 android:id="@+id/book_now"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:elevation="@dimen/_10sdp"
-                android:gravity="center"
+                android:gravity="end"
                 android:text="Book Now"
+                android:textSize="16sp"
+                android:layout_marginEnd="20dp"
+                android:layout_gravity="end"
                 android:textColor="#E14B5A"
                 android:textStyle="bold" />
 

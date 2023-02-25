@@ -1,14 +1,12 @@
 package com.figgo.customer.UI
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RatingBar
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.isVisible
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -135,7 +133,8 @@ class Thankyou_RatingCityCab : BaseClass() {
     }
 
     private fun postSubmitRating() {
-
+      val progressDialog = ProgressDialog(this)
+        progressDialog.show()
         val URL = Helper.SUBMIT_RATING
      //   Log.d("searchDriver", "json===" +URL )
       //  Log.d("SendData", pref.getride_id() )
@@ -153,6 +152,7 @@ class Thankyou_RatingCityCab : BaseClass() {
                     if (response != null) {
                         try {
 
+                            progressDialog.hide()
                             val status = response.getString("status")
 
                             if (status.equals("true")) {
@@ -200,6 +200,12 @@ class Thankyou_RatingCityCab : BaseClass() {
 
         queue.add(jsonOblect)
 
+    }
+
+
+    override fun onBackPressed() {
+
+        Toast.makeText(applicationContext, "Unable to back your money already deducted", Toast.LENGTH_LONG).show()
     }
 
 }

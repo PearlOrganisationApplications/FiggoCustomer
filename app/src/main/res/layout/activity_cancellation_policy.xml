@@ -14,6 +14,7 @@
       android:layout_marginTop="@dimen/_5sdp"
       android:fontFamily="sans-serif-black"
       android:text="Cancellation Policy"
+      android:gravity="center"
       android:textColor="@color/black"
       android:textSize="@dimen/_14sdp"/>
 

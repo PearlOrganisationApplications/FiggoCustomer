@@ -17,7 +17,7 @@
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCbd3JqvfSx0p74kYfhRTXE7LZghirSDoU</string>
     <!-- check dummy data  -->
-
+    <string name="Rs">\u20B9</string>
     <string name="skip">SKIP</string>
     <string name="start">GOT IT</string>
 

@@ -11,6 +11,7 @@ import android.os.CountDownTimer
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.view.isVisible
 import com.android.volley.AuthFailureError
@@ -64,7 +65,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
     var  ll_details:LinearLayout? = null
     var x:Int=-1
    lateinit var mProgressBar: ProgressBar
-
+   lateinit var mainConst: ConstraintLayout
     var i = 0
     var tv_tolocationdetails:TextView? = null
     var tv_fromlocationdetails:TextView? = null
@@ -110,6 +111,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
      //   var shareimg = findViewById<ImageView>(R.id.shareimg)
      //   var backimg = findViewById<ImageView>(R.id.backimg)
          activaimg = findViewById<ImageView>(R.id.activaimg)
+        mainConst = findViewById<ConstraintLayout>(R.id.mainConst)
          activavehiclenumber = findViewById<TextView>(R.id.activavehiclenumber)
          driverimg = findViewById<CircleImageView>(R.id.driverimg)
          drivername = findViewById<TextView>(R.id.drivername)
@@ -135,6 +137,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         tv_fromlocationdetails?.text = pref.getManualLoc()
         /* getcurrentdriverdetails()*/
 
+        mainConst?.isVisible = true
 
         tv_accept.setOnClickListener {
             showPendingPopup()
@@ -143,82 +146,94 @@ class SearchDriver : BaseClass() , PaymentResultListener {
             startActivity(Intent(this, NotificationBellIconActivity::class.java))
         }*/
         tv_reject_btn.setOnClickListener {
-            val URL = Helper.ride_delete
-            val progressDialog = ProgressDialog(this)
-            progressDialog.show()
-            val queue = Volley.newRequestQueue(this)
-            val json = JSONObject()
-            json.put("ride_id", pref.getRideId())
-            val jsonOblect: JsonObjectRequest = object : JsonObjectRequest(Method.POST, URL, json, object :
-                Response.Listener<JSONObject?>               {
-                @SuppressLint("SuspiciousIndentation")
-                override fun onResponse(response: JSONObject?) {
-                    Log.d("SendData", "response===" + response)
-                    if (response != null) {
-                        progressDialog.hide()
-                        try {
 
-                            val status = response.getString("status")
 
-                            if (status.equals("true")){
 
-                                val dialog = Dialog(this@SearchDriver)
-                                dialog.setCancelable(false)
-                                dialog.setContentView(R.layout.serach_driver_dialog)
-                                val body = dialog.findViewById(R.id.error) as TextView
 
-                                val yesBtn = dialog.findViewById(R.id.ok) as Button
-                                val canBtn = dialog.findViewById(R.id.cancel) as Button
-                                yesBtn.setOnClickListener {
+
+            val dialog = Dialog(this@SearchDriver)
+            dialog.setCancelable(false)
+            dialog.setContentView(R.layout.emergency_dialog)
+           // val body = dialog.findViewById(R.id.error) as TextView
+
+            val yesBtn = dialog.findViewById(R.id.ok) as TextView
+            val canBtn = dialog.findViewById(R.id.cancel) as TextView
+            yesBtn.setOnClickListener {
+
+                dialog.dismiss()
+                val URL = Helper.ride_delete
+                val progressDialog = ProgressDialog(this)
+                progressDialog.show()
+                val queue = Volley.newRequestQueue(this)
+                val json = JSONObject()
+                json.put("ride_id", pref.getRideId())
+                val jsonOblect: JsonObjectRequest = object : JsonObjectRequest(Method.POST, URL, json, object :
+                    Response.Listener<JSONObject?>               {
+                    @SuppressLint("SuspiciousIndentation")
+                    override fun onResponse(response: JSONObject?) {
+                        Log.d("SendData", "response===" + response)
+                        if (response != null) {
+                            progressDialog.hide()
+                            try {
+
+                                val status = response.getString("status")
+
+                                if (status.equals("true")){
                                     pref.setSearchBack("")
                                     startActivity(Intent(this@SearchDriver, CityCabActivity::class.java))
                                     finish()
-                                }
-                                canBtn.setOnClickListener {
-                                    dialog.dismiss()
-                                }
-                                if (!(this@SearchDriver as Activity).isFinishing) {
-                                    dialog.show()
-                                }
-                                val window: Window? = dialog.getWindow()
-                                window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
-                            }else{
+                                }else{
 
-                                Toast.makeText(this@SearchDriver, "Something went wrong!", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(this@SearchDriver, "Something went wrong!", Toast.LENGTH_LONG).show()
+
+                                }
+
+
+
+                            }catch (e:Exception){
+                                MapUtility.showDialog(e.toString(),this@SearchDriver)
 
                             }
-
-
-
-                        }catch (e:Exception){
-                            MapUtility.showDialog(e.toString(),this@SearchDriver)
-
                         }
+
                     }
+                }, object : Response.ErrorListener {
+                    override fun onErrorResponse(error: VolleyError?) {
+                        progressDialog.hide()
+                        Log.d("SendData", "error===" + error)
+                        // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
 
-                }
-            }, object : Response.ErrorListener {
-                override fun onErrorResponse(error: VolleyError?) {
-                    progressDialog.hide()
-                    Log.d("SendData", "error===" + error)
-                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
+                        MapUtility.showDialog(error.toString(),this@SearchDriver)
+                    }
+                }) {
 
-                    MapUtility.showDialog(error.toString(),this@SearchDriver)
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val headers: MutableMap<String, String> = java.util.HashMap()
+                        headers.put("Content-Type", "application/json; charset=UTF-8")
+                        headers.put("Authorization", "Bearer " + pref.getToken())
+                        headers.put("Accept", "application/vnd.api+json")
+                        return headers
+                    }
                 }
-            }) {
 
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers: MutableMap<String, String> = java.util.HashMap()
-                    headers.put("Content-Type", "application/json; charset=UTF-8")
-                    headers.put("Authorization", "Bearer " + pref.getToken())
-                    headers.put("Accept", "application/vnd.api+json")
-                    return headers
-                }
+                queue.add(jsonOblect)
+
+
+
             }
+            canBtn.setOnClickListener {
+                dialog.dismiss()
+            }
+            if (!(this@SearchDriver as Activity).isFinishing) {
+                dialog.show()
+            }
+            val window: Window? = dialog.getWindow()
+            window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
-            queue.add(jsonOblect)
+
+
 
         }
        /* ll_back.setOnClickListener {
@@ -333,12 +348,13 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         val txt_msg = dialog.findViewById<TextView>(R.id.txt_msg)
         txt_msg.setText("Dear Sir/Ma'am , your ride fare is Rs "+pref.getPrice()+" and pick up time is "+pref.getTime()+" . If 100% sure for this ride then accept or ortherwise reject. Charges Apply after 5 Min delay")
         val imageView: ImageView = dialog.findViewById(R.id.iv_check)
-        val book_now: Button = dialog.findViewById(R.id.book_now)
+        val book_now: TextView = dialog.findViewById(R.id.book_now)
         imageView.setOnClickListener { dialog.dismiss() }
         book_now.setOnClickListener {
 
             pref.setSearchBack("")
 
+            dialog.dismiss()
             val amt = pref.getPrice()
             val amount = Math.round(amt.toFloat() * 100).toInt()
             val checkout = Checkout()
@@ -555,7 +571,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                             if (::cTimer.isInitialized) {
                                 cTimer.cancel()
                             }
-                            ll_details?.visibility = View.VISIBLE
+                           // ll_details?.visibility = View.VISIBLE
                             x = 1
                             Log.d("Ride Status", "response===" + response)
 
@@ -597,7 +613,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                                 drivername?.setText(name)
                                 dl_number?.setText(dlnumber)
                                 activavehiclenumber?.setText(v_number)
-                                price?.setText(prices)
+                                price?.setText("\u20B9"+prices)
                                 vehiclename?.setText(v_name)
                                 pref.setPrice(prices)
                                    if(!driver_image.equals("")){
@@ -645,6 +661,8 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
     }
     override fun onPaymentSuccess(s: String?) {
+        mainConst?.isVisible = false
+
          progressDialog = ProgressDialog(this)
         progressDialog.show()
         Toast.makeText(this, "payment successful", Toast.LENGTH_SHORT).show()
@@ -773,6 +791,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
                                         if (status.equals("true")) {
 
+                                            finish()
                                             startActivity(
                                                 Intent(
                                                     this@SearchDriver,
@@ -791,7 +810,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
 
                                     } catch (e: Exception) {
-                                        MapUtility.showDialog(e.toString(), applicationContext)
+                                        MapUtility.showDialog(e.toString(), this@SearchDriver)
 
                                     }
                                 }
@@ -853,36 +872,37 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
 
     override fun onBackPressed() {
+        val dialog = Dialog(this@SearchDriver)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.serach_driver_dialog)
 
-        val URL = Helper.ride_delete
-        val progressDialog = ProgressDialog(this)
-        progressDialog.show()
-        val queue = Volley.newRequestQueue(this)
-        val json = JSONObject()
-        json.put("ride_id", pref.getRideId())
-        val jsonOblect: JsonObjectRequest =
-            object : JsonObjectRequest(Method.POST, URL, json, object :
-                Response.Listener<JSONObject?> {
-                @SuppressLint("SuspiciousIndentation")
-                override fun onResponse(response: JSONObject?) {
-                    Log.d("SendData", "response===" + response)
-                    if (response != null) {
-                        progressDialog.hide()
-                        try {
 
-                            val status = response.getString("status")
+        val yesBtn = dialog.findViewById(R.id.ok) as TextView
+        val canBtn = dialog.findViewById(R.id.cancel) as TextView
+        yesBtn.setOnClickListener {
+            dialog.dismiss()
+            pref.setSearchBack("")
 
-                            if (status.equals("true")) {
+            val URL = Helper.ride_delete
+            val progressDialog = ProgressDialog(this)
+            progressDialog.show()
+            val queue = Volley.newRequestQueue(this)
+            val json = JSONObject()
+            json.put("ride_id", pref.getRideId())
+            val jsonOblect: JsonObjectRequest =
+                object : JsonObjectRequest(Method.POST, URL, json, object :
+                    Response.Listener<JSONObject?> {
+                    @SuppressLint("SuspiciousIndentation")
+                    override fun onResponse(response: JSONObject?) {
+                        Log.d("SendData", "response===" + response)
+                        if (response != null) {
+                            progressDialog.hide()
+                            try {
 
-                                val dialog = Dialog(this@SearchDriver)
-                                dialog.setCancelable(false)
-                                dialog.setContentView(R.layout.serach_driver_dialog)
-                                val body = dialog.findViewById(R.id.error) as TextView
+                                val status = response.getString("status")
 
-                                val yesBtn = dialog.findViewById(R.id.ok) as Button
-                                val canBtn = dialog.findViewById(R.id.cancel) as Button
-                                yesBtn.setOnClickListener {
-                                    pref.setSearchBack("")
+                                if (status.equals("true")) {
+
                                     startActivity(
                                         Intent(
                                             this@SearchDriver,
@@ -890,58 +910,60 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                                         )
                                     )
                                     finish()
-                                }
-                                canBtn.setOnClickListener {
-                                    dialog.dismiss()
-                                }
-                                if (!(this@SearchDriver as Activity).isFinishing) {
-                                    dialog.show()
-                                }
-                                val window: Window? = dialog.getWindow()
-                                window?.setLayout(
-                                    LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT
-                                )
 
-                            } else {
+                                } else {
 
-                                Toast.makeText(
-                                    this@SearchDriver,
-                                    "Something went wrong!",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                    Toast.makeText(
+                                        this@SearchDriver,
+                                        "Something went wrong!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                }
+
+
+                            } catch (e: Exception) {
+                                MapUtility.showDialog(e.toString(), this@SearchDriver)
 
                             }
-
-
-                        } catch (e: Exception) {
-                            MapUtility.showDialog(e.toString(), this@SearchDriver)
-
                         }
+
                     }
+                }, object : Response.ErrorListener {
+                    override fun onErrorResponse(error: VolleyError?) {
+                        progressDialog.hide()
+                        Log.d("SendData", "error===" + error)
+                        // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
 
+                        MapUtility.showDialog(error.toString(), this@SearchDriver)
+                    }
+                }) {
+
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val headers: MutableMap<String, String> = java.util.HashMap()
+                        headers.put("Content-Type", "application/json; charset=UTF-8")
+                        headers.put("Authorization", "Bearer " + pref.getToken())
+                        headers.put("Accept", "application/vnd.api+json")
+                        return headers
+                    }
                 }
-            }, object : Response.ErrorListener {
-                override fun onErrorResponse(error: VolleyError?) {
-                    progressDialog.hide()
-                    Log.d("SendData", "error===" + error)
-                    // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
 
-                    MapUtility.showDialog(error.toString(), this@SearchDriver)
-                }
-            }) {
+            queue.add(jsonOblect)
 
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers: MutableMap<String, String> = java.util.HashMap()
-                    headers.put("Content-Type", "application/json; charset=UTF-8")
-                    headers.put("Authorization", "Bearer " + pref.getToken())
-                    headers.put("Accept", "application/vnd.api+json")
-                    return headers
-                }
-            }
+        }
+        canBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+        if (!(this@SearchDriver as Activity).isFinishing) {
+            dialog.show()
+        }
+        val window: Window? = dialog.getWindow()
+        window?.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
 
-        queue.add(jsonOblect)
 
 
     }

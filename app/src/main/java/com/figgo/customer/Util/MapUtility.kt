@@ -88,7 +88,7 @@ object MapUtility {
     }
     fun showDialog(title: String,requireActivity :Context) {
 
-        val builder = AlertDialog.Builder(requireActivity)
+      /*  val builder = AlertDialog.Builder(requireActivity)
         //set title for alert dialog
        // builder.setTitle(R.string.dialogTitle)
         //set message for alert dialog
@@ -105,22 +105,22 @@ object MapUtility {
 
         // Set other dialog properties
         alertDialog.setCancelable(true)
-        alertDialog.show()
+        alertDialog.show()*/
 
-       /* val dialog = Dialog(requireActivity)
+        val dialog = Dialog(requireActivity)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.custom_layout)
         val body = dialog.findViewById(R.id.error) as TextView
        body.text = "Error! We are unable to commmunicate with servers, please try again in few mintues. if still problem persists, kindly contact with Figgo Support. with all the details"
     //  body.text = title
-        val yesBtn = dialog.findViewById(R.id.ok) as Button
+        val yesBtn = dialog.findViewById(R.id.ok) as TextView
         yesBtn.setOnClickListener {
             dialog.dismiss()
         }
 
         dialog.show()
         val window: Window? = dialog.getWindow()
-        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)*/
+        window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
     }
 
 }

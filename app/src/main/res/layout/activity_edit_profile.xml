@@ -111,6 +111,7 @@
                 android:layout_height="45dp"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:orientation="vertical"
+                android:visibility="gone"
                 android:background="@drawable/out_line_box"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:padding="@dimen/_5sdp">
@@ -149,6 +150,7 @@
                 android:layout_height="45dp"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:orientation="vertical"
+                android:visibility="gone"
                 android:background="@drawable/out_line_box"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:padding="@dimen/_5sdp">
@@ -191,7 +193,7 @@
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:padding="@dimen/_5sdp">
 
-                <EditText
+                <TextView
                     android:id="@+id/update_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -241,7 +243,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginStart="6dp"
                     android:textStyle="bold"
-                    android:inputType="number"
+                    android:inputType="textEmailAddress"
                     android:background="@null"
                     android:textSize="12sp"
                     android:textColor="@color/black"/>

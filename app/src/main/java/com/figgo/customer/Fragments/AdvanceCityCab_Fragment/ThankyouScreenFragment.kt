@@ -38,7 +38,7 @@ class ThankyouScreenFragment :  Fragment() {
         var shareimg = view.findViewById<ImageView>(R.id.shareimg)
         var ll_back = view.findViewById<LinearLayout>(R.id.ll_back)
 
-        otpText?.setText("Otp -"+pref.getOtp()+"")
+      //  otpText?.setText("Otp -"+pref.getOtp()+"")
         booking_id?.setText("Booking No -"+pref.getBookingNo()+"")
 
 
