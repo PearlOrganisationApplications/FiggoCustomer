@@ -26,8 +26,11 @@ import android.view.Window
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.figgo.customer.Model.AdvanceCityCabModel
+import com.figgo.customer.Model.OneWayvehiclelistModel
 import com.figgo.customer.R
 import java.lang.Exception
+import java.util.ArrayList
 import java.util.HashMap
 
 object MapUtility {
@@ -38,6 +41,7 @@ object MapUtility {
     var ADDRESS = "address"
     var LATITUDE = "lat"
     var LONGITUDE = "long"
+    var cablistOneWay= ArrayList<OneWayvehiclelistModel>()
     val paramMap = HashMap<Int, HashMap<String,String>>()
     fun isNetworkAvailable(context: Context): Boolean {
         var activeNetworkInfo: NetworkInfo? = null

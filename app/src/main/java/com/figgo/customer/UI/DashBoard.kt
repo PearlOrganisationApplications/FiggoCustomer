@@ -125,17 +125,7 @@ class DashBoard : BaseClass(){
       setContentView(R.layout.a_dashboard)
         prefManager = PrefManager(this@DashBoard)
 
-        prefManager.setType("")
-        prefManager.setToLatL("")
-        prefManager.setToLngL("")
-        prefManager.setToLatM("")
-        prefManager.setToLngM("")
-        prefManager.setTypeC("")
-        prefManager.setToLatLC("")
-        prefManager.setToLngLC("")
-        prefManager.setToLatMC("")
-        prefManager.setToLngMC("")
-        prefManager.setSearchBack("")
+
         Log.d("token",prefManager.getToken())
 
         var window=window
@@ -515,6 +505,17 @@ class DashBoard : BaseClass(){
     }
     override fun onResume(){
         super.onResume()
+        prefManager.setType("")
+        prefManager.setToLatL("")
+        prefManager.setToLngL("")
+        prefManager.setToLatM("")
+        prefManager.setToLngM("")
+        prefManager.setTypeC("")
+        prefManager.setToLatLC("")
+        prefManager.setToLngLC("")
+        prefManager.setToLatMC("")
+        prefManager.setToLngMC("")
+        prefManager.setSearchBack("")
         getLocation()
     }
 

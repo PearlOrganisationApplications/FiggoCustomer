@@ -414,7 +414,14 @@ import android.content.SharedPreferences
      fun getTime():String{
          return pref?.getString("time","null").toString()
      }
+     fun setDate(type:String){
+         editor?.putString("date",type)
+         editor?.commit()
+     }
 
+     fun getDate():String{
+         return pref?.getString("date","null").toString()
+     }
 
      fun setNotify(type:String){
          editor?.putString("notify",type)

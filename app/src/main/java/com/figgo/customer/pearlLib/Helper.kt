@@ -33,6 +33,10 @@ package com.figgo.customer.pearlLib
      var SUBMIT_RATING = baseurl+"submit-rating"
      var UPDATE_PROFILE = baseurl+"update-user-profile"
      var USER_PROFILE = baseurl+"get-user-profile"
+//oneway
+    var ONEWAY_CREATE_RIDE = baseurl+"Oneway/create-oneway-ride"
+    var Vehicle_OneWay = baseurl+"Oneway/select-outstation-vehicle-type"
+
 
 
 }

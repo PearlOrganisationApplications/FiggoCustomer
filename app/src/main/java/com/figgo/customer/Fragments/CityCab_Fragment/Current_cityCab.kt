@@ -411,7 +411,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
      pref.setToLngLC(to_lng.toString())
          pref.setToLatMC(from_lat.toString())
           pref.setToLngMC(from_lng.toString())
-        pref.setTime(datetext?.text.toString())
+        pref.setTime(timetext?.text.toString())
         pref.setLiveLoc( liveLoc?.text.toString())
         pref.setManualLoc( manualLoc?.text.toString())
         progress?.isVisible = true

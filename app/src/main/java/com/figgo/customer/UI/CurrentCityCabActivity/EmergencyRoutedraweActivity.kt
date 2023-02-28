@@ -29,7 +29,6 @@ import com.android.volley.toolbox.Volley
 import com.figgo.cabs.figgodriver.MapData
 import com.figgo.cabs.figgodriver.Service.FireBaseService
 import com.figgo.customer.R
-import com.figgo.customer.UI.CityCabActivity
 import com.figgo.customer.UI.Thankyou_RatingCityCab
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.BaseClass
@@ -717,7 +716,13 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
                                     if (::timer.isInitialized) {
                                         timer.cancel()
                                     }
+                                    val myService = Intent(
+                                        this@EmergencyRoutedraweActivity,
+                                        FireBaseService
 
+                                        ::class.java
+                                    )
+                                    stopService(myService)
                                     val intent = Intent(this@EmergencyRoutedraweActivity, Thankyou_RatingCityCab::class.java)
                                     startActivity(intent)
                                     finish()

@@ -32,7 +32,7 @@ class One_Way_OutStationActivity : AppCompatActivity() {
         var iv_freedom  = findViewById<ImageView>(R.id.iv_freedom)
         var iv_oneway  = findViewById<ImageView>(R.id.iv_oneway)
         var iv_round  = findViewById<ImageView>(R.id.iv_round)
-        var submitoutstation = findViewById<LinearLayout>(R.id.submitoutstation)
+       // var submitoutstation = findViewById<LinearLayout>(R.id.submitoutstation)
         var shareimg = findViewById<ImageView>(R.id.shareimg)
         var backimg = findViewById<ImageView>(R.id.backimg)
        /* var ll_submitfeedom = findViewById<LinearLayout>(R.id.ll_submitfeedom)
@@ -52,9 +52,9 @@ class One_Way_OutStationActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(intent, "Invite Friends"));
         }*/
 
-        submitoutstation.setOnClickListener {
+      /*  submitoutstation.setOnClickListener {
             startActivity(Intent(this, MapsActivity1::class.java))
-        }
+        }*/
 
        /* ll_submitroundtour.setOnClickListener {
             startActivity(Intent(this,MapsActivity1::class.java))
