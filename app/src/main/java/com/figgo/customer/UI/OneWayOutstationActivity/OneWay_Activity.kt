@@ -153,6 +153,11 @@ class OneWay_Activity : BaseClass() {
             Places.initialize(this@OneWay_Activity, apiKey)
         }
         startTimer()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val currentDate = LocalDateTime.now().format(formatter)
+            tv_datetext?.setText(currentDate)
+        }
         submitoutstation1.setOnClickListener {
 
             if (tv_liveloc?.text.toString().equals("")){
@@ -417,7 +422,7 @@ class OneWay_Activity : BaseClass() {
 
                     }
                     val time = selectedHour+":"+selectedMin+":"+selectedSec+""+am_pm+""
-                    tv_datetext?.setText(currentDate)
+                   // tv_datetext?.setText(currentDate)
                     tv_timetext?.setText(time)
                 } else {
                     TODO("VERSION.SDK_INT < O")

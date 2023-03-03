@@ -330,7 +330,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                 timer = object: CountDownTimer(5000000000000000, 500) {
                     override fun onTick(millisUntilFinished: Long) {
                        // val custData = customerRef.child("loc")
-
+                        mMap?.clear()
                         setCurrentLatLon()
 
 
@@ -531,6 +531,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     fun liveRouting(){
 
         mMap?.clear()
@@ -566,7 +567,7 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
         val b3 = bitmapdraw3.bitmap
         val smallMarker3 = Bitmap.createScaledBitmap(b3, width, height, false)
 
-      val markers3 =  mMap?.addMarker(
+        mMap?.addMarker(
             MarkerOptions().position(customerLoc!!)
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker3))
                 .title("My Location")

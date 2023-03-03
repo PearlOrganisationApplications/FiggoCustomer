@@ -140,8 +140,8 @@ class DashBoard : BaseClass(){
         var rides =/* RidesBottom()*/ /*CurrentRidesFragment()*/ RideHistory()
         var more = /*RoundAndTourFragment()*/ CurrentMoreFragment()
         var support = SupportBottomNav()
-        var navView = findViewById<NavigationView>(R.id.navView)
-        var shareimg = findViewById<ImageView>(R.id.shareimg)
+        //var navView = findViewById<NavigationView>(R.id.navView)
+      //  var shareimg = findViewById<ImageView>(R.id.shareimg)
          main = findViewById<LinearLayout>(R.id.main)
         continu = findViewById<Button>(R.id.continu)
         perm = findViewById<LinearLayout>(R.id.perm)
@@ -272,7 +272,9 @@ class DashBoard : BaseClass(){
        var bottom = findViewById<BottomNavigationView>(R.id.navigation_bar)
         var home_top = findViewById<LinearLayout>(R.id.home_top)
         var home_bottom = findViewById<LinearLayout>(R.id.homebottom)
-        var live_loc = findViewById<TextView>(R.id.live_loc)
+        var
+
+                live_loc = findViewById<TextView>(R.id.live_loc)
         bottom.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.home_b->{
@@ -390,6 +392,7 @@ class DashBoard : BaseClass(){
         override fun onLocationChanged(location: Location) {
             locationByGps = location
         }
+
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}

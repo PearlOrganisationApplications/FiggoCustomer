@@ -156,7 +156,7 @@ class PayFragment : Fragment()  {
                     if (response != null) {
 
                         progressDialog.hide()
-                        val amt = "1"
+                        val amt = pref.getPrice()
                         val amount = Math.round(amt.toFloat() * 100).toInt()
                         val checkout = Checkout()
                         checkout.setKeyID("rzp_test_9N5qfy5gXIQ81Y")

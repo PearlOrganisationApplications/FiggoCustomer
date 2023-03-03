@@ -21,6 +21,8 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/appicon"
         android:label="@string/app_name"
+        android:largeHeap="true"
+        android:hardwareAccelerated="false"
         android:roundIcon="@drawable/appicon"
         android:supportsRtl="true"
         tools:targetApi="31">
@@ -55,7 +57,8 @@
             android:exported="false"/>
         <activity android:name="com.figgo.customer.UI.NotificationBellIconActivity"
             android:exported="false"/>
-
+        <activity android:name="com.figgo.customer.UI.AdavanceCityCabActivity.ThankyouScreen"
+            android:exported="false"/>
 
       <activity android:name="com.figgo.customer.UI.TermAndConditionActivity"
           android:exported="false"/>

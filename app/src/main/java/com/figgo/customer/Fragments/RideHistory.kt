@@ -121,7 +121,9 @@ class RideHistory : Fragment() {
                             val time =
                                 it.getJSONObject("data").getJSONArray("all_rides")
                                     .getJSONObject(p).getString("time_only")
-
+                            val ride_id =
+                                it.getJSONObject("data").getJSONArray("all_rides")
+                                    .getJSONObject(p).getJSONObject("ride_details").getString("ride_id")
 
                             val paramMap = HashMap<String, String>()
                             paramMap.put( "booking_id", booking_id);
@@ -132,6 +134,7 @@ class RideHistory : Fragment() {
                             paramMap.put( "date" , date);
                             paramMap.put( "time" , time);
                             paramMap.put( "type" , type);
+                            paramMap.put( "ride_id" , ride_id);
 
 
                             MapUtility.paramMap.put(p,paramMap)

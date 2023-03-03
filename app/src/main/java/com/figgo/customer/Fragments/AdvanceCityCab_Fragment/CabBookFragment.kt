@@ -21,6 +21,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.figgo.customer.pearlLib.PrefManager
 import com.figgo.customer.R
+import com.figgo.customer.UI.AdavanceCityCabActivity.ThankyouScreen
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.Helper
 import com.razorpay.Checkout
@@ -35,13 +36,13 @@ class CabBookFragment : Fragment() {
     var created_at: TextView? = null
     var updated_at: TextView? = null
     var dis1: TextView? = null
-    var dis2: TextView? = null
+    var time: TextView? = null
     var to_loc: TextView? = null
     var from_loc: TextView? = null
     var fare: TextView? = null
     var image: ImageView? = null
     var transaction_id :String ?= ""
-    var thankyouScreenFragment = ThankyouScreenFragment()
+    var thankyouScreenFragment = ThankyouScreen()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -59,7 +60,7 @@ class CabBookFragment : Fragment() {
         created_at = view.findViewById<TextView>(R.id.created_at)
         updated_at = view.findViewById<TextView>(R.id.updated_at)
         dis1 = view.findViewById<TextView>(R.id.dis)
-        dis2 = view.findViewById<TextView>(R.id.dis2)
+        time = view.findViewById<TextView>(R.id.time)
         to_loc = view.findViewById<TextView>(R.id.to_loc)
         from_loc = view.findViewById<TextView>(R.id.from_loc)
         fare = view.findViewById<TextView>(R.id.fare)
@@ -214,8 +215,8 @@ class CabBookFragment : Fragment() {
                                 .getString("created_at")
                             val updatedAt = response.getJSONObject("data").getJSONObject("ride")
                                 .getString("updated_at")
-                            val full_image = response.getJSONObject("data").getJSONObject("vehicle")
-                                .getString("full_image")
+                            val time_only = response.getJSONObject("data").getJSONObject("vehicle")
+                                .getString("time_only")
                             val max_price = response.getJSONObject("data").getJSONObject("vehicle")
                                 .getString("max_price")
                             val min_price = response.getJSONObject("data").getJSONObject("vehicle")
@@ -230,9 +231,10 @@ class CabBookFragment : Fragment() {
                             created_at?.setText(createdAt)
                             updated_at?.setText(updatedAt)
                             dis1?.setText(distance)
-                            dis2?.setText(distance)
+                            time?.setText(time_only)
                             to_loc?.setText(to_location)
                             from_loc?.setText(from_location)
+                            pref.setPrice(max_price)
                             fare?.setText(
                                 "Approx.. fare Rs. " + min_price + " to " + max_price + ",\n                for this ride\nwithout waiting  parking charge\nFinal Price is differ from Approx. "
 

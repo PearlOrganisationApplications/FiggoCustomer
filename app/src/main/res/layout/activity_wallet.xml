@@ -48,7 +48,7 @@
                 android:gravity="center"
                 android:layout_marginTop="@dimen/_32sdp"
                 android:textColor="@color/white"
-                android:text="parments history"
+                android:text="payments history"
                 android:padding="@dimen/_6sdp"/>
 
         </LinearLayout>

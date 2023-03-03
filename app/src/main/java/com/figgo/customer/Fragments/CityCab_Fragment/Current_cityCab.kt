@@ -175,7 +175,11 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
        startTimer()
 
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+           val currentDate = LocalDateTime.now().format(formatter)
+            datetext?.setText(currentDate)
+        }
         calenderimg.setOnClickListener {
             val c = Calendar.getInstance()
             val year = c.get(Calendar.YEAR)
@@ -386,7 +390,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
                     }
                     val time = selectedHour+":"+selectedMin+":"+selectedSec+""+am_pm+""
-                    datetext?.setText(currentDate)
+                  //
                     timetext?.setText(time)
                 } else {
                     TODO("VERSION.SDK_INT < O")
@@ -1113,6 +1117,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         super.onResume()
 
         pref.setSearchBack("")
+
         if (onResu.equals("false")){
             onResu = ""
         }else{

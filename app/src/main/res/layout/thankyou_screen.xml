@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorlightblue"
     android:visibility="visible"
-    tools:context=".Fragments.AdvanceCityCab_Fragment.ThankyouScreenFragment">
+    tools:context=".UI.AdavanceCityCabActivity.ThankyouScreen">
 
 
     <include layout="@layout/headerbackwithnotification"/>

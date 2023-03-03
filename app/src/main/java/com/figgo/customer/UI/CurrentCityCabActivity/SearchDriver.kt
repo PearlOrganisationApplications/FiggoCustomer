@@ -324,13 +324,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
        // onBackPress()
         // intents = intent.getStringExtra("intent").toString()
 
-        if(pref.getNotify().equals("false")) {
-            searchDriver()
 
-        }else  if(pref.getNotify().equals("true")) {
-            getRideStatus()
-
-        }
 
     }
 
@@ -693,7 +687,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         val json = JSONObject()
         json.put("ride_request_id", pref.getReqRideId())
         json.put("ride_id", pref.getride_id())
-        //  Log.d("transac",transaction_id.toString())
+          Log.d("sentData",json.toString())
         //  Log.d("rides",pref.getride_id())
         val jsonOblect: JsonObjectRequest =
             object : JsonObjectRequest(Method.POST, URL, json, object :
@@ -769,6 +763,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                 if (mProgressBar.progress == 100){
                     if (::cTimer.isInitialized) {
                         cTimer.cancel()
+                        finish()
                     }
                     Toast.makeText(this@SearchDriver, "Unable to found nearby drivers...", Toast.LENGTH_LONG).show()
                     val URL = Helper.ride_delete
@@ -967,4 +962,19 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
 
     }
+
+    override fun onResume() {
+        super.onResume()
+
+
+        if(pref.getNotify().equals("false")) {
+            searchDriver()
+
+        }else  if(pref.getNotify().equals("true")) {
+            getRideStatus()
+
+        }
+    }
+
+
 }

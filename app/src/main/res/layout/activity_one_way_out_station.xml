@@ -270,7 +270,7 @@
                         android:layout_marginStart="@dimen/_12sdp"
                         android:layout_weight="0.7"
                         android:background="@drawable/btn_left_corner"
-                        android:hint="Auto Dedect Live location"
+                        android:hint="Auto Detect Live location"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_12sdp" />
 
@@ -320,7 +320,7 @@
                         android:layout_marginStart="@dimen/_12sdp"
                         android:layout_weight="0.7"
                         android:background="@drawable/btn_left_corner"
-                        android:hint="Fill menual"
+                        android:hint="Fill manual"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_12sdp" />
 

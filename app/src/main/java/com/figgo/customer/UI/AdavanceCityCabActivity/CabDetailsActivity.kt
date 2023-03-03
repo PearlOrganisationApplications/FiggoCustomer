@@ -3,14 +3,13 @@ package com.figgo.customer.UI.AdavanceCityCabActivity
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.android.volley.AuthFailureError
@@ -18,7 +17,6 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.figgo.customer.Fragments.AdvanceCityCab_Fragment.ThankyouScreenFragment
 import com.figgo.customer.pearlLib.PrefManager
 import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.R
@@ -33,7 +31,7 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
     lateinit var nav_controller: NavController
     lateinit var mainConst: ConstraintLayout
     var transaction_id :String ?= ""
-    var thankyouScreenFragment = ThankyouScreenFragment()
+    var thankyouScreenFragment = ThankyouScreen()
     lateinit var pref: PrefManager
     override fun setLayoutXml() {
         TODO("Not yet implemented")
@@ -104,7 +102,7 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
         json.put("ride_id", pref.getRideId())
       //  json.put("ride_request_id", pref.getReqRideId())
         Log.d("transac",transaction_id.toString())
-        Log.d("rides",pref.getride_id())
+    //    Log.d("rides",pref.getride_id())
         val jsonOblect: JsonObjectRequest =
             object : JsonObjectRequest(Method.POST, URL, json, object :
                 Response.Listener<JSONObject?>               {
@@ -121,12 +119,14 @@ class CabDetailsActivity : BaseClass(), PaymentResultListener {
 
                           //  pref.setOtp(otp.toString())
                             pref.setBookingNo(booking_no)
+                            startActivity(Intent(this@CabDetailsActivity, ThankyouScreen::class.java))
 
-                            supportFragmentManager.beginTransaction().apply {
+                           /* supportFragmentManager.beginTransaction().apply {
                                 replace(R.id.cabdetailsframe, thankyouScreenFragment)
                                 commit()
                                 mainConst.isVisible = true
-                            }
+
+                            }*/
                         }catch (e:Exception){
                             MapUtility.showDialog(e.toString(),this@CabDetailsActivity)
 

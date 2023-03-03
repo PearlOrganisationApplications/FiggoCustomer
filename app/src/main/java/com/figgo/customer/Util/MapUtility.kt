@@ -115,7 +115,7 @@ object MapUtility {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.custom_layout)
         val body = dialog.findViewById(R.id.error) as TextView
-       body.text = "Error! We are unable to commmunicate with servers, please try again in few mintues. if still problem persists, kindly contact with Figgo Support. with all the details"
+       body.text = "Error! We are unable to commmunicate with servers, please try again in few mintues. if still problem persists, kindly contact with Figgo Support. With all the details"
     //  body.text = title
         val yesBtn = dialog.findViewById(R.id.ok) as TextView
         yesBtn.setOnClickListener {
@@ -126,5 +126,7 @@ object MapUtility {
         val window: Window? = dialog.getWindow()
         window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
     }
+
+
 
 }

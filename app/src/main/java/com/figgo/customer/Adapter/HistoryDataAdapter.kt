@@ -69,17 +69,7 @@ class HistoryDataAdapter(var context:Activity, var historyData:List<HistoryModel
             holder.view.setOnClickListener {
 
 
-                if (historyData.get(position).type.equals("advance_booking")){
 
-                    if (historyData.get(position).status.equals("pending")){
-
-                    }
-
-                }else if (historyData.get(position).type.equals("current_booking")){
-                    if (historyData.get(position).status.equals("pending")){
-
-                    }
-                }
                 context.startActivity(
                     Intent(context, HistoryMapsActivity::class.java)
                         .putExtra("position",position))

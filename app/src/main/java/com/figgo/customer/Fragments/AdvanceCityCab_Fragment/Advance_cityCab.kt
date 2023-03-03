@@ -1,5 +1,6 @@
 package com.figgo.customer.Fragments.AdvanceCityCab_Fragment
 //Neeraj
+
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
@@ -13,10 +14,12 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.format.Time
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -36,12 +39,11 @@ import com.figgo.customer.Adapter.AdvanceCityDataAdapter
 import com.figgo.customer.Model.AdvanceCityCabModel
 import com.figgo.customer.R
 import com.figgo.customer.UI.AdavanceCityCabActivity.CabDetailsActivity
-import com.figgo.customer.UI.IOnBackPressed
 import com.figgo.customer.UI.AdavanceCityCabActivity.LocationPickerActivity
+import com.figgo.customer.UI.IOnBackPressed
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.databinding.ActivityMainBinding
 import com.figgo.customer.databinding.FragmentAdvanceCityCabBinding
-
 import com.figgo.customer.pearlLib.Helper
 import com.figgo.customer.pearlLib.PrefManager
 import com.google.android.gms.common.ConnectionResult
@@ -63,6 +65,7 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import org.json.JSONObject
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -117,6 +120,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
     private var onResu: String? = ""
     lateinit var cTimer : CountDownTimer
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -161,6 +165,16 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
         pref.setToLatMC("")
         pref.setToLngMC("")
         startTimer()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+          val currentDate = LocalDateTime.now().format(formatter)
+            datetext?.setText(currentDate)
+        }else{
+            val df: DateFormat = SimpleDateFormat("yyyy-MM-dd")
+            val date: String = df.format(Calendar.getInstance().time)
+            datetext?.setText(date)
+        }
+
         val apiKey = getString(R.string.api_key)
 
         if (!Places.isInitialized()) {
@@ -199,6 +213,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
                              //dat = (dayOfMonth.toString() + "-" + (monthOfYear + 1) + "-" + year.toString())
                             dat = (year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth.toString())
                         }
+
                         datetext?.setText(dat)
                     },
                     year,
@@ -266,7 +281,37 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
                 Toast.makeText(requireActivity(), "Please select Destination Address", Toast.LENGTH_LONG).show()
 
             }else {
-                submitform()
+
+                val dialog = Dialog(requireActivity())
+                dialog.setCancelable(false)
+                dialog.setContentView(R.layout.confirm_time_dialog)
+
+
+                val yesBtn = dialog.findViewById(R.id.ok) as TextView
+                val canBtn = dialog.findViewById(R.id.cancel) as TextView
+                val time = dialog.findViewById(R.id.time) as TextView
+                time.setText("Are you sure with this date: "+datetext?.text.toString()+"\n and time: "+timetext?.text.toString())
+                yesBtn.setOnClickListener {
+                    dialog.dismiss()
+                    submitform()
+
+                }
+                canBtn.setOnClickListener {
+                    dialog.dismiss()
+                }
+                if (!(requireActivity() as Activity).isFinishing) {
+                    dialog.show()
+                }
+                val window: Window? = dialog.getWindow()
+                window?.setLayout(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+
+
+
+
+
             }
 
         }
@@ -315,7 +360,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
             override fun onTick(millisUntilFinished: Long) {//300000
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                    val currentDate = LocalDateTime.now().format(formatter)
+                     val currentDate = LocalDateTime.now().format(formatter)
 
                     val calendar = Calendar.getInstance()
                     val hour = calendar[Calendar.HOUR_OF_DAY]
@@ -352,10 +397,17 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
 
                     }
                     val time = selectedHour+":"+selectedMin+":"+selectedSec+""+am_pm+""
-                    datetext?.setText(currentDate)
+
                     timetext?.setText(time)
                 } else {
-                    TODO("VERSION.SDK_INT < O")
+                    var today = Time(Time.getCurrentTimezone());
+                    today.setToNow()
+                    var selectedHour : String
+                    var selectedMin : String
+                    var selectedSec : String
+
+
+
                 }
 
             }
@@ -1019,7 +1071,6 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
     }
     override fun onResume() {
         super.onResume()
-
 
 
         if (onResu.equals("false")){
