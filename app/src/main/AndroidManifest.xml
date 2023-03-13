@@ -21,6 +21,8 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/appicon"
         android:label="@string/app_name"
+        android:largeHeap="true"
+        android:hardwareAccelerated="false"
         android:roundIcon="@drawable/appicon"
         android:supportsRtl="true"
         tools:targetApi="31">
@@ -47,21 +49,24 @@
         <activity android:name="com.figgo.customer.UI.Thankyou_RatingCityCab"
             android:exported="false"/>
 
-
+        <activity android:name="com.figgo.customer.UI.AdavanceCityCabActivity.ThankyouScreenAdvProceed"
+            android:exported="false"/>
         <activity android:name="com.figgo.customer.UI.Edit_Profile_Activity"
             android:exported="false"/>
 
         <activity android:name="com.figgo.customer.UI.HistoryMapsActivity"
             android:exported="false"/>
+        <activity android:name="com.figgo.customer.UI.NotificationBellIconActivity"
+            android:exported="false"/>
+        <activity android:name="com.figgo.customer.UI.AdavanceCityCabActivity.ThankyouScreen"
+            android:exported="false"/>
 
-
-      <activity android:name="com.figgo.customer.UI.NotificationBellIconActivity"
-          android:exported="false"/>
       <activity android:name="com.figgo.customer.UI.TermAndConditionActivity"
           android:exported="false"/>
         <activity android:name="com.figgo.customer.UI.CurrentAboutActivity"
             android:exported="false"/>
-
+        <activity android:name="com.figgo.customer.UI.SearchDriverHistory"
+            android:exported="false"/>
        <activity android:name="com.figgo.customer.UI.CancellationPolicy"
            android:exported="false"/>
       <activity android:name="com.figgo.customer.UI.Current_Driver_Details_List"
@@ -84,6 +89,29 @@
         <activity
             android:name="com.figgo.customer.UI.CurrentMap.EmergencyMapsActivity"
             android:exported="false" />
+        <activity
+            android:name="com.figgo.customer.UI.OneWayOutstationActivity.PayActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.figgo.customer.UI.OneWayOutstationActivity.OneWay_Activity"
+            android:exported="false" />
+        <activity
+            android:name="com.figgo.customer.UI.OneWayOutstationActivity.ThankyouScreenOneway"
+            android:exported="false" />
+        <meta-data
+            android:name="android.app.lib_name"
+            android:value="" />
+
+
+        <activity
+            android:name="com.figgo.customer.UI.OneWayOutstationActivity.BookingDestinatiion"
+            android:exported="false" />
+
+        <activity
+            android:name="com.figgo.customer.UI.OneWayOutstationActivity.OneWayCabBookDetails"
+            android:exported="false" />
+
 
 
         <activity

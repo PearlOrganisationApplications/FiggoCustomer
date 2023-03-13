@@ -125,17 +125,7 @@ class DashBoard : BaseClass(){
       setContentView(R.layout.a_dashboard)
         prefManager = PrefManager(this@DashBoard)
 
-        prefManager.setType("")
-        prefManager.setToLatL("")
-        prefManager.setToLngL("")
-        prefManager.setToLatM("")
-        prefManager.setToLngM("")
-        prefManager.setTypeC("")
-        prefManager.setToLatLC("")
-        prefManager.setToLngLC("")
-        prefManager.setToLatMC("")
-        prefManager.setToLngMC("")
-        prefManager.setSearchBack("")
+
         Log.d("token",prefManager.getToken())
 
         var window=window
@@ -150,8 +140,8 @@ class DashBoard : BaseClass(){
         var rides =/* RidesBottom()*/ /*CurrentRidesFragment()*/ RideHistory()
         var more = /*RoundAndTourFragment()*/ CurrentMoreFragment()
         var support = SupportBottomNav()
-        var navView = findViewById<NavigationView>(R.id.navView)
-        var shareimg = findViewById<ImageView>(R.id.shareimg)
+        //var navView = findViewById<NavigationView>(R.id.navView)
+      //  var shareimg = findViewById<ImageView>(R.id.shareimg)
          main = findViewById<LinearLayout>(R.id.main)
         continu = findViewById<Button>(R.id.continu)
         perm = findViewById<LinearLayout>(R.id.perm)
@@ -172,7 +162,7 @@ class DashBoard : BaseClass(){
          liveLoc = findViewById<TextView>(R.id.live_loc)
         var ll_logout = findViewById<LinearLayout>(R.id.ll_logout)
 
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+      //  locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
 
 
@@ -217,6 +207,9 @@ class DashBoard : BaseClass(){
         ll_faqs.setOnClickListener {
             Toast.makeText(this, "Faqs", Toast.LENGTH_LONG).show()
         }
+        ll_helpsupport.setOnClickListener {
+                //Toast.makeText(this, "Faqs", Toast.LENGTH_LONG).show()
+            }
 
 
         img_webview.setOnClickListener {
@@ -279,7 +272,9 @@ class DashBoard : BaseClass(){
        var bottom = findViewById<BottomNavigationView>(R.id.navigation_bar)
         var home_top = findViewById<LinearLayout>(R.id.home_top)
         var home_bottom = findViewById<LinearLayout>(R.id.homebottom)
-        var live_loc = findViewById<TextView>(R.id.live_loc)
+        var
+
+                live_loc = findViewById<TextView>(R.id.live_loc)
         bottom.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.home_b->{
@@ -397,6 +392,7 @@ class DashBoard : BaseClass(){
         override fun onLocationChanged(location: Location) {
             locationByGps = location
         }
+
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}
@@ -512,6 +508,21 @@ class DashBoard : BaseClass(){
     }
     override fun onResume(){
         super.onResume()
+        prefManager.setType("")
+        prefManager.setToLatL("")
+        prefManager.setToLngL("")
+        prefManager.setToLatM("")
+        prefManager.setToLngM("")
+        prefManager.setTypeC("")
+        prefManager.setToLatLC("")
+        prefManager.setToLngLC("")
+        prefManager.setToLatMC("")
+        prefManager.setToLngMC("")
+        prefManager.setSearchBack("")
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
         getLocation()
     }
 

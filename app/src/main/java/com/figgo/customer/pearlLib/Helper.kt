@@ -15,6 +15,7 @@ package com.figgo.customer.pearlLib
      var CHECK_RIDE_REQUEST_STATUS= baseurl+"ride/check-ride-request-status"
      var ACCEPT_CURRENT_CITYRIDE= baseurl+"ride/accept-current-city-ride"
      var UPDATE_CITY_RIDE_PAYMENT_STATUS= baseurl+"ride/update-city-ride-payment-status"
+     var ADVANCE_UPDATE_CITY_RIDE_PAYMENT_STATUS= baseurl+"advance-ride/update-advance-city-ride-payment-status"
      var ENTER_PASSENGER_DETAILS= baseurl+"ride/enter-passenger-details"
      var RIDE_HISTORY= baseurl+"user/ride-history"
      var check_status= baseurl+"check-status"
@@ -30,6 +31,19 @@ package com.figgo.customer.pearlLib
 
      var Ride_Status = baseurl+"ride/check-ride-status"
      var SUBMIT_RATING = baseurl+"submit-rating"
+     var UPDATE_PROFILE = baseurl+"update-user-profile"
+     var USER_PROFILE = baseurl+"get-user-profile"
 
+    var ONEWAY_CREATE_RIDE = baseurl+"Oneway/create-oneway-ride"
+    var Vehicle_OneWay = baseurl+"Oneway/select-outstation-vehicle-type"
+    var ADVANCE_DETAILS_PROCEED = baseurl+"advance-ride/proceed"
+    var ADVANCE_SEARCH_DRIVER = baseurl+"advance-ride/search-driver"
+    var ADVANCE_RIDE_DELETE = baseurl+"advance-ride/get-advance-request-status"
+     var AD_CHECK_RIDE_REQUEST_STATUS= baseurl+"advance-ride/get-advance-request-status"
+
+     var AD_ACCEPT_CITYRIDE= baseurl+""
+     var ONEWAY_UPDATE_CITY_RIDE_PAYMENT_STATUS= baseurl+"Oneway/update-oneway-ride-payment-status"
+
+     var ENTER_PASSENGER_DETAILS_ONEWAY = baseurl+"Oneway/enter-oneway-passenger-details"
 
 }

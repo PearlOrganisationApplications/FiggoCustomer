@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.AuthFailureError
+import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.figgo.customer.Adapter.HistoryDataAdapter
@@ -26,7 +28,8 @@ import com.figgo.customer.pearlLib.PrefManager
 
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.HashMap
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * A simple [Fragment] subclass.
@@ -84,16 +87,7 @@ class RideHistory : Fragment() {
                         Log.d("Data Response", "" + it)
                         var allride: JSONObject = it.getJSONObject("data")
                         var allrideArray: JSONArray = allride.getJSONArray("all_rides")
-                        contentdata.add(
-                            HistoryModel(
-                                "Booking Id",
-                                "To Location",
-                                "From Location",
-                                "Status",
-                                "Distance",
-                                "View","Type"
-                            )
-                        )
+
                         //  ride_details=allrideArray.optJSONObject(1).getJSONObject("ride_detail")
                         //Log.d("Ride Detail ",""+ride_details.toString())
                         for (p in 0..allrideArray.length() - 1) {
@@ -121,6 +115,10 @@ class RideHistory : Fragment() {
                             val time =
                                 it.getJSONObject("data").getJSONArray("all_rides")
                                     .getJSONObject(p).getString("time_only")
+                            val ride_id =
+                                it.getJSONObject("data").getJSONArray("all_rides").getJSONObject(p).getString("id")
+
+
 
 
                             val paramMap = HashMap<String, String>()
@@ -132,6 +130,7 @@ class RideHistory : Fragment() {
                             paramMap.put( "date" , date);
                             paramMap.put( "time" , time);
                             paramMap.put( "type" , type);
+                            paramMap.put( "ride_id" , ride_id);
 
 
                             MapUtility.paramMap.put(p,paramMap)
@@ -143,35 +142,53 @@ class RideHistory : Fragment() {
                                     name1,
                                     status,
                                     actual_distance,
-                                    "View",type
+                                    "View",type,ride_id
                                 )
                             )
                         }
+
+                        contentdata.add(HistoryModel(
+                            "Booking Id",
+                            "To Location",
+                            "From Location",
+                            "Status",
+                            "Distance",
+                            "View","Type","Ride_id"))
+                        Collections.reverse(contentdata)
                         header.adapter = HistoryDataAdapter(requireActivity(),contentdata)
                         header.layoutManager = LinearLayoutManager(requireContext())
                         header.isNestedScrollingEnabled = false
                     }
                     catch (e:Exception){
-                        Toast.makeText(requireContext(),"Server Problem", Toast.LENGTH_SHORT).show()
-                    }
+                        MapUtility.showDialog("",requireActivity())
+                   }
                 }
 
-            },{
 
 
-            }){
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val headers: MutableMap<String, String> = HashMap()
-                headers.put("Authorization", "Bearer " + prefManager.getToken())
-                return headers
-            }
-        }
-        queue.add(jsonObject)
+}, object : Response.ErrorListener {
+    override fun onErrorResponse(error: VolleyError?) {
+        // progressDialog.hide()
+        Log.d("SendData", "error===" + error)
+        // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
 
-
+        MapUtility.showDialog(error.toString(),requireActivity())
     }
+}) {
 
+    @Throws(AuthFailureError::class)
+    override fun getHeaders(): Map<String, String> {
+        val headers: MutableMap<String, String> = java.util.HashMap()
+        headers.put("Content-Type", "application/json; charset=UTF-8");
+        headers.put("Authorization", "Bearer " + prefManager.getToken());
+        headers.put("Accept", "application/vnd.api+json");
+        return headers
+    }
+}
+
+queue.add(jsonObject)
+
+}
     companion object {
         // TODO: Rename parameter arguments, choose names that match
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

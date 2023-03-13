@@ -49,9 +49,9 @@
 
     <fragment
         android:id="@+id/thankyouScreenFragment"
-        android:name="com.figgo.customer.Fragments.AdvanceCityCab_Fragment.ThankyouScreenFragment"
+        android:name="com.figgo.customer.UI.AdavanceCityCabActivity.ThankyouScreen"
         android:label="fragment_thankyou_screen"
-        tools:layout="@layout/fragment_thankyou_screen" >
+        tools:layout="@layout/thankyou_screen" >
        <action
             android:id="@+id/action_thankyouScreenFragment_to_vehicleNumberFragment"
             app:destination="@id/vehicleNumberFragment" />

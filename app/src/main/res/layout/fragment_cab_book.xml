@@ -47,7 +47,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="center"
                 android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:padding="8dp"
+                        android:textStyle="bold"
+                        android:text="Created At :"
+                        android:textColor="#000F3B"
+                        android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/created_at"
@@ -57,7 +74,8 @@
                     android:padding="8dp"
                     android:text="25.10.2022 / 6.00 pm"
                     android:textColor="#000F3B"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -79,7 +97,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/dis2"
+                        android:id="@+id/time"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_8sdp"
@@ -92,6 +110,22 @@
                         android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="8dp"
+                    android:textStyle="bold"
+                    android:text="Updated At :"
+                    android:textColor="#000F3B"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/updated_at"
@@ -101,26 +135,50 @@
                     android:padding="8dp"
                     android:text="25.10.2022 / 6.00 pm"
                     android:textColor="#000F3B"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
 
+            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="6dp"
+                        android:src="@drawable/ic_custmarker"/>
                 <TextView
                     android:id="@+id/to_loc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:padding="8dp"
                     android:text="Sector 34, Chandigarh"
                     android:textColor="#000F3B"
-                    android:textSize="20sp" />
+                    android:layout_marginStart="6dp"
+                    android:textSize="16sp" />
 
+                </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="6dp"
+                    android:src="@drawable/ic_arrival"/>
                 <TextView
                     android:id="@+id/from_loc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginStart="6dp"
                     android:text="Rohani Delhi, India"
                     android:textColor="#000F3B"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
+            </LinearLayout>
 
                 <TextView
                     android:id="@+id/fare"
@@ -131,11 +189,12 @@
                     android:padding="10dp"
                     android:text="Approx.. fare Rs. 125 to 145,\n                for this ride\nwithout waiting  parking charge\nFinal Price is differ from Approx. "
                     android:textColor="#000F3B"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -184,6 +243,7 @@
         android:id="@+id/bottombuttonbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainConst"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UI.AdavanceCityCabActivity.CabDetailsActivity">
@@ -11,27 +12,35 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
+        android:visibility="gone"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@+id/bottombuttonbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/cabbookgraph"
+        tools:ignore="MissingConstraints" />
+
+    <FrameLayout
+        android:id="@+id/cabdetailsframe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        app:navGraph="@navigation/cabbookgraph"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintVertical_bias="0.5" />
 
     <include
-        layout="@layout/bottom_button_layout"
         android:id="@+id/bottombuttonbar"
+        layout="@layout/bottom_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-
-
-
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

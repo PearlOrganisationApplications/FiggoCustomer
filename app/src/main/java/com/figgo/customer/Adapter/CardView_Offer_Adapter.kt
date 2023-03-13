@@ -10,10 +10,14 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+
+
 import com.figgo.customer.pearlLib.PrefManager
 import com.figgo.customer.Model.CurrentVehicle_itemListAdapter
 import com.figgo.customer.R
 import com.figgo.customer.UI.CityCabActivity
+import com.figgo.customer.UI.OneWayOutstationActivity.BookingDestinatiion
+import com.figgo.customer.UI.OneWayOutstationActivity.OneWay_Activity
 import com.figgo.customer.UI.Shared_cab_Activity
 
 class CardView_Offer_Adapter(var context: Activity, var cardoffer_list: ArrayList<CurrentVehicle_itemListAdapter>): RecyclerView.Adapter<CardView_Offer_Adapter.CurrentDriverHolder>() {
@@ -48,7 +52,7 @@ class CardView_Offer_Adapter(var context: Activity, var cardoffer_list: ArrayLis
                     holder.cab_name.setTextColor(Color.WHITE)
                     holder.ll_lnr.setBackgroundColor(Color.parseColor("#A79ECD"))
                   /*  holder.cab_category.setImageResource(R.drawable.intracity)*/
-                    context.startActivity(Intent(context,Shared_cab_Activity::class.java))
+                    context.startActivity(Intent(context, OneWay_Activity::class.java))
                 }
                 2->{
                     holder.cab_name.setTextColor(Color.WHITE)

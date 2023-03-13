@@ -1,85 +1,73 @@
-package com.figgo.customer.UI
+package com.figgo.customer.UI.AdavanceCityCabActivity
 
-import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.*
-import androidx.core.view.isVisible
+import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.figgo.customer.pearlLib.PrefManager
 import com.figgo.customer.R
 import com.figgo.customer.UI.CityCabActivity
 import com.figgo.customer.UI.DashBoard
 import com.figgo.customer.Util.MapUtility
-import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.pearlLib.Helper
-import com.figgo.customer.pearlLib.PrefManager
-import com.squareup.picasso.Picasso
 import org.json.JSONObject
 
-
-class Thankyou_RatingCityCab : BaseClass() {
+class ThankyouScreenAdvProceed :  AppCompatActivity() {
     lateinit var pref: PrefManager
     var booking_id: TextView? = null
     var otpText: TextView? = null
-    var next_button: TextView? = null
-    var book_other: TextView? = null
-    var tv_submit: TextView? = null
-    var tv_later: TextView? = null
-    var close: TextView? = null
-    var shareimg1: ImageView? = null
-    var ll_back: LinearLayout? = null
     var ride_service_rating: RatingBar? = null
     var figgo_service_rating: RatingBar? = null
 
     var rating :Float? = 0.0f
     var rating2 :Float? = 0.0f
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pref = PrefManager(this@Thankyou_RatingCityCab)
-        setLayoutXml()
-        initializeViews()
-        initializeInputs()
-        initializeClickListners()
-
-
-    }
-
-    override fun setLayoutXml() {
-        setContentView(R.layout.fragment_thankyou__rating_)
-    }
-
-    override fun initializeViews() {
-        //  next_button = findViewById<TextView>(R.id.next_button)
-        tv_submit = findViewById<TextView>(R.id.tv_submit)
-        tv_later = findViewById<TextView>(R.id.tv_later)
-      //  close = findViewById<TextView>(R.id.close)
-      //  booking_id = findViewById<TextView>(R.id.booking_id)
-      //  otpText = findViewById<TextView>(R.id.otp)
-
-        // ll_back = findViewById<LinearLayout>(R.id.ll_back)
-         ride_service_rating = findViewById<RatingBar>(R.id.ride_service_rating)
+        setContentView(R.layout.thankyou_screen_proceed)
+       // var next_button = view.findViewById<TextView>(R.id.next_button)
+        var later = findViewById<TextView>(R.id.later)
+        var submit = findViewById<TextView>(R.id.submit)
+        booking_id = findViewById<TextView>(R.id.booking_id)
+        ride_service_rating = findViewById<RatingBar>(R.id.ride_service_rating)
         figgo_service_rating = findViewById<RatingBar>(R.id.figgo_service_rating)
+        pref = PrefManager(this@ThankyouScreenAdvProceed)
+        var shareimg = findViewById<ImageView>(R.id.shareimg)
+        var ll_back = findViewById<LinearLayout>(R.id.ll_back)
+
+        //  otpText?.setText("Otp -"+pref.getOtp()+"")
+        booking_id?.setText("Booking No -"+pref.getBookingNo()+"")
 
 
-    }
+        shareimg.setOnClickListener {
+            var intent= Intent()
+            intent.action= Intent.ACTION_SEND
+            intent.putExtra(Intent.EXTRA_TEXT,"I am Inviting you to join  Figgo App for better experience to book cabs")
+            intent.setType("text/plain")
+            startActivity(Intent.createChooser(intent, "Invite Friends"));
+        }
 
-    @SuppressLint("SuspiciousIndentation")
-    override fun initializeClickListners() {
+        ll_back.setOnClickListener {
+            startActivity(Intent(this@ThankyouScreenAdvProceed, DashBoard::class.java))
+        }
 
 
 
 
-        tv_submit?.setOnClickListener {
-         rating = ride_service_rating?.rating
-        rating2 = figgo_service_rating?.rating
+       /* next_button.setOnClickListener {
+            Navigation.findNavController(view)
+                .navigate(R.id.action_thankyouScreenFragment_to_vehicleNumberFragment)
+        }*/
+
+        submit?.setOnClickListener {
+            rating = ride_service_rating?.rating
+            rating2 = figgo_service_rating?.rating
 
 
             if (rating!! > 1.0){
@@ -94,54 +82,23 @@ class Thankyou_RatingCityCab : BaseClass() {
             }
             postSubmitRating()
 
-          //  Log.d("Thankyou_RatingCityCab","rating   "+rating)
-        }
-
-
-
-        tv_later?.setOnClickListener {
-
-            startActivity(
-                Intent(
-                    this@Thankyou_RatingCityCab,
-                    DashBoard::class.java
-                )
-            )
             //  Log.d("Thankyou_RatingCityCab","rating   "+rating)
         }
 
-
-      /*  book_other?.setOnClickListener {
-
-            startActivity(Intent(this@Thankyou_RatingCityCab, CityCabActivity::class.java))
-
+        later.setOnClickListener {
+            startActivity(Intent(this@ThankyouScreenAdvProceed, DashBoard::class.java))
         }
-        close?.setOnClickListener {
-            startActivity(Intent(this@Thankyou_RatingCityCab, DashBoard::class.java))
-        }*/
-
-
     }
-
-    override fun initializeInputs() {
-      //  otpText?.setText("Otp -" + pref.getOtp() + "")
-     //   booking_id?.setText("Booking No -" + pref.getBookingNo() + "")
-    }
-
-    override fun initializeLabels() {
-        TODO("Not yet implemented")
-    }
-
     private fun postSubmitRating() {
-      val progressDialog = ProgressDialog(this)
+        val progressDialog = ProgressDialog(this)
         progressDialog.show()
         val URL = Helper.SUBMIT_RATING
-     //   Log.d("searchDriver", "json===" +URL )
-      //  Log.d("SendData", pref.getride_id() )
+        //   Log.d("searchDriver", "json===" +URL )
+        //  Log.d("SendData", pref.getride_id() )
         val queue = Volley.newRequestQueue(this)
         val json = JSONObject()
         json.put("driver_id", pref.getdriver_id())
-      //  json.put("driver_id", 646)
+        //  json.put("driver_id", 646)
         json.put("driver_rating", rating)
         json.put("figo_rating", rating2)
         // json.put("ride_id", "1070")
@@ -159,7 +116,7 @@ class Thankyou_RatingCityCab : BaseClass() {
 
                                 startActivity(
                                     Intent(
-                                        this@Thankyou_RatingCityCab,
+                                        this@ThankyouScreenAdvProceed,
                                         DashBoard::class.java
                                     )
                                 )
@@ -174,7 +131,7 @@ class Thankyou_RatingCityCab : BaseClass() {
                             }
 
                         }catch (e:Exception){
-                            MapUtility.showDialog(e.toString(),this@Thankyou_RatingCityCab)
+                            MapUtility.showDialog(e.toString(),this@ThankyouScreenAdvProceed)
 
                         }
                     }
@@ -184,7 +141,7 @@ class Thankyou_RatingCityCab : BaseClass() {
                         Log.d("SendData", "error===" + error)
                         //
 
-                        MapUtility.showDialog(error.toString(),this@Thankyou_RatingCityCab)
+                        MapUtility.showDialog(error.toString(),this@ThankyouScreenAdvProceed)
                     }
                 }) {
 
@@ -203,9 +160,14 @@ class Thankyou_RatingCityCab : BaseClass() {
     }
 
 
+
+
+
     override fun onBackPressed() {
 
-        Toast.makeText(applicationContext, "Unable to back your money already deducted", Toast.LENGTH_LONG).show()
+        Toast.makeText(this@ThankyouScreenAdvProceed, "Unable to back your money already deducted", Toast.LENGTH_LONG).show()
     }
+
+
 
 }

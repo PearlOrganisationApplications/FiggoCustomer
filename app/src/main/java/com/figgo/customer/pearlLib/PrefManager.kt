@@ -80,7 +80,7 @@ import android.content.SharedPreferences
          return pref?.getString("token","null").toString()
      }
 
-     fun setRideId(ride_id:String){
+     fun setRideId(ride_id: String?){
          editor?.putString("ride_id",ride_id)
          editor?.commit()
      }
@@ -414,7 +414,14 @@ import android.content.SharedPreferences
      fun getTime():String{
          return pref?.getString("time","null").toString()
      }
+     fun setDate(type:String){
+         editor?.putString("date",type)
+         editor?.commit()
+     }
 
+     fun getDate():String{
+         return pref?.getString("date","null").toString()
+     }
 
      fun setNotify(type:String){
          editor?.putString("notify",type)

@@ -22,7 +22,7 @@
                     android:background="@drawable/semi"
                     android:layout_gravity="center"
                     android:paddingHorizontal="5dp"
-                    android:src="@drawable/airportcab"
+
                     android:id="@+id/cab"/>
                 <TextView
                     android:id="@+id/rating"

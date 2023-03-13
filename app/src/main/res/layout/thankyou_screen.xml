@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorlightblue"
-    tools:context=".Fragments.AdvanceCityCab_Fragment.ThankyouScreenFragment">
+    android:visibility="visible"
+    tools:context=".UI.AdavanceCityCabActivity.ThankyouScreen">
 
 
     <include layout="@layout/headerbackwithnotification"/>

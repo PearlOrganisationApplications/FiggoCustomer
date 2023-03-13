@@ -35,6 +35,17 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.figgo.customer.Adapter.CurrentVehicleAdapter
+import com.figgo.customer.Model.CurrentModel
+import com.figgo.customer.Model.CurrentVehicleModel
+import com.figgo.customer.R
+import com.figgo.customer.UI.CurrentCityCabActivity.LocationPickerActivityCurr
+import com.figgo.customer.UI.IOnBackPressed
+import com.figgo.customer.Util.MapUtility
+import com.figgo.customer.databinding.ActivityMainBinding
+import com.figgo.customer.databinding.FragmentCurrentCityCabBinding
+import com.figgo.customer.pearlLib.Helper
+import com.figgo.customer.pearlLib.PrefManager
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
@@ -50,17 +61,6 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-import com.figgo.customer.Adapter.CurrentVehicleAdapter
-import com.figgo.customer.Model.CurrentModel
-import com.figgo.customer.Model.CurrentVehicleModel
-import com.figgo.customer.R
-import com.figgo.customer.UI.IOnBackPressed
-import com.figgo.customer.UI.CurrentCityCabActivity.LocationPickerActivityCurr
-import com.figgo.customer.Util.MapUtility
-import com.figgo.customer.databinding.ActivityMainBinding
-import com.figgo.customer.databinding.FragmentCurrentCityCabBinding
-import com.figgo.customer.pearlLib.Helper
-import com.figgo.customer.pearlLib.PrefManager
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -92,12 +92,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
     var to_lng :String ?= ""
     var from_lng :String ?= ""
     lateinit var pref: PrefManager
-    var current_loc:TextView? = null
-    var destination_loc:TextView? = null
-    var to_location_name:String ?= null
-    var from_location_name:String? = null
-    var linear_des:String ? = " "
-    var live_loc:String ? = " "
+
     var selects : String ?= "";
     lateinit var ll_location : LinearLayout
     lateinit var ll_choose_vehicle : LinearLayout
@@ -175,7 +170,11 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
        startTimer()
 
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+           val currentDate = LocalDateTime.now().format(formatter)
+            datetext?.setText(currentDate)
+        }
         calenderimg.setOnClickListener {
             val c = Calendar.getInstance()
             val year = c.get(Calendar.YEAR)
@@ -201,11 +200,13 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
             if (datePickerDialog != null) {
                 datePickerDialog.show()
+                    datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000)
             }
 
         }
         watchimg?.setOnClickListener {
             val cal = Calendar.getInstance()
+            val c = Calendar.getInstance()
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 val am_pm = if (hour < 12) "AM" else "PM"
                 var selectedHour : Int
@@ -219,13 +220,25 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
                         selectedHour = hour
                     }
                 }
-                cal.set(Calendar.HOUR_OF_DAY, selectedHour)
+                cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
                 if (timetext != null) {
                     if (::cTimer.isInitialized) {
                         cTimer.cancel()
                     }
-                    timetext?.text = SimpleDateFormat("HH:mm:ss").format(cal.time)+""+am_pm+""
+
+                  /*  if (cal.getTimeInMillis() >= c.getTimeInMillis()) {
+                        //it's after current
+
+
+                    } else {
+                        //it's before current'
+                        Toast.makeText(requireActivity(), "Invalid Time", Toast.LENGTH_LONG)
+                            .show()
+                    }*/
+                   timetext?.text = SimpleDateFormat("HH:mm:ss").format(cal.time)+""+am_pm+""
+
+
                 }
             }
             TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show()
@@ -386,7 +399,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
 
                     }
                     val time = selectedHour+":"+selectedMin+":"+selectedSec+""+am_pm+""
-                    datetext?.setText(currentDate)
+                  //
                     timetext?.setText(time)
                 } else {
                     TODO("VERSION.SDK_INT < O")
@@ -411,7 +424,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
      pref.setToLngLC(to_lng.toString())
          pref.setToLatMC(from_lat.toString())
           pref.setToLngMC(from_lng.toString())
-        pref.setTime(datetext?.text.toString())
+        pref.setTime(timetext?.text.toString())
         pref.setLiveLoc( liveLoc?.text.toString())
         pref.setManualLoc( manualLoc?.text.toString())
         progress?.isVisible = true
@@ -1113,6 +1126,7 @@ class Current_cityCab : Fragment(), IOnBackPressed, OnMapReadyCallback, GoogleMa
         super.onResume()
 
         pref.setSearchBack("")
+
         if (onResu.equals("false")){
             onResu = ""
         }else{

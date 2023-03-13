@@ -76,8 +76,8 @@ class LoginActivity : AppCompatActivity(){
 
 
         val continuetv = findViewById<TextView>(R.id.continuetv)
-        var forgot_account = findViewById<TextView>(R.id.forgot_account)
-        var google_login_button = findViewById<TextView>(R.id.google_login_button)
+       // var forgot_account = findViewById<TextView>(R.id.forgot_account)
+       // var google_login_button = findViewById<TextView>(R.id.google_login_button)
         cc_number = findViewById<ConstraintLayout>(R.id.cc_number)
         otp_screen = findViewById<CardView>(R.id.otp_screen)
         progress = findViewById<ProgressBar>(R.id.progress)

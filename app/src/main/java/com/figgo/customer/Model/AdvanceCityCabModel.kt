@@ -1,6 +1,7 @@
 package com.figgo.customer.Model
 
-data class AdvanceCityCabModel( var name:String,
+data class
+AdvanceCityCabModel( var name:String,
                                 var image:String,
                                 var rideId:String,
                                 var vehicleId:String,

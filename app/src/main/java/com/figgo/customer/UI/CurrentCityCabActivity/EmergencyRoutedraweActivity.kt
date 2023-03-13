@@ -1,6 +1,8 @@
 package com.figgo.customer.UI.CurrentCityCabActivity
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -13,7 +15,9 @@ import android.location.*
 import android.net.Uri
 import android.os.*
 import android.util.Log
+import android.view.Window
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -24,9 +28,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.figgo.cabs.figgodriver.MapData
 import com.figgo.cabs.figgodriver.Service.FireBaseService
-
 import com.figgo.customer.R
-import com.figgo.customer.UI.NotificationBellIconActivity
 import com.figgo.customer.UI.Thankyou_RatingCityCab
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.BaseClass
@@ -78,7 +80,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     private var count:Int=0
     private var countT:Int=0
     var rideID:Int = 0
-    private var timer: CountDownTimer?=null
+    lateinit var timer: CountDownTimer
     lateinit var fusedLocationProviderClient:FusedLocationProviderClient
     lateinit var context:Context
     var dropLocation: LatLng? = null
@@ -86,6 +88,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     private var provider: String? = null
     var waypoints :LatLng? = null
     var customerLoc:LatLng? = null
+    val points: MutableList<LatLng> = ArrayList<LatLng>()
     private var locationManager: LocationManager? = null
     var activaimg:ImageView? = null
 
@@ -116,10 +119,10 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
         setContentView(R.layout.activity_emergency_routedrawe)
         geocoder= Geocoder(this)
         pref = PrefManager(this@EmergencyRoutedraweActivity)
-        var iv_bellicon = findViewById<ImageView>(R.id.iv_bellicon)
-        var tv_emrgencybtn = findViewById<TextView>(R.id.tv_emrgencybtn)
-        var tv_vehiclenumber = findViewById<TextView>(R.id.tv_vehiclenumber)
-        var iv_drivername = findViewById<TextView>(R.id.iv_drivername)
+     //   var iv_bellicon = findViewById<ImageView>(R.id.iv_bellicon)
+       // var tv_emrgencybtn = findViewById<TextView>(R.id.tv_emrgencybtn)
+      //  var tv_vehiclenumber = findViewById<TextView>(R.id.tv_vehiclenumber)
+      //  var iv_drivername = findViewById<TextView>(R.id.iv_drivername)
         driverimg = findViewById<CircleImageView>(R.id.crl_driverimg)
         activaimg = findViewById<ImageView>(R.id.iv_activaimg)
         var vehiclename = findViewById<TextView>(R.id.vehiclename)
@@ -131,7 +134,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
         var iv_call = findViewById<ImageView>(R.id.iv_call)
         tv_otp = findViewById<TextView>(R.id.tv_otp)
         rideId=pref.getride_id()
-     //   var tv_emrgencybtn = findViewById<TextView>(R.id.tv_emrgencybtn)
+       var tv_emrgencybtn = findViewById<TextView>(R.id.tv_emrgencybtn)
         val profileName=intent.getStringExtra("name")
         val dl_number=intent.getStringExtra("dl_number")
         val veh_number=intent.getStringExtra("veh_number")
@@ -161,96 +164,122 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
         val criteria = Criteria()
         provider = locationManager!!.getBestProvider(criteria, false)
 
-        shareimg()
-        onBackPress()
+//        shareimg()
+  //      onBackPress()
 
-        iv_bellicon.setOnClickListener {
+       /* iv_bellicon.setOnClickListener {
             startActivity(Intent(this, NotificationBellIconActivity::class.java))
-        }
+        }*/
 
         tv_emrgencybtn.setOnClickListener {
-            //startActivity(Intent(this,DriveRatingActivity::class.java))
-            var geocoder: Geocoder
-            val addresses: List<Address>
-            geocoder = Geocoder(this@EmergencyRoutedraweActivity, Locale.getDefault())
 
 
-            var strAdd : String? = null
-            try {
-                val addresses = geocoder.getFromLocation(waypointsLatitude!!, waypointsLongitude!!, 1)
-                if (addresses != null) {
-                    val returnedAddress = addresses[0]
-                    val strReturnedAddress = java.lang.StringBuilder("")
-                    for (i in 0..returnedAddress.maxAddressLineIndex) {
-                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+
+            val dialog = Dialog(this@EmergencyRoutedraweActivity)
+            dialog.setCancelable(false)
+            dialog.setContentView(R.layout.serach_driver_dialog)
+            // val body = dialog.findViewById(R.id.error) as TextView
+
+            val yesBtn = dialog.findViewById(R.id.ok) as TextView
+            val canBtn = dialog.findViewById(R.id.cancel) as TextView
+            yesBtn.setOnClickListener {
+
+                dialog.dismiss()
+                var geocoder: Geocoder
+                val addresses: List<Address>
+                geocoder = Geocoder(this@EmergencyRoutedraweActivity, Locale.getDefault())
+
+
+                var strAdd : String? = null
+                try {
+                    val addresses = geocoder.getFromLocation(waypointsLatitude!!, waypointsLongitude!!, 1)
+                    if (addresses != null) {
+                        val returnedAddress = addresses[0]
+                        val strReturnedAddress = java.lang.StringBuilder("")
+                        for (i in 0..returnedAddress.maxAddressLineIndex) {
+                            strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+                        }
+                        strAdd = strReturnedAddress.toString()
+                        Log.w(" Current loction address", strReturnedAddress.toString())
+                    } else {
+                        Log.w(" Current loction address", "No Address returned!")
                     }
-                    strAdd = strReturnedAddress.toString()
-                    Log.w(" Current loction address", strReturnedAddress.toString())
-                } else {
-                    Log.w(" Current loction address", "No Address returned!")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.w(" Current loction address",  e.printStackTrace().toString())
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Log.w(" Current loction address",  e.printStackTrace().toString())
-            }
-            val URL = Helper.EMERGENCY
-            val queue = Volley.newRequestQueue(this)
-            val json = JSONObject()
-            json.put("ride_id", pref.getride_id())
-            json.put("location_name", strAdd)
-            json.put("lat", waypointsLatitude)
-            json.put("lng", waypointsLongitude)
+                val URL = Helper.EMERGENCY
+                val queue = Volley.newRequestQueue(this)
+                val json = JSONObject()
+                json.put("ride_id", pref.getride_id())
+                json.put("location_name", strAdd)
+                json.put("lat", waypointsLatitude)
+                json.put("lng", waypointsLongitude)
 
-            //  Log.d("transac",transaction_id.toString())
-            //  Log.d("rides",pref.getride_id())
-            val jsonOblect: JsonObjectRequest =
-                object : JsonObjectRequest(Method.POST, URL, json, object :
-                    Response.Listener<JSONObject?>               {
-                    @SuppressLint("SuspiciousIndentation")
-                    override fun onResponse(response: JSONObject?) {
+                //  Log.d("transac",transaction_id.toString())
+                //  Log.d("rides",pref.getride_id())
+                val jsonOblect: JsonObjectRequest =
+                    object : JsonObjectRequest(Method.POST, URL, json, object :
+                        Response.Listener<JSONObject?>               {
+                        @SuppressLint("SuspiciousIndentation")
+                        override fun onResponse(response: JSONObject?) {
 
-                        Log.d("SendData", "response===" + response)
-                        if (response != null) {
-                            try {
+                            Log.d("SendData", "response===" + response)
+                            if (response != null) {
+                                try {
 
-                                val status = response.getString("status")
-                                if (status.equals("true")) {
+                                    val status = response.getString("status")
+                                    if (status.equals("true")) {
 
+                                        /*startActivity(Intent).(this@SearchDriver,EmergencyRoutedraweActivity::class.java))*/
 
-                                    /*startActivity(Intent).(this@SearchDriver,EmergencyRoutedraweActivity::class.java))*/
+                                        Toast.makeText(this@EmergencyRoutedraweActivity, "Figgo Safety Response Team will contact you immediately.. !", Toast.LENGTH_LONG).show()
 
-
-                                } else {
+                                    } else {
+                                        Toast.makeText(this@EmergencyRoutedraweActivity, "Something went wrong!", Toast.LENGTH_LONG).show()
+                                    }
+                                }catch (e:Exception){
+                                    MapUtility.showDialog(e.toString(),this@EmergencyRoutedraweActivity)
 
                                 }
-                            }catch (e:Exception){
-                                MapUtility.showDialog(e.toString(),this@EmergencyRoutedraweActivity)
-
                             }
+
                         }
+                    }, object : Response.ErrorListener {
+                        override fun onErrorResponse(error: VolleyError?) {
+                            // progressDialog.hide()
+                            Log.d("SendData", "error===" + error)
+                            // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
 
+                            MapUtility.showDialog(error.toString(),this@EmergencyRoutedraweActivity)
+                        }
+                    }) {
+
+                        @Throws(AuthFailureError::class)
+                        override fun getHeaders(): Map<String, String> {
+                            val headers: MutableMap<String, String> = java.util.HashMap()
+                            headers.put("Content-Type", "application/json; charset=UTF-8");
+                            headers.put("Authorization", "Bearer " + pref.getToken());
+                            headers.put("Accept", "application/vnd.api+json");
+                            return headers
+                        }
                     }
-                }, object : Response.ErrorListener {
-                    override fun onErrorResponse(error: VolleyError?) {
-                        // progressDialog.hide()
-                        Log.d("SendData", "error===" + error)
-                        // Toast.makeText(this@Current_Driver_Details_List, "Something went wrong!", Toast.LENGTH_LONG).show()
 
-                        MapUtility.showDialog(error.toString(),this@EmergencyRoutedraweActivity)
-                    }
-                }) {
+                queue.add(jsonOblect)
 
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val headers: MutableMap<String, String> = java.util.HashMap()
-                        headers.put("Content-Type", "application/json; charset=UTF-8");
-                        headers.put("Authorization", "Bearer " + pref.getToken());
-                        headers.put("Accept", "application/vnd.api+json");
-                        return headers
-                    }
-                }
+            }
+            canBtn.setOnClickListener {
+                dialog.dismiss()
+            }
+            if (!(this@EmergencyRoutedraweActivity as Activity).isFinishing) {
+                dialog.show()
+            }
+            val window: Window? = dialog.getWindow()
+            window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
-            queue.add(jsonOblect)
+
+
+            //startActivity(Intent(this,DriveRatingActivity::class.java))
 
         }
 
@@ -298,10 +327,10 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                 val urll = getDirectionURL(originLocation, destinationLocation, apiKey)
                // GetDirection(urll).execute()
 
-                timer = object: CountDownTimer(1000000, 500) {
+                timer = object: CountDownTimer(500000, 50000) {
                     override fun onTick(millisUntilFinished: Long) {
                        // val custData = customerRef.child("loc")
-
+                        mMap?.clear()
                         setCurrentLatLon()
 
 
@@ -316,7 +345,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                 }
                 (timer as CountDownTimer).start()
 
-                mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(waypoints!!, 14F))
+              //  mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(waypoints!!, 14F))
 
 
             }
@@ -477,6 +506,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     }
     @SuppressLint("MissingPermission")
     fun setCurrentLatLon(){
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
             override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
@@ -502,6 +532,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     fun liveRouting(){
 
         mMap?.clear()
@@ -512,12 +543,13 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
         //customerLocation = LatLng(cust_lat)
         val height = 80
         val width = 80
+        var markers1 : Marker? = null
 if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
     driverlocation = LatLng(originLatitude, originLongitude)
     val bitmapdraw = resources.getDrawable(R.drawable.driver) as BitmapDrawable
     val b = bitmapdraw.bitmap
     val smallMarker = Bitmap.createScaledBitmap(b, width, height, false)
-    mMap?.addMarker(
+     markers1 = mMap?.addMarker(
         MarkerOptions().position(driverlocation!!)
             .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
             .title("Driver Location")
@@ -526,7 +558,7 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
         val bitmapdraw2 = resources.getDrawable(R.drawable.ic_arrival) as BitmapDrawable
         val b2 = bitmapdraw2.bitmap
         val smallMarker2 = Bitmap.createScaledBitmap(b2, width, height, false)
-        mMap?.addMarker(
+        val markers2 = mMap?.addMarker(
             MarkerOptions().position(dropLocation!!)
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker2))
                 .title("Destination")
@@ -541,20 +573,36 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarker3))
                 .title("My Location")
         )
-        if(count == 0) {
-            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(customerLoc!!, 10F))
+        if(count == 1) {
+
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(customerLoc!!, 11F))
+
         }
         count++
-       /* val circle: Circle = mMap.addCircle(
-            CircleOptions().center(LatLng(waypointsLatitude, waypointsLongitude)).radius(1000.0)
-                .strokeColor(
-                    Color.RED
-                )
-        )
-        circle.isVisible = true
-        getZoomLevel(circle)*/
 
 
+
+
+      /*  val builder = LatLngBounds.Builder()
+
+//the include method will calculate the min and max bound.
+
+//the include method will calculate the min and max bound.
+        builder.include(markers1!!.getPosition())
+        builder.include(markers2!!.getPosition())
+        builder.include(markers3!!.getPosition())
+
+
+        //val bounds = builder.build()
+
+        val widths = resources.displayMetrics.widthPixels
+       // val heights = resources.displayMetrics.heightPixels
+        //val padding = (heights * 0.20).toInt() // offset from edges of the map 10% of screen
+
+
+        val cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, 0)
+
+        mMap!!.animateCamera(cu)*/
         val source = "$originLatitude,$originLongitude"
         val destination = "$destinationLatitude,$destinationLongitude"
         Log.e("Origin ", "$source\n Destination $destination")
@@ -667,7 +715,16 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
                                     if (::cTimer.isInitialized) {
                                         cTimer.cancel()
                                     }
+                                    if (::timer.isInitialized) {
+                                        timer.cancel()
+                                    }
+                                    val myService = Intent(
+                                        this@EmergencyRoutedraweActivity,
+                                        FireBaseService
 
+                                        ::class.java
+                                    )
+                                    stopService(myService)
                                     val intent = Intent(this@EmergencyRoutedraweActivity, Thankyou_RatingCityCab::class.java)
                                     startActivity(intent)
                                     finish()
@@ -707,7 +764,7 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
     }
     fun startTimer() {
 
-        cTimer = object : CountDownTimer(50000000000000, 1000) {
+        cTimer = object : CountDownTimer(500000000000, 1000) {
             override fun onTick(millisUntilFinished: Long) {//300000
                // txtTimer?.setText("seconds remaining: " +""+ (millisUntilFinished / 1000).toString())
 
@@ -728,7 +785,11 @@ if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
         }
         cTimer.start()
     }
+    override fun onBackPressed() {
 
+        Toast.makeText(applicationContext, "Unable to back your money already deducted", Toast.LENGTH_LONG).show()
+    }
 
+   
 }
 
