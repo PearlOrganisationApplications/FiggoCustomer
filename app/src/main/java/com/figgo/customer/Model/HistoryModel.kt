@@ -7,5 +7,6 @@ data class HistoryModel (
     var status:String,
     var distance:String,
     var view:String,
-    var type:String
+    var type:String,
+    var Ride_id:String
         )

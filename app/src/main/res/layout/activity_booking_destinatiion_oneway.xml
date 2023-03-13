@@ -47,7 +47,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginStart="@dimen/_4sdp"
-                                android:text="pic location name"
+                                android:text="pic-up location name"
                                 android:id="@+id/pick_location"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_12sdp" />

@@ -5,9 +5,12 @@ import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -17,7 +20,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.figgo.customer.R
-import com.figgo.customer.UI.AdavanceCityCabActivity.ThankyouScreen
+import com.figgo.customer.UI.AdavanceCityCabActivity.ThankyouScreenAdvProceed
 import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.pearlLib.Helper
@@ -31,6 +34,16 @@ import java.util.HashMap
 class HistoryMapsActivity : BaseClass() , PaymentResultListener {
     var transaction_id :String ?= ""
     lateinit var pref: PrefManager
+    lateinit var cTimer : CountDownTimer
+    lateinit var booking_idtxt : TextView
+    lateinit var to_loctxt : TextView
+    lateinit var from_loctxt : TextView
+    lateinit var statusTxt : TextView
+    lateinit var timeTxt : TextView
+    lateinit var dateTxt : TextView
+    lateinit var payRel : RelativeLayout
+    lateinit var searchRel : LinearLayout
+    var count :Int = 0
     override fun setLayoutXml() {
         TODO("Not yet implemented")
     }
@@ -56,58 +69,63 @@ class HistoryMapsActivity : BaseClass() , PaymentResultListener {
         setContentView(R.layout.activity_history_maps)
         var shareimg = findViewById<ImageView>(R.id.shareimg)
         var backimg = findViewById<ImageView>(R.id.backimg)
-        var booking_idtxt = findViewById<TextView>(R.id.booking_id)
-        var to_loctxt = findViewById<TextView>(R.id.to_loc)
-        var from_loctxt = findViewById<TextView>(R.id.from_loc)
-        var statusTxt = findViewById<TextView>(R.id.status)
-        var continu = findViewById<Button>(R.id.continu)
+        booking_idtxt = findViewById<TextView>(R.id.booking_id)
+         to_loctxt = findViewById<TextView>(R.id.to_loc)
+         from_loctxt = findViewById<TextView>(R.id.from_loc)
+         statusTxt = findViewById<TextView>(R.id.status)
+        var cancel = findViewById<TextView>(R.id.cancel)
+        var pay = findViewById<Button>(R.id.continu)
+         payRel = findViewById<RelativeLayout>(R.id.payRel)
+         searchRel = findViewById<LinearLayout>(R.id.searchRel)
 
-        var dateTxt = findViewById<TextView>(R.id.date)
-        var timeTxt = findViewById<TextView>(R.id.time)
+         dateTxt = findViewById<TextView>(R.id.date)
+        var search = findViewById<TextView>(R.id.search)
+       // var reject = findViewById<TextView>(R.id.reject)
+         timeTxt = findViewById<TextView>(R.id.time)
         var iv_bellicon = findViewById<ImageView>(R.id.iv_bellicon)
         pref = PrefManager(this@HistoryMapsActivity)
 
         shareimg()
         onBackPress()
 
+        startTimer()
 
-        val pos = intent.getIntExtra("position",-1)
+        val ride_id = intent.getStringExtra("ride_id")!!
 
-        val hashmap = MapUtility.paramMap.get(pos-1)
+    /*   val hashmap = MapUtility.paramMap.get(pos-1)
 
 
-        val booking_id = hashmap?.get("booking_id")
+       val booking_id = hashmap?.get("booking_id")
         val to_loc = hashmap?.get("to_loc")
         val from_loc = hashmap?.get("from_loc")
         val status = hashmap?.get("status")
         val date = hashmap?.get("date")
         val time = hashmap?.get("time")
-        val type = hashmap?.get("type")
-        val ride_id = hashmap?.get("ride_id")
+                val ride_id = hashmap?.get("ride_id")
+       */
 
-        if (ride_id != null) {
+
+
             pref.setRideId(ride_id)
-        }
-        booking_idtxt.setText(booking_id)
-        to_loctxt.setText(to_loc)
-        from_loctxt.setText(from_loc)
-        statusTxt.setText(status)
-        dateTxt.setText(date)
-        timeTxt.setText(time)
-        if (type.equals("advance_booking")){
 
-            if (status.equals("accepted")){
+        Log.d("rite_id",pref.getRideId())
 
-                continu.isVisible = true
-            }
 
-        }
 
         iv_bellicon.setOnClickListener {
             startActivity(Intent(this, NotificationBellIconActivity::class.java))
         }
+        cancel.setOnClickListener {
+          //  startActivity(Intent(this, DashBoard::class.java))
+            finish()
+        }
 
-        continu.setOnClickListener {
+        search.setOnClickListener {
+            pref.setNotify("false")
+            startActivity(Intent(this, SearchDriverHistory::class.java))
+        }
+
+        pay.setOnClickListener {
             val amt = 1
             val amount = Math.round(amt.toFloat() * 100).toInt()
             val checkout = Checkout()
@@ -131,6 +149,26 @@ class HistoryMapsActivity : BaseClass() , PaymentResultListener {
         }
 
     }
+    fun startTimer() {
+
+        cTimer = object : CountDownTimer(300000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {//300000
+                if (count % 10 ==  0) {
+                    getDetails()
+
+                    // Toast.makeText(this@SearchDriver, "fetching driver...", Toast.LENGTH_LONG).show()
+
+                }
+                count++
+            }
+
+            override fun onFinish() {
+                startTimer()
+
+            }
+        }
+        cTimer.start()
+    }
 
     override fun onPaymentSuccess(s: String?) {
 
@@ -149,6 +187,110 @@ class HistoryMapsActivity : BaseClass() , PaymentResultListener {
         Toast.makeText(this@HistoryMapsActivity, "Payment failed$i", Toast.LENGTH_SHORT).show()
 
     }
+
+
+    private fun getDetails() {
+
+        val URL = Helper.ADVANCE_DETAILS_PROCEED
+        val queue = Volley.newRequestQueue(this@HistoryMapsActivity)
+        val json = JSONObject()
+
+        json.put("ride_id", pref.getRideId())
+        //  json.put("ride_request_id", pref.getReqRideId())
+        // Log.d("transac",transaction_id.toString())
+        //  Log.d("rides",pref.getride_id())
+        val jsonOblect: JsonObjectRequest =
+            object : JsonObjectRequest(Method.POST, URL, json, object :
+                Response.Listener<JSONObject?>               {
+                @SuppressLint("SuspiciousIndentation")
+                override fun onResponse(response: JSONObject?) {
+
+                    Log.d("SendData", "response===" + response)
+                    if (response != null) {
+                        try {
+
+
+                          //  val booking_no = response.getJSONObject("ride").getString("booking_id")
+                            // val otp = response.getInt("otp")
+
+                            //  pref.setOtp(otp.toString())
+                            val booking_id = response.getJSONObject("ride").getString("booking_id")
+                            val to_loc = response.getJSONObject("ride").getJSONObject("to_location").getString("name")
+                            val from_loc = response.getJSONObject("ride").getJSONObject("from_location").getString("name")
+                            val status = response.getJSONObject("ride").getString("status")
+                            val date = response.getJSONObject("ride").getString("date_only")
+                            val time = response.getJSONObject("ride").getString("time_only")
+                            val type = response.getJSONObject("ride").getString("type")
+                            val price = response.getJSONObject("ride").getString("price")
+                            pref.setToLatL(response.getJSONObject("ride")
+                                .getJSONObject("to_location").getString("lat"))
+                            pref.setToLngL(response.getJSONObject("ride")
+                                .getJSONObject("to_location").getString("lng"))
+
+                            pref.setToLatM(response.getJSONObject("ride")
+                                .getJSONObject("from_location").getString("lat"))
+                            pref.setToLngM(response.getJSONObject("ride")
+                                .getJSONObject("from_location").getString("lng"))
+                            booking_idtxt.setText(booking_id)
+                            to_loctxt.setText(to_loc)
+                            from_loctxt.setText(from_loc)
+                            statusTxt.setText(status)
+                            dateTxt.setText(date)
+                            timeTxt.setText(time)
+                            pref.setTime(time)
+                            pref.setPrice(price)
+
+
+
+                            Log.d("type",type)
+                            Log.d("status",status)
+                            if (type.equals("advance_booking")){
+
+                                if (status.equals("accepted")){
+
+                                    payRel.isVisible = true
+                                    searchRel.isVisible = false
+                                }else if (status.equals("pending")){
+                                    payRel.isVisible = false
+                                    searchRel.isVisible = true
+                                }
+
+                            }else{
+                                payRel.isVisible = false
+                                searchRel.isVisible = false
+                            }
+
+                        }catch (e:Exception){
+                            MapUtility.showDialog(e.toString(),this@HistoryMapsActivity)
+
+                        }
+                    }
+
+                }
+            }, object : Response.ErrorListener {
+                override fun onErrorResponse(error: VolleyError?) {
+                    Log.d("SendData", "error===" + error)
+
+                    //Toast.makeText(this@CabDetailsActivity, "Something went wrong!", Toast.LENGTH_LONG).show()
+                    MapUtility.showDialog(error.toString(),this@HistoryMapsActivity)
+                }
+            }) {
+
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val headers: MutableMap<String, String> = HashMap()
+                    headers.put("Content-Type", "application/json; charset=UTF-8");
+                    headers.put("Authorization", "Bearer " + pref.getToken());
+                    headers.put("Accept", "application/vnd.api+json");
+                    return headers
+                }
+            }
+
+        queue.add(jsonOblect)
+
+    }
+
+
 
     private fun getOtp() {
         val progressDialog = ProgressDialog(this@HistoryMapsActivity)
@@ -178,7 +320,7 @@ class HistoryMapsActivity : BaseClass() , PaymentResultListener {
 
                             //  pref.setOtp(otp.toString())
                             pref.setBookingNo(booking_no)
-                            startActivity(Intent(this@HistoryMapsActivity, ThankyouScreen::class.java))
+                            startActivity(Intent(this@HistoryMapsActivity, ThankyouScreenAdvProceed::class.java))
 
                             /* supportFragmentManager.beginTransaction().apply {
                                  replace(R.id.cabdetailsframe, thankyouScreenFragment)
@@ -215,5 +357,7 @@ class HistoryMapsActivity : BaseClass() , PaymentResultListener {
         queue.add(jsonOblect)
 
     }
-
+    override fun onBackPressed() {
+        finish()
+    }
 }

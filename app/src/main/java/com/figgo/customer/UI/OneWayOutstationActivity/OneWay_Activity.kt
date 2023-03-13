@@ -458,7 +458,7 @@ class OneWay_Activity : BaseClass() {
         json.put("to_lng", to_lng)
         json.put("from_lat", from_lat)
         json.put("from_lng", from_lng)
-        json.put("type", "advance_booking")
+      //  json.put("type", "advance_booking")
         json.put("to_location_name", tv_liveloc?.text.toString())
         json.put("from_location_name", tv_manualloc?.text.toString())
 

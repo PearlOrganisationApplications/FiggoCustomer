@@ -72,7 +72,7 @@ class HistoryDataAdapter(var context:Activity, var historyData:List<HistoryModel
 
                 context.startActivity(
                     Intent(context, HistoryMapsActivity::class.java)
-                        .putExtra("position",position))
+                        .putExtra("ride_id",historyData.get(position).Ride_id))
                 // .putExtra("driver_id",OneWayListRatingVehicle.driver_id))
 
             }

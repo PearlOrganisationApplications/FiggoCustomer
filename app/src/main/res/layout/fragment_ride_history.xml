@@ -46,7 +46,7 @@
          android:gravity="center_horizontal"
          android:textAllCaps="true"
          android:text="Ride History"
-        android:textColor="@color/gray_8ba6c1"
+        android:textColor="@color/black"
          android:textStyle="bold"
          />
 
@@ -56,7 +56,7 @@
      <LinearLayout
          android:background="@color/gray_8ba6c1"
          android:layout_marginTop="20dp"
-         android:layout_marginBottom="20dp"
+         android:layout_marginBottom="80dp"
          android:id="@+id/attendanceContainer"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"

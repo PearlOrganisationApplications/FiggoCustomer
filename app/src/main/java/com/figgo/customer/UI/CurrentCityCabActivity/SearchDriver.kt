@@ -5,9 +5,11 @@ import android.app.*
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.os.Bundle
-import android.os.CountDownTimer
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.location.Geocoder
+import android.os.*
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -19,6 +21,8 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.figgo.cabs.figgodriver.MapData
+import com.figgo.cabs.figgodriver.Service.FireBaseService
 import com.figgo.customer.R
 import com.figgo.customer.UI.CityCabActivity
 import com.figgo.customer.UI.PaymentMethodActivity
@@ -26,18 +30,37 @@ import com.figgo.customer.Util.MapUtility
 import com.figgo.customer.pearlLib.BaseClass
 import com.figgo.customer.pearlLib.Helper
 import com.figgo.customer.pearlLib.PrefManager
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.*
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
+import com.google.android.libraries.places.api.Places
+import com.google.gson.Gson
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONObject
+import java.util.ArrayList
 
 
-class SearchDriver : BaseClass() , PaymentResultListener {
+class SearchDriver : BaseClass() , PaymentResultListener, OnMapReadyCallback {
     lateinit var pref: PrefManager
     lateinit var progressDialog:ProgressDialog
     lateinit var cTimer : CountDownTimer
     var count :Int = 0
+    var count1 :Int = 0
     var txtTimer: TextView? = null
     var txtPer: TextView? = null
     var transaction_id :String ?= ""
@@ -76,6 +99,23 @@ class SearchDriver : BaseClass() , PaymentResultListener {
     private val channelId = "i.apps.notifications"
     private val description = "Driver Found"
     var paymentMethodActivity = PaymentMethodActivity()
+    private var originLatitude: Double = 28.5021359
+    private var originLongitude: Double = 77.4054901
+    private var destinationLatitude: Double = 28.5151087
+    private var destinationLongitude: Double = 77.3932163
+    private var waypointsLatitude : Double = 28.5151087
+    private var waypointsLongitude : Double = 77.3932163
+    lateinit var geocoder: Geocoder
+    var rideId:String=""
+    private lateinit var driverlocation:LatLng
+    private var mMap: GoogleMap? = null
+    var destination:MarkerOptions? = null
+    lateinit var timer : CountDownTimer
+    var customerLoc:LatLng? = null
+    var driverLoc:LatLng? = null
+    var dropLocation: LatLng? = null
+    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
     override fun setLayoutXml() {
         TODO("Not yet implemented")
     }
@@ -140,6 +180,21 @@ class SearchDriver : BaseClass() , PaymentResultListener {
         mainConst?.isVisible = true
 
         tv_accept.setOnClickListener {
+
+
+            if (::cTimer.isInitialized) {
+                cTimer.cancel()
+            }
+            if (::timer.isInitialized) {
+                timer.cancel()
+            }
+            val myService = Intent(
+                this@SearchDriver,
+                FireBaseService
+
+                ::class.java
+            )
+            stopService(myService)
             showPendingPopup()
         }
 /*        iv_bellicon.setOnClickListener {
@@ -153,8 +208,8 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
             val dialog = Dialog(this@SearchDriver)
             dialog.setCancelable(false)
-            dialog.setContentView(R.layout.emergency_dialog)
-           // val body = dialog.findViewById(R.id.error) as TextView
+            dialog.setContentView(R.layout.serach_driver_dialog)
+            val body = dialog.findViewById(R.id.error) as TextView
 
             val yesBtn = dialog.findViewById(R.id.ok) as TextView
             val canBtn = dialog.findViewById(R.id.cancel) as TextView
@@ -318,15 +373,271 @@ class SearchDriver : BaseClass() , PaymentResultListener {
 
         }*/
 
-
+        rideId=pref.getride_id()
         pref.setSearchBack("1")
        // shareimg()
        // onBackPress()
         // intents = intent.getStringExtra("intent").toString()
 
+        val apiKey = getString(R.string.api_key)
+
+        // Initializing the Places API with the help of our API_KEY
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, apiKey)
+        }
+
+
+        // Map Fragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        setCurrentLatLon()
+        destinationLatitude = pref.getToLatMC().toDouble()
+        destinationLongitude = pref.getToLngMC().toDouble()
+
+        mapFragment.getMapAsync {
+            mMap = it
+            val originLocation = LatLng(originLatitude, originLongitude)
+            mMap!!.addMarker(MarkerOptions().position(originLocation))
+            val destinationLocation = LatLng(destinationLatitude, destinationLongitude)
+            mMap!!.addMarker(MarkerOptions().position(destinationLocation))
+            val urll = getDirectionURL(originLocation, destinationLocation, apiKey)
+            // GetDirection(urll).execute()
+
+            timer = object: CountDownTimer(5000000000000000, 500) {
+                override fun onTick(millisUntilFinished: Long) {
+                    // val custData = customerRef.child("loc")
+                    mMap?.clear()
+                    setCurrentLatLon()
+
+
+                    Log.d("rideId",rideId)
+
+
+
+                }
+                override fun onFinish() {
+
+                }
+            }
+            (timer as CountDownTimer).start()
+
+            //  mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(waypoints!!, 14F))
+
+
+        }
 
 
     }
+
+
+
+
+
+
+
+
+
+    override fun onMapReady(p0: GoogleMap) {
+        mMap =p0
+    }
+
+    private fun getDirectionURL(origin: LatLng, dest: LatLng, secret: String) : String{
+
+       // waypoints = LatLng(waypointsLatitude.toDouble() , waypointsLongitude.toDouble())
+        return "https://maps.googleapis.com/maps/api/directions/json?origin=${waypointsLatitude},${waypointsLongitude}" +
+                "&destination=${dest.latitude},${dest.longitude}" +
+                "&sensor=false" +
+                "&mode=driving" +
+                "&key=$secret"
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetDirection(val url : String) : AsyncTask<Void, Void, List<List<LatLng>>>(){
+        override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
+            val client = OkHttpClient()
+            val request = Request.Builder().url(url).build()
+            val response = client.newCall(request).execute()
+            val data = response.body?.string()
+            Log.d("SEND DATA"," data ===="+ data )
+
+            val result =  ArrayList<List<LatLng>>()
+            try{
+                val respObj = Gson().fromJson(data, MapData::class.java)
+                val path =  ArrayList<LatLng>()
+                for (i in 0 until respObj.routes[0].legs[0].steps.size){
+                    path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
+                }
+                result.add(path)
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+            return result
+        }
+
+        override fun onPostExecute(result: List<List<LatLng>>) {
+            val lineoption = PolylineOptions()
+            for (i in result.indices){
+                lineoption.addAll(result[i])
+                lineoption.width(10f)
+                lineoption.color(Color.GREEN)
+                lineoption.geodesic(true)
+                /* lineoption.startCap()
+                 if (result.lastIndex.equals(LatLng(destinationLatitude, destinationLongitude))){
+
+                 }*/
+            }
+            mMap?.addPolyline(lineoption)
+        }
+    }
+    fun decodePolyline(encoded: String): List<LatLng> {
+        val poly = ArrayList<LatLng>()
+        var index = 0
+        val len = encoded.length
+        var lat = 0
+        var lng = 0
+        while (index < len) {
+            var b: Int
+            var shift = 0
+            var result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lat += dlat
+            shift = 0
+            result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lng += dlng
+            val latLng = LatLng((lat.toDouble() / 1E5),(lng.toDouble() / 1E5))
+            poly.add(latLng)
+        }
+        return poly
+    }
+
+    @SuppressLint("MissingPermission")
+    fun setCurrentLatLon(){
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
+            override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
+
+            override fun isCancellationRequested() = false
+        })
+            .addOnSuccessListener { location: android.location.Location? ->
+                if (location == null)
+                    Toast.makeText(this, "Cannot get location.", Toast.LENGTH_SHORT).show()
+                else {
+                    waypointsLatitude = location.latitude
+                    //pref.setlatitude(originLatitude.toFloat())
+                    waypointsLongitude = location.longitude
+
+                    originLatitude = pref.getDriverlat().toDouble()
+                    originLongitude = pref.getDriverlng().toDouble()
+                    liveRouting()
+                    //pref.setlongitude(originLongitude.toFloat())
+                    //Toast.makeText(this,"Lat :"+lat+"\nLong: "+long, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    fun liveRouting(){
+
+        mMap?.clear()
+
+
+        dropLocation  = LatLng(destinationLatitude, destinationLongitude)
+        customerLoc = LatLng(waypointsLatitude,waypointsLongitude)
+        //customerLocation = LatLng(cust_lat)
+        val height = 80
+        val width = 80
+        var markers1 : Marker? = null
+        if(destinationLatitude>=0.000&&destinationLongitude>=0.00) {
+            driverlocation = LatLng(originLatitude, originLongitude)
+            val bitmapdraw = resources.getDrawable(R.drawable.driver) as BitmapDrawable
+            val b = bitmapdraw.bitmap
+            val smallMarker = Bitmap.createScaledBitmap(b, width, height, false)
+            markers1 = mMap?.addMarker(
+                MarkerOptions().position(driverlocation!!)
+                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+                    .title("Driver Location")
+            )
+        }
+        val bitmapdraw2 = resources.getDrawable(R.drawable.ic_arrival) as BitmapDrawable
+        val b2 = bitmapdraw2.bitmap
+        val smallMarker2 = Bitmap.createScaledBitmap(b2, width, height, false)
+        val markers2 = mMap?.addMarker(
+            MarkerOptions().position(dropLocation!!)
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker2))
+                .title("Destination")
+        )
+
+        val bitmapdraw3 = resources.getDrawable(R.drawable.ic_custmarker) as BitmapDrawable
+        val b3 = bitmapdraw3.bitmap
+        val smallMarker3 = Bitmap.createScaledBitmap(b3, width, height, false)
+
+        mMap?.addMarker(
+            MarkerOptions().position(customerLoc!!)
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker3))
+                .title("My Location")
+        )
+        if(count1 == 1) {
+
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(customerLoc!!, 11F))
+
+        }
+        count1++
+
+
+
+
+        /*  val builder = LatLngBounds.Builder()
+
+  //the include method will calculate the min and max bound.
+
+  //the include method will calculate the min and max bound.
+          builder.include(markers1!!.getPosition())
+          builder.include(markers2!!.getPosition())
+          builder.include(markers3!!.getPosition())
+
+
+          //val bounds = builder.build()
+
+          val widths = resources.displayMetrics.widthPixels
+         // val heights = resources.displayMetrics.heightPixels
+          //val padding = (heights * 0.20).toInt() // offset from edges of the map 10% of screen
+
+
+          val cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, 0)
+
+          mMap!!.animateCamera(cu)*/
+        val source = "$originLatitude,$originLongitude"
+        val destination = "$destinationLatitude,$destinationLongitude"
+        Log.e("Origin ", "$source\n Destination $destination")
+        //GetDirection().execute(source, destination)
+        var url:String=getDirectionURL(driverlocation!!, dropLocation!!,"AIzaSyCbd3JqvfSx0p74kYfhRTXE7LZghirSDoU")
+        GetDirection(url).execute()
+        Handler().postDelayed({
+            //do something
+        }, 5000)
+    }
+    /* fun getZoomLevel(circle: Circle?): Int {
+         if (circle != null) {
+             val radius = circle.radius
+             val scale = radius / 500
+             zoomLevel = (16 - Math.log(scale) / Math.log(2.0)).toInt()
+         }
+         return zoomLevel
+     }*/
 
 
 
@@ -572,7 +883,7 @@ class SearchDriver : BaseClass() , PaymentResultListener {
                             val status = response.getString("status")
 
                             if (status.equals("true")) {
-
+                                startService(Intent(this@SearchDriver, FireBaseService::class.java))
                                 if(pref.getNotify().equals("false")) {
                                     addNotification()
                                 }else  if(pref.getNotify().equals("true")) {

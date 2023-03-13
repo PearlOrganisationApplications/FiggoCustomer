@@ -80,7 +80,7 @@ import android.content.SharedPreferences
          return pref?.getString("token","null").toString()
      }
 
-     fun setRideId(ride_id:String){
+     fun setRideId(ride_id: String?){
          editor?.putString("ride_id",ride_id)
          editor?.commit()
      }

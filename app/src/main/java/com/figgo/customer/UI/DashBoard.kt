@@ -162,7 +162,7 @@ class DashBoard : BaseClass(){
          liveLoc = findViewById<TextView>(R.id.live_loc)
         var ll_logout = findViewById<LinearLayout>(R.id.ll_logout)
 
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+      //  locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
 
 
@@ -519,6 +519,10 @@ class DashBoard : BaseClass(){
         prefManager.setToLatMC("")
         prefManager.setToLngMC("")
         prefManager.setSearchBack("")
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
         getLocation()
     }
 

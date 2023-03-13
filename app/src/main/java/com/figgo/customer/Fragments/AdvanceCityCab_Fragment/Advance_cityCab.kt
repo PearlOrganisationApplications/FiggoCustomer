@@ -111,8 +111,6 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
     private var hasNetwork = false
     private var locationByGps: Location? = null
     private var locationByNetwork: Location? = null
-    private var lastKnownLocationByGps: Location? = null
-    private lateinit var googleApiClient: GoogleApiClient
     var press : String ?= "";
     var datetext: TextView? = null
     var timetext: TextView? = null
@@ -128,7 +126,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
         return binding.root
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission", "SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         pref = PrefManager(requireActivity())
@@ -224,6 +222,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
 
             if (datePickerDialog != null) {
                 datePickerDialog.show()
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000)
             }
 
         }
@@ -252,6 +251,7 @@ class Advance_cityCab : Fragment(), OnMapReadyCallback, GoogleApiClient.Connecti
                 }
             }
             TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show()
+
         }
 
         manualLoc?.setOnClickListener {

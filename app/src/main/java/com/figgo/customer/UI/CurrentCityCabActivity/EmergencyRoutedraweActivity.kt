@@ -327,7 +327,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
                 val urll = getDirectionURL(originLocation, destinationLocation, apiKey)
                // GetDirection(urll).execute()
 
-                timer = object: CountDownTimer(5000000000000000, 500) {
+                timer = object: CountDownTimer(500000, 50000) {
                     override fun onTick(millisUntilFinished: Long) {
                        // val custData = customerRef.child("loc")
                         mMap?.clear()
@@ -506,6 +506,7 @@ class EmergencyRoutedraweActivity : BaseClass(), OnMapReadyCallback{
     }
     @SuppressLint("MissingPermission")
     fun setCurrentLatLon(){
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
             override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token

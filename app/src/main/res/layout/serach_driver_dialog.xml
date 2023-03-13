@@ -31,21 +31,24 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:orientation="horizontal">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/cancel"
-        android:text="Cancel"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="20dp"
-        android:background="@color/white"
-        android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/white"
+                android:text="Cancel"
+                android:padding="@dimen/_4sdp"
+                android:textSize="16sp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
             android:id="@+id/ok"
             android:text="OK"
+            android:padding="@dimen/_4sdp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="8dp"
             android:layout_alignParentEnd="true"

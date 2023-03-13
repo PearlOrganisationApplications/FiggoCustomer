@@ -33,10 +33,17 @@ package com.figgo.customer.pearlLib
      var SUBMIT_RATING = baseurl+"submit-rating"
      var UPDATE_PROFILE = baseurl+"update-user-profile"
      var USER_PROFILE = baseurl+"get-user-profile"
-//oneway
+
     var ONEWAY_CREATE_RIDE = baseurl+"Oneway/create-oneway-ride"
     var Vehicle_OneWay = baseurl+"Oneway/select-outstation-vehicle-type"
+    var ADVANCE_DETAILS_PROCEED = baseurl+"advance-ride/proceed"
+    var ADVANCE_SEARCH_DRIVER = baseurl+"advance-ride/search-driver"
+    var ADVANCE_RIDE_DELETE = baseurl+"advance-ride/get-advance-request-status"
+     var AD_CHECK_RIDE_REQUEST_STATUS= baseurl+"advance-ride/get-advance-request-status"
 
+     var AD_ACCEPT_CITYRIDE= baseurl+""
+     var ONEWAY_UPDATE_CITY_RIDE_PAYMENT_STATUS= baseurl+"Oneway/update-oneway-ride-payment-status"
 
+     var ENTER_PASSENGER_DETAILS_ONEWAY = baseurl+"Oneway/enter-oneway-passenger-details"
 
 }
